@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-space: #050505;
+    --text-primary: #f5f5f5;
+    --cyan-accent: #00f0ff;
+    --citrus-neon: #ccff00;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #050505;
+    color: #f5f5f5;
+  }
+  
+  ::selection {
+    background-color: #00f0ff;
+    color: #050505;
+  }
+}
+
+/* Engineering Grid Texture */
+.bg-grid-pattern {
+  background-size: 48px 48px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
+
+.bg-radial-mask {
+  mask-image: radial-gradient(circle at center, black 40%, transparent 85%);
+  -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 85%);
+}
+
+/* Subtle Film Grain */
+.bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.035'/%3E%3C/svg%3E");
+}
+
+/* Hollow / Outlined Typography for "Slow Website" */
+.hollow-text {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(245, 245, 245, 0.45);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hollow-text:hover {
+  -webkit-text-stroke: 1.5px #00f0ff;
+  color: rgba(0, 240, 255, 0.1);
+  text-shadow: 0 0 35px rgba(0, 240, 255, 0.6);
+}
+
+/* Premium Glow Effects */
+.glow-cyan-btn {
+  box-shadow: 0 0 25px -4px rgba(0, 240, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.glow-cyan-btn:hover {
+  box-shadow: 0 0 40px 2px rgba(0, 240, 255, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.glow-citrus-btn {
+  box-shadow: 0 0 25px -4px rgba(204, 255, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.glow-citrus-btn:hover {
+  box-shadow: 0 0 40px 2px rgba(204, 255, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* Glassmorphism Card Specular border */
+.glass-panel {
+  background: rgba(14, 14, 17, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1f1f23;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00f0ff;
+}
