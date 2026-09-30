@@ -18,7 +18,7 @@ export default function ContactFooterSection({ selectedPlan }: ContactFooterSect
   const [submitted, setSubmitted] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
 
@@ -34,11 +34,34 @@ export default function ContactFooterSection({ selectedPlan }: ContactFooterSect
 
     setLoading(true);
 
-    // Simulate instant audit & submission processing
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          website: formData.websiteUrl.trim(),
+          selectedTier: selectedPlan || "Standard Mockup Request",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to submit request.");
+      }
+
       setSubmitted(true);
-    }, 1200);
+    } catch (err: unknown) {
+      console.error("Submission error:", err);
+      const message = err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      setErrorMsg(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

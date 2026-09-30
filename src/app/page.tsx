@@ -46,8 +46,10 @@ export default function DarkCreativeStudioAgency() {
     notes: "",
     selectedTier: "Zero-Upfront Subscription ($150/mo)",
   });
+  const [honeypot, setHoneypot] = useState("");
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Scroll listener for sticky glass header
   useEffect(() => {
@@ -95,16 +97,43 @@ export default function DarkCreativeStudioAgency() {
     }, 380);
   };
 
-  // Form submission handler
-  const handleSubmitForm = (e: React.FormEvent) => {
+  // Live API form submission handler
+  const handleSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email) return;
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+    setErrorMessage(null);
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          honeypot,
+        }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok || result.error) {
+        throw new Error(result.error || "Failed to submit prototype request.");
+      }
+
       setFormSubmitted(true);
-    }, 1200);
+    } catch (err: unknown) {
+      console.error("Submission error:", err);
+      setErrorMessage(
+        err instanceof Error
+          ? err.message
+          : "Network error. Please try again or email directly."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -992,6 +1021,25 @@ export default function DarkCreativeStudioAgency() {
                     </motion.div>
                   ) : (
                     <form onSubmit={handleSubmitForm} className="space-y-8">
+                      {/* Anti-spam honeypot */}
+                      <input
+                        type="text"
+                        name="website_verify_hp"
+                        value={honeypot}
+                        onChange={(e) => setHoneypot(e.target.value)}
+                        tabIndex={-1}
+                        autoComplete="off"
+                        className="hidden absolute -left-[9999px]"
+                      />
+
+                      {/* Error feedback banner */}
+                      {errorMessage && (
+                        <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-mono flex items-center gap-2.5">
+                          <span>⚠️</span>
+                          <span>{errorMessage}</span>
+                        </div>
+                      )}
+
                       {/* Name Field */}
                       <div className="relative">
                         <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-2">
