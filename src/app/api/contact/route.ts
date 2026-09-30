@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     }
 
     const apiKey = process.env.RESEND_API_KEY;
-    const recipientEmail = process.env.CONTACT_EMAIL || "farukolawale5o9@gmail.com";
+    const recipientEmail = process.env.CONTACT_EMAIL || "farukolawale509@gmail.com";
     const discordWebhook = process.env.DISCORD_WEBHOOK_URL;
 
     // Optional: Send instant push notification to Discord if configured
