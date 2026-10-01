@@ -726,10 +726,10 @@ export default function WhiteCreativeStudioAgency() {
                     <div className="absolute -right-[3px] top-28 w-[3px] h-12 bg-zinc-700 rounded-r-sm" />
 
                     {/* iPhone Display Glass */}
-                    <div className="rounded-[38px] bg-white overflow-hidden flex flex-col relative border border-zinc-200/40 select-none">
+                    <div className="rounded-[38px] bg-white overflow-hidden flex flex-col relative border border-zinc-200/40 select-none isolate [transform:translateZ(0)]">
                       
                       {/* iOS Status Bar */}
-                      <div className="pt-2.5 pb-1 px-5 bg-[#f6f6f6]/95 backdrop-blur-md flex items-center justify-between text-zinc-950">
+                      <div className="pt-2.5 pb-1 px-5 bg-[#f6f6f6] rounded-t-[38px] flex items-center justify-between text-zinc-950">
                         {/* Time */}
                         <span className="text-xs font-semibold tracking-tight font-sans">9:41</span>
                         
@@ -758,7 +758,7 @@ export default function WhiteCreativeStudioAgency() {
                       </div>
 
                       {/* iOS Navigation Bar */}
-                      <div className="px-3.5 py-1.5 bg-[#f6f6f6]/95 backdrop-blur-md border-b border-[#e5e5ea] flex items-center justify-between">
+                      <div className="px-3.5 py-1.5 bg-[#f6f6f6] border-b border-[#e5e5ea] flex items-center justify-between">
                         {/* Back to Messages */}
                         <div className="flex items-center text-[#007aff] text-xs font-medium cursor-default">
                           <ChevronLeft className="w-4 h-4 stroke-[2.5] -ml-1" />
@@ -907,7 +907,7 @@ export default function WhiteCreativeStudioAgency() {
                       </div>
 
                       {/* iOS Bottom Input Bar */}
-                      <div className="px-3 py-1.5 bg-[#f6f6f6]/95 border-t border-[#e5e5ea] flex items-center gap-1.5">
+                      <div className="px-3 py-1.5 bg-[#f6f6f6] border-t border-[#e5e5ea] flex items-center gap-1.5">
                         <div className="w-6 h-6 rounded-full bg-[#e5e5ea] flex items-center justify-center text-zinc-600 shrink-0">
                           <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                         </div>
@@ -923,7 +923,7 @@ export default function WhiteCreativeStudioAgency() {
                       </div>
 
                       {/* iOS Home Indicator Bar */}
-                      <div className="bg-[#f6f6f6]/95 pb-1 pt-0.5 flex justify-center">
+                      <div className="bg-[#f6f6f6] pb-1.5 pt-0.5 flex justify-center rounded-b-[38px]">
                         <div className="w-28 h-1 bg-zinc-300 rounded-full" />
                       </div>
 
