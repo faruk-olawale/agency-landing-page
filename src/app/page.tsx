@@ -210,11 +210,11 @@ export default function WhiteCreativeStudioAgency() {
         <div className="absolute top-[40%] right-[-10%] w-[45vw] h-[45vw] max-w-[500px] rounded-full bg-cyan-500/[0.05] blur-[150px]" />
       </div>
 
-      {/* FIXED TOP NAVIGATION BAR */}
+      {/* FIXED TOP NAVIGATION BAR WITH STRATEGIC GLASSMORPHISM */}
       <header
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
           scrolled
-            ? "bg-white/90 backdrop-blur-xl border-b border-zinc-200/80 py-3 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.04)]"
+            ? "bg-white/70 backdrop-blur-xl border-b border-zinc-200/60 py-3 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.03)] supports-[backdrop-filter]:bg-white/60"
             : "bg-transparent py-5"
         }`}
       >
@@ -231,7 +231,7 @@ export default function WhiteCreativeStudioAgency() {
             <span className="font-black text-base tracking-tight font-sans text-zinc-950 flex items-center">
               SPEEDCRAFT<span className="text-cyan-600 font-mono">.</span>
             </span>
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[10px] font-mono font-bold text-emerald-800 border border-emerald-300/80 rounded-full bg-emerald-50/90 tracking-normal shadow-2xs">
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[10px] font-mono font-bold text-emerald-800 border border-emerald-300/60 rounded-full bg-emerald-50/80 backdrop-blur-md tracking-normal shadow-2xs">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               100/100 AUDIT GUARANTEED
             </span>
@@ -289,7 +289,7 @@ export default function WhiteCreativeStudioAgency() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/95 border border-zinc-200 text-zinc-700 text-xs font-mono tracking-wide mb-8 shadow-2xs backdrop-blur-md"
+              className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/75 border border-white/80 text-zinc-700 text-xs font-mono tracking-wide mb-8 shadow-2xs backdrop-blur-md ring-1 ring-zinc-200/60"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="font-semibold text-zinc-900">HAND-CRAFTED NEXT.JS 15 ENGINE</span>
@@ -346,7 +346,7 @@ export default function WhiteCreativeStudioAgency() {
               </div>
             </motion.div>
 
-            {/* TELEMETRY STATS GRID (STUDIO GRADE, ZERO EMOJIS, TACTILE CARDS) */}
+            {/* TELEMETRY STATS GRID (STUDIO GRADE, ZERO EMOJIS, TACTILE CARDS WITH FROSTED GLASS) */}
             <motion.div
               initial={{ opacity: 0, y: 25 }}
               animate={{ opacity: 1, y: 0 }}
@@ -354,7 +354,7 @@ export default function WhiteCreativeStudioAgency() {
               className="mt-16 pt-10 border-t border-zinc-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
             >
               {/* Stat 1: Google Lighthouse Verification Gauge */}
-              <div className="card-surface p-5 rounded-2xl flex flex-col justify-between">
+              <div className="p-5 rounded-2xl flex flex-col justify-between bg-white/70 backdrop-blur-md border border-white/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-zinc-200/60 transition-all duration-200 hover:bg-white/85 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
                 <div>
                   <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 tracking-wider uppercase mb-3">
                     <span>{"// CORE WEB VITALS"}</span>
@@ -398,7 +398,7 @@ export default function WhiteCreativeStudioAgency() {
               </div>
 
               {/* Stat 2: Edge Network Latency */}
-              <div className="card-surface p-5 rounded-2xl flex flex-col justify-between">
+              <div className="p-5 rounded-2xl flex flex-col justify-between bg-white/70 backdrop-blur-md border border-white/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-zinc-200/60 transition-all duration-200 hover:bg-white/85 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
                 <div>
                   <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 tracking-wider uppercase mb-3">
                     <span>{"// FIRST CONTENTFUL PAINT"}</span>
@@ -430,7 +430,7 @@ export default function WhiteCreativeStudioAgency() {
               </div>
 
               {/* Stat 3: Vulnerability Surface */}
-              <div className="card-surface p-5 rounded-2xl flex flex-col justify-between">
+              <div className="p-5 rounded-2xl flex flex-col justify-between bg-white/70 backdrop-blur-md border border-white/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-zinc-200/60 transition-all duration-200 hover:bg-white/85 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
                 <div>
                   <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 tracking-wider uppercase mb-3">
                     <span>{"// ATTACK SURFACE"}</span>
@@ -456,7 +456,7 @@ export default function WhiteCreativeStudioAgency() {
               </div>
 
               {/* Stat 4: Verified Client Conversion Lift with Sparkline */}
-              <div className="card-surface p-5 rounded-2xl flex flex-col justify-between">
+              <div className="p-5 rounded-2xl flex flex-col justify-between bg-white/70 backdrop-blur-md border border-white/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-zinc-200/60 transition-all duration-200 hover:bg-white/85 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
                 <div>
                   <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 tracking-wider uppercase mb-3">
                     <span>{"// REVENUE UPTICK"}</span>
@@ -663,7 +663,7 @@ export default function WhiteCreativeStudioAgency() {
                 </div>
               </motion.div>
 
-              {/* BENTO ITEM 3: DONE-FOR-YOU CONCIERGE CHAT MOCKUP (STREAMLINED & DYNAMIC) */}
+              {/* BENTO ITEM 3: DONE-FOR-YOU CONCIERGE CHAT MOCKUP (STREAMLINED & DYNAMIC GLASS) */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -672,20 +672,24 @@ export default function WhiteCreativeStudioAgency() {
                   if (!chatStarted) setChatStarted(true);
                 }}
                 transition={{ duration: 0.5, delay: 0.15 }}
-                className="md:col-span-12 card-surface rounded-3xl p-6 sm:p-8 flex flex-col lg:flex-row items-center justify-between gap-8"
+                className="md:col-span-12 relative overflow-hidden rounded-3xl p-6 sm:p-8 flex flex-col lg:flex-row items-center justify-between gap-8 bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_12px_40px_rgba(0,0,0,0.04)] ring-1 ring-zinc-950/5"
               >
-                <div className="max-w-xl">
+                {/* Colorful Ambient Mesh Glows behind frosted glass */}
+                <div className="absolute -top-24 -right-20 w-96 h-96 bg-gradient-to-br from-cyan-400/20 via-emerald-300/15 to-transparent rounded-full blur-3xl pointer-events-none -z-0" />
+                <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-gradient-to-tr from-blue-500/15 via-cyan-400/10 to-transparent rounded-full blur-3xl pointer-events-none -z-0" />
+
+                <div className="max-w-xl relative z-10">
                   <div className="flex items-center gap-2.5 mb-3 flex-wrap">
-                    <div className="w-8 h-8 rounded-xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-700">
+                    <div className="w-8 h-8 rounded-xl bg-cyan-50/80 border border-cyan-200/80 backdrop-blur-md flex items-center justify-center text-cyan-700 shadow-2xs">
                       <Wrench className="w-4 h-4" />
                     </div>
-                    <span className="font-mono text-xs px-2.5 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 font-semibold">
+                    <span className="font-mono text-xs px-2.5 py-0.5 rounded-full bg-zinc-100/80 border border-zinc-200/80 backdrop-blur-md text-zinc-700 font-semibold shadow-2xs">
                       DIRECT DEV ACCESS // ZERO DASHBOARDS
                     </span>
                     <button
                       type="button"
                       onClick={handleReplayChat}
-                      className="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium text-cyan-700 hover:text-cyan-900 bg-cyan-50/80 hover:bg-cyan-100 px-2.5 py-0.5 rounded-full border border-cyan-200/80 transition-all cursor-pointer shadow-2xs"
+                      className="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium text-cyan-800 hover:text-cyan-950 bg-white/80 hover:bg-white px-2.5 py-0.5 rounded-full border border-cyan-200/80 backdrop-blur-md transition-all cursor-pointer shadow-2xs"
                       title="Replay live message interaction"
                     >
                       <RotateCcw className="w-3 h-3" />
@@ -712,7 +716,7 @@ export default function WhiteCreativeStudioAgency() {
                 </div>
 
                 {/* Compact, Ultra-Realistic iPhone 16 Pro Dynamic Chat */}
-                <div className="w-full max-w-[340px] sm:max-w-[370px] lg:max-w-[380px] shrink-0 mx-auto">
+                <div className="w-full max-w-[340px] sm:max-w-[370px] lg:max-w-[380px] shrink-0 mx-auto relative z-10">
                   {/* Physical iPhone 16 Pro Chassis */}
                   <div className="relative rounded-[46px] p-2 bg-gradient-to-b from-zinc-800 via-zinc-900 to-black shadow-[0_20px_50px_-15px_rgba(0,0,0,0.35),0_0_0_1px_rgba(255,255,255,0.12)]">
                     {/* Hardware Buttons */}
@@ -1279,14 +1283,14 @@ export default function WhiteCreativeStudioAgency() {
                 Choose between zero upfront investment with lifetime full-service care, or complete source code ownership.
               </p>
 
-              {/* Interactive Toggle Switch */}
-              <div className="inline-flex items-center p-1.5 rounded-full bg-zinc-200/80 border border-zinc-300/80 shadow-inner">
+              {/* Interactive Toggle Switch with Floating Glassmorphism */}
+              <div className="inline-flex items-center p-1.5 rounded-full bg-zinc-100/70 backdrop-blur-lg border border-zinc-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-white/60">
                 <button
                   type="button"
                   onClick={() => handleSelectPlan("subscription")}
                   className={`px-5 py-2 rounded-full text-xs font-mono font-bold transition-all cursor-pointer ${
                     billingPlan === "subscription"
-                      ? "bg-white text-zinc-950 shadow-sm"
+                      ? "bg-white/95 backdrop-blur-md text-zinc-950 shadow-xs border border-white/80"
                       : "text-zinc-600 hover:text-zinc-950"
                   }`}
                 >
@@ -1297,7 +1301,7 @@ export default function WhiteCreativeStudioAgency() {
                   onClick={() => handleSelectPlan("lumpSum")}
                   className={`px-5 py-2 rounded-full text-xs font-mono font-bold transition-all cursor-pointer ${
                     billingPlan === "lumpSum"
-                      ? "bg-white text-zinc-950 shadow-sm"
+                      ? "bg-white/95 backdrop-blur-md text-zinc-950 shadow-xs border border-white/80"
                       : "text-zinc-600 hover:text-zinc-950"
                   }`}
                 >
@@ -1703,19 +1707,20 @@ export default function WhiteCreativeStudioAgency() {
 
       </main>
 
-      {/* TEMPLATE DETAIL DEMO MODAL */}
+      {/* TEMPLATE DETAIL DEMO MODAL WITH STRATEGIC GLASSMORPHISM */}
       <AnimatePresence>
         {activeModalDemo && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-zinc-950/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-zinc-950/40 backdrop-blur-md transition-all">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-3xl shadow-2xl border border-zinc-200 flex flex-col overflow-hidden"
+              initial={{ opacity: 0, scale: 0.95, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 12 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="relative w-full max-w-4xl max-h-[90vh] bg-white/90 backdrop-blur-2xl rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.25)] border border-white/80 ring-1 ring-zinc-900/10 flex flex-col overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Top Bar */}
-              <div className="px-6 py-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
+              <div className="px-6 py-4 border-b border-zinc-200/70 flex items-center justify-between bg-white/60 backdrop-blur-md">
                 <div className="flex items-center gap-3">
                   <span className="w-3 h-3 rounded-full bg-rose-400 inline-block" />
                   <span className="w-3 h-3 rounded-full bg-amber-400 inline-block" />
@@ -1728,12 +1733,12 @@ export default function WhiteCreativeStudioAgency() {
 
                 <div className="flex items-center gap-3">
                   {/* Viewport switch */}
-                  <div className="hidden sm:flex items-center bg-zinc-200/70 p-0.5 rounded-lg text-xs font-mono">
+                  <div className="hidden sm:flex items-center bg-zinc-100/80 backdrop-blur-md border border-zinc-200/60 p-0.5 rounded-lg text-xs font-mono">
                     <button
                       onClick={() => setModalDeviceView("desktop")}
                       className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-all ${
                         modalDeviceView === "desktop"
-                          ? "bg-white text-zinc-950 shadow-xs font-bold"
+                          ? "bg-white text-zinc-950 shadow-xs font-bold border border-white/80"
                           : "text-zinc-600 hover:text-zinc-950"
                       }`}
                     >
@@ -1744,7 +1749,7 @@ export default function WhiteCreativeStudioAgency() {
                       onClick={() => setModalDeviceView("mobile")}
                       className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-all ${
                         modalDeviceView === "mobile"
-                          ? "bg-white text-zinc-950 shadow-xs font-bold"
+                          ? "bg-white text-zinc-950 shadow-xs font-bold border border-white/80"
                           : "text-zinc-600 hover:text-zinc-950"
                       }`}
                     >
