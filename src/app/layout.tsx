@@ -14,16 +14,30 @@ export const viewport: Viewport = {
   themeColor: "#ffffff",
 };
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://agency-landing-page.vercel.app";
+// Automatically detect production URL on Vercel or localhost
+const getBaseUrl = () => {
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL;
+  }
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return "http://localhost:3000";
+};
+
+const siteUrl = getBaseUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "SPEEDCRAFT // High-Performance Creative Studio | 100/100 PageSpeed Guaranteed",
-    template: "%s | SPEEDCRAFT Studio",
+    default: "SPEEDCRAFT // 100/100 PageSpeed Web Studio", // 42 chars - fits Google 60-char sweet spot
+    template: "%s | SPEEDCRAFT",
   },
   description:
-    "Hand-coded, sub-second web experiences for local businesses and clinical practices. Guaranteed 100/100 Google PageSpeed, zero bloated WordPress, and sub-300ms edge rendering that converts clicks to calls.",
+    "Hand-coded, sub-second websites for local businesses. Guaranteed 100/100 Google PageSpeed and zero bloated WordPress to convert clicks into calls.", // 146 chars - fits Google 150-160 char limit
   keywords: [
     "creative studio",
     "web performance agency",
@@ -44,18 +58,27 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: siteUrl,
-    title: "SPEEDCRAFT // High-Performance Creative Studio | 100/100 PageSpeed",
+    url: "/",
+    title: "SPEEDCRAFT // High-Performance Web Studio", // 41 chars - fits under 60-char limit
     description:
-      "Stop losing local customers to a slow website. Hand-coded sub-second web experiences with guaranteed 100/100 Core Web Vitals.",
+      "Hand-coded, sub-second websites for local businesses with guaranteed 100/100 Google PageSpeed.", // 95 chars - fits optimal range
     siteName: "SPEEDCRAFT Studio",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "SPEEDCRAFT // High-Performance Web Studio",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "SPEEDCRAFT // High-Performance Creative Studio | 100/100 PageSpeed",
+    title: "SPEEDCRAFT // High-Performance Web Studio", // 41 chars
     description:
-      "Stop losing local customers to a slow website. Hand-coded sub-second web experiences with guaranteed 100/100 Core Web Vitals.",
+      "Hand-coded, sub-second websites for local businesses with guaranteed 100/100 Google PageSpeed.", // 95 chars
     creator: "@speedcraft",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
@@ -79,7 +102,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
     name: "SPEEDCRAFT Studio",
-    image: `${siteUrl}/opengraph-image`,
+    image: `${siteUrl}/og-image.png`,
     description:
       "Hand-coded, sub-second web experiences for local businesses. Guaranteed 100/100 Core Web Vitals and zero bloated WordPress plugins.",
     url: siteUrl,
