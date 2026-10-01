@@ -27,6 +27,7 @@ import {
   Plus,
   Mic,
   ArrowUp,
+  RotateCcw,
 } from "lucide-react";
 
 export default function WhiteCreativeStudioAgency() {
@@ -44,6 +45,34 @@ export default function WhiteCreativeStudioAgency() {
   // Interactive ROI Calculator State
   const [dealValue, setDealValue] = useState<number>(750);
   const [monthlyTraffic, setMonthlyTraffic] = useState<number>(1200);
+
+  // Interactive Live iMessage unfolding animation state
+  const [chatStep, setChatStep] = useState(0);
+  const [chatStarted, setChatStarted] = useState(false);
+
+  useEffect(() => {
+    if (!chatStarted) return;
+    
+    const t1 = setTimeout(() => setChatStep(1), 800);
+    const t2 = setTimeout(() => setChatStep(2), 1600);
+    const t3 = setTimeout(() => setChatStep(3), 2300);
+    const t4 = setTimeout(() => setChatStep(4), 3600);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      clearTimeout(t4);
+    };
+  }, [chatStarted]);
+
+  const handleReplayChat = () => {
+    setChatStep(0);
+    setTimeout(() => setChatStep(1), 800);
+    setTimeout(() => setChatStep(2), 1600);
+    setTimeout(() => setChatStep(3), 2300);
+    setTimeout(() => setChatStep(4), 3600);
+  };
 
   // Form State
   const [formData, setFormData] = useState({
@@ -634,22 +663,34 @@ export default function WhiteCreativeStudioAgency() {
                 </div>
               </motion.div>
 
-              {/* BENTO ITEM 3: DONE-FOR-YOU CONCIERGE CHAT MOCKUP (SPAN 12 - MOBBIN STYLE) */}
+              {/* BENTO ITEM 3: DONE-FOR-YOU CONCIERGE CHAT MOCKUP (STREAMLINED & DYNAMIC) */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
+                onViewportEnter={() => {
+                  if (!chatStarted) setChatStarted(true);
+                }}
                 transition={{ duration: 0.5, delay: 0.15 }}
                 className="md:col-span-12 card-surface rounded-3xl p-6 sm:p-8 flex flex-col lg:flex-row items-center justify-between gap-8"
               >
                 <div className="max-w-xl">
-                  <div className="flex items-center gap-2.5 mb-3">
+                  <div className="flex items-center gap-2.5 mb-3 flex-wrap">
                     <div className="w-8 h-8 rounded-xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-700">
                       <Wrench className="w-4 h-4" />
                     </div>
                     <span className="font-mono text-xs px-2.5 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 font-semibold">
                       DIRECT DEV ACCESS // ZERO DASHBOARDS
                     </span>
+                    <button
+                      type="button"
+                      onClick={handleReplayChat}
+                      className="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium text-cyan-700 hover:text-cyan-900 bg-cyan-50/80 hover:bg-cyan-100 px-2.5 py-0.5 rounded-full border border-cyan-200/80 transition-all cursor-pointer shadow-2xs"
+                      title="Replay live message interaction"
+                    >
+                      <RotateCcw className="w-3 h-3" />
+                      <span>Replay Interaction</span>
+                    </button>
                   </div>
 
                   <h3 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight mb-2">
@@ -670,43 +711,41 @@ export default function WhiteCreativeStudioAgency() {
                   </div>
                 </div>
 
-                {/* Ultra-Realistic iPhone 16 Pro iMessage Device Mockup */}
-                <div className="w-full lg:w-[410px] shrink-0 mx-auto">
+                {/* Compact, Ultra-Realistic iPhone 16 Pro Dynamic Chat */}
+                <div className="w-full max-w-[340px] sm:max-w-[370px] lg:max-w-[380px] shrink-0 mx-auto">
                   {/* Physical iPhone 16 Pro Chassis */}
-                  <div className="relative rounded-[50px] p-[10px] bg-gradient-to-b from-zinc-800 via-zinc-900 to-black shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35),0_0_0_1px_rgba(255,255,255,0.12)]">
+                  <div className="relative rounded-[46px] p-2 bg-gradient-to-b from-zinc-800 via-zinc-900 to-black shadow-[0_20px_50px_-15px_rgba(0,0,0,0.35),0_0_0_1px_rgba(255,255,255,0.12)]">
                     {/* Hardware Buttons */}
-                    <div className="absolute -left-[3px] top-24 w-[3px] h-8 bg-zinc-700 rounded-l-sm" />
-                    <div className="absolute -left-[3px] top-36 w-[3px] h-12 bg-zinc-700 rounded-l-sm" />
-                    <div className="absolute -left-[3px] top-52 w-[3px] h-12 bg-zinc-700 rounded-l-sm" />
-                    <div className="absolute -right-[3px] top-32 w-[3px] h-16 bg-zinc-700 rounded-r-sm" />
+                    <div className="absolute -left-[3px] top-20 w-[3px] h-6 bg-zinc-700 rounded-l-sm" />
+                    <div className="absolute -left-[3px] top-30 w-[3px] h-10 bg-zinc-700 rounded-l-sm" />
+                    <div className="absolute -left-[3px] top-44 w-[3px] h-10 bg-zinc-700 rounded-l-sm" />
+                    <div className="absolute -right-[3px] top-28 w-[3px] h-12 bg-zinc-700 rounded-r-sm" />
 
                     {/* iPhone Display Glass */}
-                    <div className="rounded-[42px] bg-white overflow-hidden flex flex-col relative border border-zinc-200/40 select-none">
+                    <div className="rounded-[38px] bg-white overflow-hidden flex flex-col relative border border-zinc-200/40 select-none">
                       
                       {/* iOS Status Bar */}
-                      <div className="pt-3 pb-1 px-7 bg-[#f6f6f6]/95 backdrop-blur-md flex items-center justify-between text-zinc-950">
+                      <div className="pt-2.5 pb-1 px-5 bg-[#f6f6f6]/95 backdrop-blur-md flex items-center justify-between text-zinc-950">
                         {/* Time */}
-                        <span className="text-[13px] font-semibold tracking-tight font-sans">9:41</span>
+                        <span className="text-xs font-semibold tracking-tight font-sans">9:41</span>
                         
                         {/* Dynamic Island */}
-                        <div className="w-[92px] h-[22px] bg-black rounded-full mx-auto relative flex items-center justify-end px-2.5 shadow-inner">
-                          <div className="w-2.5 h-2.5 rounded-full bg-[#0d1326] ring-1 ring-blue-500/20" />
+                        <div className="w-[84px] h-[19px] bg-black rounded-full mx-auto relative flex items-center justify-end px-2 shadow-inner">
+                          <div className="w-2 h-2 rounded-full bg-[#0d1326] ring-1 ring-blue-500/20" />
                         </div>
 
-                        {/* Status Icons: Cellular Signal, 5G, Battery */}
+                        {/* Status Icons: Cellular, 5G, Battery */}
                         <div className="flex items-center gap-1 text-zinc-900">
-                          {/* Cellular Signal (4 bars) */}
-                          <svg className="w-3.5 h-3 fill-current" viewBox="0 0 17 12">
+                          <svg className="w-3.5 h-2.5 fill-current" viewBox="0 0 17 12">
                             <rect x="0" y="8" width="2.5" height="4" rx="0.5" />
                             <rect x="4.5" y="5.5" width="2.5" height="6.5" rx="0.5" />
                             <rect x="9" y="3" width="2.5" height="9" rx="0.5" />
                             <rect x="13.5" y="0" width="2.5" height="12" rx="0.5" />
                           </svg>
 
-                          <span className="text-[10px] font-bold tracking-tighter leading-none">5G</span>
+                          <span className="text-[9px] font-bold tracking-tighter leading-none">5G</span>
 
-                          {/* Battery Pill */}
-                          <svg className="w-5 h-2.5 text-zinc-900" viewBox="0 0 25 12" fill="none">
+                          <svg className="w-4.5 h-2.5 text-zinc-900" viewBox="0 0 25 12" fill="none">
                             <rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" strokeWidth="1" />
                             <rect x="2" y="2" width="16" height="8" rx="1.5" fill="currentColor" />
                             <path d="M23 4v4" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
@@ -715,148 +754,173 @@ export default function WhiteCreativeStudioAgency() {
                       </div>
 
                       {/* iOS Navigation Bar */}
-                      <div className="px-4 py-2 bg-[#f6f6f6]/95 backdrop-blur-md border-b border-[#e5e5ea] flex items-center justify-between">
+                      <div className="px-3.5 py-1.5 bg-[#f6f6f6]/95 backdrop-blur-md border-b border-[#e5e5ea] flex items-center justify-between">
                         {/* Back to Messages */}
-                        <div className="flex items-center text-[#007aff] text-[13px] font-medium cursor-default">
-                          <ChevronLeft className="w-5 h-5 stroke-[2.5] -ml-1.5" />
-                          <span className="-ml-0.5">12</span>
+                        <div className="flex items-center text-[#007aff] text-xs font-medium cursor-default">
+                          <ChevronLeft className="w-4 h-4 stroke-[2.5] -ml-1" />
+                          <span>12</span>
                         </div>
 
-                        {/* Center: Contact Profile Header */}
+                        {/* Center Contact Header */}
                         <div className="flex flex-col items-center">
-                          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-cyan-600 via-cyan-500 to-emerald-400 p-[1.5px] shadow-2xs">
-                            <div className="w-full h-full rounded-full bg-zinc-900 flex items-center justify-center font-bold text-xs text-white tracking-tight">
+                          <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-cyan-600 via-cyan-500 to-emerald-400 p-[1.2px] shadow-2xs">
+                            <div className="w-full h-full rounded-full bg-zinc-900 flex items-center justify-center font-bold text-[10px] text-white tracking-tight">
                               FO
                             </div>
                           </div>
                           <div className="flex items-center gap-0.5 mt-0.5">
-                            <span className="font-semibold text-xs text-zinc-950">Faruk (Speedcraft)</span>
-                            <ChevronRight className="w-3 h-3 text-zinc-400 stroke-[2]" />
+                            <span className="font-semibold text-[11px] text-zinc-950">Faruk (Speedcraft)</span>
+                            <ChevronRight className="w-2.5 h-2.5 text-zinc-400 stroke-[2]" />
                           </div>
-                          <span className="text-[10px] text-zinc-400 font-medium">iMessage</span>
+                          <span className="text-[9px] text-zinc-400 font-medium leading-none">iMessage</span>
                         </div>
 
-                        {/* Right: FaceTime & Phone Action Icons */}
-                        <div className="flex items-center gap-3 text-[#007aff]">
-                          <Video className="w-4 h-4 stroke-[2]" />
-                          <Phone className="w-3.5 h-3.5 stroke-[2]" />
+                        {/* FaceTime & Phone Icons */}
+                        <div className="flex items-center gap-2.5 text-[#007aff]">
+                          <Video className="w-3.5 h-3.5 stroke-[2]" />
+                          <Phone className="w-3 h-3 stroke-[2]" />
                         </div>
                       </div>
 
-                      {/* Conversation Scroll Body */}
-                      <div className="p-3.5 space-y-2.5 bg-[#ffffff] text-[13px] leading-snug font-sans">
+                      {/* Compact Conversation Scroll Body */}
+                      <div className="p-3 space-y-2 bg-[#ffffff] text-[12.5px] sm:text-[13px] leading-snug font-sans min-h-[205px] flex flex-col justify-end">
                         {/* Timestamp */}
-                        <div className="text-center text-[10px] text-zinc-400 font-medium my-0.5">
+                        <div className="text-center text-[9.5px] text-zinc-400 font-medium my-0.5">
                           Today 10:14 AM
                         </div>
 
-                        {/* Incoming message from client with authentic tail */}
-                        <div className="flex justify-start">
-                          <div className="relative bg-[#e9e9eb] text-zinc-950 px-3.5 py-2 rounded-[18px] rounded-bl-[4px] max-w-[85%] font-normal">
-                            Hey Faruk! Emergency — our board just approved a $50 promo. Can we get the banner live before our 11 AM email blast?
+                        {/* Message 1: Incoming Emergency Request */}
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.97 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          transition={{ duration: 0.35, ease: "easeOut" }}
+                          className="flex justify-start"
+                        >
+                          <div className="relative bg-[#e9e9eb] text-zinc-950 px-3 py-1.5 rounded-[18px] rounded-bl-[4px] max-w-[85%] font-normal">
+                            Hey Faruk! Emergency — board approved a $50 promo. Can we get the banner live before 11 AM?
                             {/* Incoming Bubble Tail */}
                             <svg className="absolute -bottom-[0.5px] -left-[5px] w-[14px] h-[14px] text-[#e9e9eb] fill-current pointer-events-none" viewBox="0 0 14 14">
                               <path d="M14,0 C14,7.732 7.732,14 0,14 C4.5,14 8,11 9.5,8 C10.2,6 10.5,3.5 10.5,0 Z" />
                             </svg>
                           </div>
-                        </div>
+                        </motion.div>
 
-                        {/* Outgoing instant acknowledgment */}
-                        <div className="flex justify-end">
-                          <div className="bg-[#007aff] text-white px-3.5 py-1.5 rounded-[18px] max-w-[82%] font-normal">
-                            On it! Modifying component & edge rules now.
-                          </div>
-                        </div>
-
-                        {/* Outgoing completion message with rich link card & tapback */}
-                        <div className="flex flex-col items-end pt-0.5">
-                          {/* Rich Live Audit Card Preview */}
-                          <div className="bg-white border border-zinc-200/90 rounded-[14px] overflow-hidden shadow-2xs max-w-[86%] mb-1.5 text-left">
-                            <div className="bg-gradient-to-r from-zinc-950 to-zinc-800 p-2.5 flex items-center justify-between text-white">
-                              <div className="flex items-center gap-2">
-                                <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center">
-                                  <Check className="w-3 h-3 text-emerald-400 stroke-[3]" />
+                        {/* Message 2: Outgoing Live Deployment & Tapback (Unfolds at Step 1+) */}
+                        <AnimatePresence>
+                          {chatStep >= 1 && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 12, scale: 0.95 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              transition={{ duration: 0.35, ease: "easeOut" }}
+                              className="flex flex-col items-end pt-0.5"
+                            >
+                              {/* Compact Live Audit Badge */}
+                              <div className="bg-zinc-950 text-white rounded-xl px-2.5 py-1 mb-1 flex items-center justify-between text-[10px] w-fit max-w-[88%] border border-zinc-800 shadow-2xs gap-2.5">
+                                <div className="flex items-center gap-1.5 truncate">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 animate-pulse" />
+                                  <span className="font-semibold text-zinc-200 truncate">speedcraft.dev/live</span>
                                 </div>
-                                <div>
-                                  <div className="text-[11px] font-bold tracking-tight">speedcraft.dev/live</div>
-                                  <div className="text-[9px] text-zinc-400 font-mono">Edge Node #310 Verified</div>
-                                </div>
+                                <span className="font-mono text-emerald-400 font-bold shrink-0 text-[9.5px]">100/100 · 0.28s</span>
                               </div>
-                              <span className="text-[11px] font-mono font-black text-emerald-400">100/100</span>
-                            </div>
-                            <div className="p-2 bg-zinc-50 border-t border-zinc-100 text-[10px] text-zinc-600">
-                              <span className="font-semibold text-zinc-900 block">Promo Banner &amp; Countdown Deployed</span>
-                              Turnaround: 9m 14s · 0.28s LCP Edge Delivery
-                            </div>
-                          </div>
 
-                          {/* Message bubble with Loved Tapback reaction */}
-                          <div className="relative bg-[#007aff] text-white px-3.5 py-2 rounded-[18px] rounded-br-[4px] max-w-[88%] font-normal">
-                            Done! Live across all 310 global edge nodes in 9 minutes. Cache purged and PageSpeed verified at 100/100.
-                            
-                            {/* Outgoing Bubble Tail */}
-                            <svg className="absolute -bottom-[0.5px] -right-[5px] w-[14px] h-[14px] text-[#007aff] fill-current pointer-events-none" viewBox="0 0 14 14">
-                              <path d="M0,0 C0,7.732 6.268,14 14,14 C9.5,14 6,11 4.5,8 C3.8,6 3.5,3.5 3.5,0 Z" />
-                            </svg>
+                              {/* Message bubble with Loved Tapback reaction */}
+                              <div className="relative bg-[#007aff] text-white px-3 py-1.5 rounded-[18px] rounded-br-[4px] max-w-[88%] font-normal">
+                                Done! Live across all 310 global edge nodes in 9 minutes. Cache purged &amp; PageSpeed 100/100.
+                                
+                                {/* Outgoing Bubble Tail */}
+                                <svg className="absolute -bottom-[0.5px] -right-[5px] w-[14px] h-[14px] text-[#007aff] fill-current pointer-events-none" viewBox="0 0 14 14">
+                                  <path d="M0,0 C0,7.732 6.268,14 14,14 C9.5,14 6,11 4.5,8 C3.8,6 3.5,3.5 3.5,0 Z" />
+                                </svg>
 
-                            {/* Loved Tapback Sticker */}
-                            <div className="absolute -top-3.5 -left-2 flex items-center z-10 select-none">
-                              <div className="bg-white rounded-full px-1.5 py-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-zinc-200/80 flex items-center gap-0.5">
-                                <span className="text-xs leading-none">❤️</span>
-                                <span className="text-[9px] font-bold text-zinc-600 font-sans">1</span>
+                                {/* Loved Tapback Sticker - Springs in at Step 2 */}
+                                <AnimatePresence>
+                                  {chatStep >= 2 && (
+                                    <motion.div
+                                      initial={{ scale: 0, opacity: 0 }}
+                                      animate={{ scale: 1, opacity: 1 }}
+                                      transition={{ type: "spring", stiffness: 450, damping: 16 }}
+                                      className="absolute -top-3 -left-2 flex items-center z-10 select-none"
+                                    >
+                                      <div className="bg-white rounded-full px-1.5 py-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-zinc-200/80 flex items-center gap-0.5">
+                                        <span className="text-[11px] leading-none">❤️</span>
+                                        <span className="text-[9px] font-bold text-zinc-600 font-sans">1</span>
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
                               </div>
-                            </div>
-                          </div>
 
-                          {/* Delivered status receipt */}
-                          <div className="text-[10px] text-zinc-400 font-medium mt-1 pr-1">
-                            Delivered · 10:24 AM
-                          </div>
-                        </div>
+                              {/* Delivered status receipt */}
+                              <div className="text-[9px] text-zinc-400 font-medium mt-0.5 pr-1">
+                                Delivered · 10:23 AM
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
 
-                        {/* Client reaction reply */}
-                        <div className="flex justify-start pt-1">
-                          <div className="relative bg-[#e9e9eb] text-zinc-950 px-3.5 py-2 rounded-[18px] rounded-bl-[4px] max-w-[85%] font-normal">
-                            Holy cow that was fast! 😭 Our old agency took 4 days just to answer support tickets haha. You guys are unreal 🙌
-                            {/* Incoming Bubble Tail */}
-                            <svg className="absolute -bottom-[0.5px] -left-[5px] w-[14px] h-[14px] text-[#e9e9eb] fill-current pointer-events-none" viewBox="0 0 14 14">
-                              <path d="M14,0 C14,7.732 7.732,14 0,14 C4.5,14 8,11 9.5,8 C10.2,6 10.5,3.5 10.5,0 Z" />
-                            </svg>
-                          </div>
-                        </div>
+                        {/* Step 3: Brief Client Typing Indicator before final response */}
+                        <AnimatePresence>
+                          {chatStep === 3 && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 8, scale: 0.9 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.8 }}
+                              transition={{ duration: 0.2 }}
+                              className="flex justify-start pt-0.5"
+                            >
+                              <div className="relative bg-[#e9e9eb] px-3 py-2 rounded-[18px] rounded-bl-[4px] flex items-center gap-1.5 shadow-2xs">
+                                <span className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{ animationDelay: "0ms" }} />
+                                <span className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{ animationDelay: "150ms" }} />
+                                <span className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{ animationDelay: "300ms" }} />
+                                {/* Incoming Bubble Tail */}
+                                <svg className="absolute -bottom-[0.5px] -left-[5px] w-[14px] h-[14px] text-[#e9e9eb] fill-current pointer-events-none" viewBox="0 0 14 14">
+                                  <path d="M14,0 C14,7.732 7.732,14 0,14 C4.5,14 8,11 9.5,8 C10.2,6 10.5,3.5 10.5,0 Z" />
+                                </svg>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
 
-                        {/* Client typing indicator dots */}
-                        <div className="flex justify-start pt-0.5">
-                          <div className="bg-[#e9e9eb] px-3 py-2 rounded-[18px] rounded-bl-[4px] flex items-center gap-1.5 shadow-2xs">
-                            <span className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{ animationDelay: "0ms" }} />
-                            <span className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{ animationDelay: "150ms" }} />
-                            <span className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{ animationDelay: "300ms" }} />
-                          </div>
-                        </div>
+                        {/* Step 4: Final Enthusiastic Client Response */}
+                        <AnimatePresence>
+                          {chatStep >= 4 && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 12, scale: 0.95 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              transition={{ duration: 0.35, ease: "easeOut" }}
+                              className="flex justify-start pt-0.5"
+                            >
+                              <div className="relative bg-[#e9e9eb] text-zinc-950 px-3 py-1.5 rounded-[18px] rounded-bl-[4px] max-w-[85%] font-normal">
+                                Holy cow that was fast! 😭 Our old agency took 4 days just to reply. You guys are unreal 🙌
+                                {/* Incoming Bubble Tail */}
+                                <svg className="absolute -bottom-[0.5px] -left-[5px] w-[14px] h-[14px] text-[#e9e9eb] fill-current pointer-events-none" viewBox="0 0 14 14">
+                                  <path d="M14,0 C14,7.732 7.732,14 0,14 C4.5,14 8,11 9.5,8 C10.2,6 10.5,3.5 10.5,0 Z" />
+                                </svg>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
 
                       {/* iOS Bottom Input Bar */}
-                      <div className="px-3.5 py-2 bg-[#f6f6f6]/95 border-t border-[#e5e5ea] flex items-center gap-2">
-                        {/* Plus Apps Button */}
-                        <div className="w-7 h-7 rounded-full bg-[#e5e5ea] flex items-center justify-center text-zinc-600 shrink-0 hover:bg-[#d8d8dc] transition-colors">
-                          <Plus className="w-4 h-4 stroke-[2.5]" />
+                      <div className="px-3 py-1.5 bg-[#f6f6f6]/95 border-t border-[#e5e5ea] flex items-center gap-1.5">
+                        <div className="w-6 h-6 rounded-full bg-[#e5e5ea] flex items-center justify-center text-zinc-600 shrink-0">
+                          <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                         </div>
                         
-                        {/* Capsule Input Field */}
-                        <div className="flex-1 bg-white border border-[#d1d1d6] rounded-full px-3 py-1 flex items-center justify-between text-xs text-zinc-400 shadow-2xs">
+                        <div className="flex-1 bg-white border border-[#d1d1d6] rounded-full px-2.5 py-1 flex items-center justify-between text-[11px] text-zinc-400 shadow-2xs">
                           <span>iMessage</span>
-                          <Mic className="w-3.5 h-3.5 text-zinc-400" />
+                          <Mic className="w-3 h-3 text-zinc-400" />
                         </div>
 
-                        {/* Send Arrow Button */}
-                        <div className="w-7 h-7 rounded-full bg-[#007aff] flex items-center justify-center text-white shrink-0 shadow-2xs">
-                          <ArrowUp className="w-4 h-4 stroke-[3]" />
+                        <div className="w-6 h-6 rounded-full bg-[#007aff] flex items-center justify-center text-white shrink-0 shadow-2xs">
+                          <ArrowUp className="w-3.5 h-3.5 stroke-[3]" />
                         </div>
                       </div>
 
                       {/* iOS Home Indicator Bar */}
                       <div className="bg-[#f6f6f6]/95 pb-1 pt-0.5 flex justify-center">
-                        <div className="w-32 h-1 bg-zinc-300 rounded-full" />
+                        <div className="w-28 h-1 bg-zinc-300 rounded-full" />
                       </div>
 
                     </div>
