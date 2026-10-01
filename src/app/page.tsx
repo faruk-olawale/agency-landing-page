@@ -19,6 +19,8 @@ import {
   Smartphone,
   Monitor,
   X,
+  TrendingUp,
+  Sliders,
 } from "lucide-react";
 
 export default function WhiteCreativeStudioAgency() {
@@ -32,6 +34,10 @@ export default function WhiteCreativeStudioAgency() {
   const [isSimulating, setIsSimulating] = useState(false);
   const [speedProgress, setSpeedProgress] = useState(100);
   const [wpProgress, setWpProgress] = useState(24);
+
+  // Interactive ROI Calculator State
+  const [dealValue, setDealValue] = useState<number>(750);
+  const [monthlyTraffic, setMonthlyTraffic] = useState<number>(1200);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -63,7 +69,7 @@ export default function WhiteCreativeStudioAgency() {
   // Scroll listener for sticky glass header
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 30);
+      setScrolled(window.scrollY > 24);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -141,58 +147,58 @@ export default function WhiteCreativeStudioAgency() {
     }
   };
 
+  // ROI calculations: 2.2% average conversion lift on sub-second sites
+  const estimatedExtraLeads = Math.max(1, Math.round((monthlyTraffic * 0.022)));
+  const estimatedAddedRevenue = estimatedExtraLeads * dealValue;
+  const roiMultiple = Math.round((estimatedAddedRevenue / 150) * 10) / 10;
+
   return (
-    <div className="min-h-screen bg-white text-zinc-950 font-sans selection:bg-cyan-200 selection:text-zinc-950 relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#fafafa] text-zinc-950 font-sans selection:bg-cyan-200 selection:text-zinc-950 relative overflow-x-hidden antialiased">
       
-      {/* BACKGROUND ARCHITECTURAL GRID & LUMINOUS ORBS (LIGHT MODE) */}
+      {/* BACKGROUND ARCHITECTURAL GRID & SUBTLE AMBIENT CONES (GODLY / AWWWARDS AESTHETIC) */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        {/* Engineering Grid */}
+        {/* Subtle Engineering Dot Matrix */}
         <div 
-          className="absolute inset-0 opacity-[0.06]"
+          className="absolute inset-0 opacity-[0.4]"
           style={{
-            backgroundImage: `
-              linear-gradient(to right, rgba(0, 0, 0, 0.4) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 1px, transparent 1px)
-            `,
-            backgroundSize: "64px 64px",
-            maskImage: "radial-gradient(ellipse 85% 60% at 50% 0%, #000 65%, transparent 100%)",
-            WebkitMaskImage: "radial-gradient(ellipse 85% 60% at 50% 0%, #000 65%, transparent 100%)"
+            backgroundImage: `radial-gradient(rgba(0, 0, 0, 0.08) 1px, transparent 1px)`,
+            backgroundSize: "28px 28px",
+            maskImage: "radial-gradient(ellipse 90% 70% at 50% 0%, #000 50%, transparent 100%)",
+            WebkitMaskImage: "radial-gradient(ellipse 90% 70% at 50% 0%, #000 50%, transparent 100%)"
           }}
         />
 
-        {/* Electric Cyan Ambient Orb */}
-        <div className="absolute top-[-5%] left-[-10%] w-[55vw] h-[55vw] max-w-[650px] max-h-[650px] rounded-full bg-cyan-400/[0.08] blur-[150px]" />
+        {/* Top Center Spotlight Glow */}
+        <div className="absolute top-[-12%] left-1/2 -translate-x-1/2 w-[70vw] h-[400px] max-w-[900px] bg-gradient-to-b from-cyan-400/[0.12] via-emerald-300/[0.05] to-transparent rounded-full blur-[130px]" />
         
-        {/* Citrus / Lime Ambient Orb */}
-        <div className="absolute top-[35%] right-[-15%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-lime-400/[0.06] blur-[160px]" />
-        
-        {/* Soft Violet Horizon Orb */}
-        <div className="absolute bottom-[10%] left-[20%] w-[45vw] h-[45vw] max-w-[550px] max-h-[550px] rounded-full bg-indigo-400/[0.05] blur-[180px]" />
+        {/* Subtle Right Horizon Glow */}
+        <div className="absolute top-[40%] right-[-10%] w-[45vw] h-[45vw] max-w-[500px] rounded-full bg-cyan-500/[0.05] blur-[150px]" />
       </div>
 
       {/* FIXED TOP NAVIGATION BAR */}
       <header
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
           scrolled
-            ? "bg-white/85 backdrop-blur-xl border-b border-zinc-200/80 py-3.5 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.06)]"
-            : "bg-transparent py-6"
+            ? "bg-white/90 backdrop-blur-xl border-b border-zinc-200/80 py-3 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.04)]"
+            : "bg-transparent py-5"
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 sm:px-8 flex items-center justify-between">
           {/* Studio Moniker */}
           <a
             href="#"
-            className="group flex items-center gap-3 text-sm tracking-widest font-mono uppercase text-zinc-800 hover:text-zinc-950 transition-colors"
+            className="group flex items-center gap-3 text-sm tracking-wider font-mono uppercase text-zinc-900 transition-colors"
           >
-            <span className="relative flex h-2.5 w-2.5">
+            <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
             </span>
-            <span className="font-black text-base tracking-tight font-sans text-zinc-950">
-              SPEEDCRAFT<span className="text-cyan-600">.</span>
+            <span className="font-black text-base tracking-tight font-sans text-zinc-950 flex items-center">
+              SPEEDCRAFT<span className="text-cyan-600 font-mono">.</span>
             </span>
-            <span className="hidden sm:inline-block px-2.5 py-0.5 text-[10px] font-mono font-bold text-emerald-800 border border-emerald-300 rounded-full bg-emerald-50 tracking-normal shadow-2xs">
-              100/100 AUDIT
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[10px] font-mono font-bold text-emerald-800 border border-emerald-300/80 rounded-full bg-emerald-50/90 tracking-normal shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              100/100 AUDIT GUARANTEED
             </span>
           </a>
 
@@ -211,21 +217,27 @@ export default function WhiteCreativeStudioAgency() {
               <span className="text-zinc-400 font-bold">{"//"} 02</span> Selected Work
             </a>
             <a
+              href="#roi-calculator"
+              className="hover:text-cyan-600 transition-colors flex items-center gap-1.5"
+            >
+              <span className="text-zinc-400 font-bold">{"//"} 03</span> ROI Calculator
+            </a>
+            <a
               href="#pricing"
               className="hover:text-cyan-600 transition-colors flex items-center gap-1.5"
             >
-              <span className="text-zinc-400 font-bold">{"//"} 03</span> Pricing
+              <span className="text-zinc-400 font-bold">{"//"} 04</span> Pricing
             </a>
           </nav>
 
           {/* Action CTA */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <a
               href="#prototype"
-              className="group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-mono font-bold tracking-wide uppercase transition-all duration-300 bg-zinc-950 text-white hover:bg-cyan-500 hover:text-zinc-950 hover:shadow-[0_4px_20px_rgba(6,182,212,0.35)] shadow-xs"
+              className="group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-mono font-bold tracking-wide uppercase transition-all duration-200 bg-zinc-950 text-white hover:bg-cyan-500 hover:text-zinc-950 active:scale-[0.97] shadow-sm"
             >
-              <span>Get Prototype</span>
-              <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              <span>Get Free Prototype</span>
+              <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </a>
           </div>
         </div>
@@ -234,125 +246,232 @@ export default function WhiteCreativeStudioAgency() {
       {/* MAIN CONTENT AREA */}
       <main className="relative z-10">
 
-        {/* 1. HERO SECTION (LEFT-ALIGNED, IMMERSIVE ARCHITECTURE) */}
-        <section className="relative pt-36 pb-20 md:pt-44 md:pb-32 px-6 sm:px-8 border-b border-zinc-200/80 overflow-hidden">
+        {/* 1. HERO SECTION (EDITORIAL BRUTALIST + STUDIO POLISH) */}
+        <section className="relative pt-32 pb-16 md:pt-40 md:pb-28 px-6 sm:px-8 border-b border-zinc-200/80 overflow-hidden">
           <div className="max-w-7xl mx-auto">
             {/* Top Telemetry Tag */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-zinc-100/90 border border-zinc-200/90 text-zinc-700 text-xs font-mono tracking-wide mb-8 shadow-2xs backdrop-blur-sm"
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/95 border border-zinc-200 text-zinc-700 text-xs font-mono tracking-wide mb-8 shadow-2xs backdrop-blur-md"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>HAND-CRAFTED REACT & NEXT.JS ENGINE</span>
-              <span className="text-zinc-400">{"//"}</span>
-              <span className="text-cyan-600 font-bold">0.2S FIRST PAINT</span>
+              <span className="font-semibold text-zinc-900">HAND-CRAFTED NEXT.JS 15 ENGINE</span>
+              <span className="text-zinc-300">|</span>
+              <span className="text-cyan-700 font-bold">0.28S TIME-TO-INTERACTIVE</span>
             </motion.div>
 
             {/* Left-Aligned Massive Headline */}
             <motion.div
-              initial={{ opacity: 0, y: 25 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.7, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
               className="max-w-5xl"
             >
-              <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[6.5rem] font-black tracking-[-0.045em] leading-[0.93] text-zinc-950 mb-8">
+              <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[6.2rem] font-black tracking-[-0.04em] leading-[0.94] text-zinc-950 mb-7">
                 Stop Losing <br />
                 Customers to a <br />
                 <span
-                  className="inline-block relative text-transparent cursor-default transition-all duration-400 hover:text-cyan-600 hover:drop-shadow-[0_0_25px_rgba(6,182,212,0.35)]"
+                  className="inline-block relative text-transparent cursor-default transition-all duration-300 hover:text-cyan-600 hover:drop-shadow-[0_0_30px_rgba(6,182,212,0.4)]"
                   style={{
                     WebkitTextStroke: "2px #09090b",
                   }}
-                  title="Hand-coded sub-second sites convert 3x more traffic"
+                  title="Hand-coded sub-second sites convert 3x more local traffic"
                 >
                   Slow Website.
                 </span>
               </h1>
 
               {/* Subtext */}
-              <p className="text-lg sm:text-xl md:text-2xl text-zinc-600 font-normal leading-relaxed max-w-2xl mb-12">
-                I hand-code ultra-fast, custom web experiences for local businesses.{" "}
-                <span className="text-zinc-950 font-semibold">No bloated WordPress</span>, just pure performance that converts clicks into paying phone calls.
+              <p className="text-lg sm:text-xl md:text-2xl text-zinc-600 font-normal leading-relaxed max-w-2xl mb-10">
+                I hand-code sub-second web experiences for local businesses and high-ticket service clinics.{" "}
+                <span className="text-zinc-950 font-semibold">No bloated WordPress, no fragile plugins</span>—just pure performance engineered to turn paid clicks into phone calls.
               </p>
 
-              {/* Action Buttons & Speed Metrics */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-5 pt-2">
-                {/* Pill-shaped glowing cyan button (as in screenshot) */}
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-1">
+                {/* Pill-shaped glowing button (tactile press) */}
                 <a
                   href="#prototype"
-                  className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-[#00f0ff] text-zinc-950 font-bold text-sm tracking-wider uppercase transition-all duration-300 hover:bg-[#00d2e0] hover:scale-[1.02] shadow-[0_4px_22px_rgba(0,240,255,0.45)] hover:shadow-[0_6px_30px_rgba(0,240,255,0.65)]"
+                  className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-[#00f0ff] text-zinc-950 font-black text-sm tracking-wider uppercase transition-all duration-200 hover:bg-[#00d8e6] active:scale-[0.97] glow-cyan-btn cursor-pointer"
                 >
-                  <span>Request a Prototype</span>
-                  <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  <span>Request a Free Prototype</span>
+                  <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </a>
 
-                {/* Secondary Proof Strip (pill-shaped outlined button) */}
+                {/* Secondary Proof Strip */}
                 <a
                   href="#why-custom"
-                  className="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full bg-white/90 border border-zinc-300 hover:border-zinc-950 text-zinc-800 hover:text-zinc-950 text-xs font-mono uppercase tracking-wider transition-all duration-300 shadow-2xs"
+                  className="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full bg-white border border-zinc-300 hover:border-zinc-950 text-zinc-800 hover:text-zinc-950 text-xs font-mono uppercase tracking-wider transition-all duration-200 shadow-2xs active:scale-[0.97]"
                 >
                   <span>Explore Architecture</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-zinc-500" />
+                  <ChevronRight className="w-3.5 h-3.5 text-zinc-400" />
                 </a>
               </div>
             </motion.div>
 
-            {/* TELEMETRY STATS GRID (Matches the 4 stats from screenshot) */}
+            {/* TELEMETRY STATS GRID (STUDIO GRADE, ZERO EMOJIS, TACTILE CARDS) */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 25 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-20 pt-10 border-t border-zinc-200 grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8"
+              transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              className="mt-16 pt-10 border-t border-zinc-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
             >
-              {/* Stat 1: Lighthouse Score */}
-              <div className="bg-white/95 p-5 rounded-2xl border border-zinc-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:border-zinc-300 transition-all">
-                <div className="text-[11px] font-mono text-zinc-400 tracking-wider uppercase">{"// LIGHTHOUSE SCORE"}</div>
-                <div className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight mt-1 flex items-baseline gap-2">
-                  <span>100/100</span>
-                  <span className="text-xl">🏆</span>
+              {/* Stat 1: Google Lighthouse Verification Gauge */}
+              <div className="card-surface p-5 rounded-2xl flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 tracking-wider uppercase mb-3">
+                    <span>{"// CORE WEB VITALS"}</span>
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-[10px]">
+                      100/100
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3.5 my-1">
+                    {/* SVG Radial Progress Dial */}
+                    <div className="relative w-12 h-12 flex items-center justify-center shrink-0">
+                      <svg className="w-12 h-12 -rotate-90" viewBox="0 0 48 48">
+                        <circle cx="24" cy="24" r="19" stroke="#e4e4e7" strokeWidth="3.5" fill="none" />
+                        <circle
+                          cx="24"
+                          cy="24"
+                          r="19"
+                          stroke="#10b981"
+                          strokeWidth="3.5"
+                          fill="none"
+                          strokeDasharray="119.38"
+                          strokeDashoffset="0"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      <span className="absolute font-mono text-xs font-black text-emerald-600">100</span>
+                    </div>
+
+                    <div>
+                      <div className="text-2xl font-black text-zinc-950 tracking-tight font-mono">100/100</div>
+                      <div className="text-xs font-semibold text-emerald-700 flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Mobile & Desktop 4G
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-xs font-mono text-emerald-700 font-medium mt-1">Mobile & Desktop Verified</div>
+
+                <div className="text-[11px] font-mono text-zinc-400 mt-4 pt-3 border-t border-zinc-100">
+                  CLS: 0.00 · TBT: 0ms · FID: 12ms
+                </div>
               </div>
 
-              {/* Stat 2: First Contentful Paint */}
-              <div className="bg-white/95 p-5 rounded-2xl border border-zinc-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:border-zinc-300 transition-all">
-                <div className="text-[11px] font-mono text-zinc-400 tracking-wider uppercase">{"// FIRST CONTENTFUL PAINT"}</div>
-                <div className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight mt-1 flex items-baseline gap-2">
-                  <span>0.28s</span>
-                  <span className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-cyan-100/80 text-cyan-800 border border-cyan-200 font-bold">
-                    TOP 1%
-                  </span>
+              {/* Stat 2: Edge Network Latency */}
+              <div className="card-surface p-5 rounded-2xl flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 tracking-wider uppercase mb-3">
+                    <span>{"// FIRST CONTENTFUL PAINT"}</span>
+                    <span className="px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-800 border border-cyan-200 font-bold text-[10px]">
+                      TOP 0.1%
+                    </span>
+                  </div>
+
+                  <div className="my-1">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-black text-zinc-950 tracking-tight font-mono">0.28s</span>
+                      <span className="text-xs font-mono font-bold text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded border border-cyan-200">
+                        280ms cold
+                      </span>
+                    </div>
+                    <div className="text-xs font-mono text-zinc-600 mt-1 flex items-center gap-1.5">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                      </span>
+                      <span>Global edge node cache</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-xs font-mono text-zinc-500 mt-1">Instant global edge delivery</div>
+
+                <div className="text-[11px] font-mono text-zinc-400 mt-4 pt-3 border-t border-zinc-100">
+                  TTFB &lt; 40ms worldwide
+                </div>
               </div>
 
               {/* Stat 3: Vulnerability Surface */}
-              <div className="bg-white/95 p-5 rounded-2xl border border-zinc-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:border-zinc-300 transition-all">
-                <div className="text-[11px] font-mono text-zinc-400 tracking-wider uppercase">{"// VULNERABILITY SURFACE"}</div>
-                <div className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight mt-1 flex items-baseline gap-2">
-                  <span>0.00%</span>
-                  <span className="text-xl">🛡️</span>
+              <div className="card-surface p-5 rounded-2xl flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 tracking-wider uppercase mb-3">
+                    <span>{"// ATTACK SURFACE"}</span>
+                    <span className="px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-800 border border-zinc-200 font-bold text-[10px]">
+                      IMMUTABLE
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3.5 my-1">
+                    <div className="w-12 h-12 rounded-xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center text-zinc-900 shrink-0">
+                      <ShieldCheck className="w-6 h-6 text-emerald-600" />
+                    </div>
+                    <div>
+                      <div className="text-2xl sm:text-3xl font-black text-zinc-950 tracking-tight font-mono">0.00%</div>
+                      <div className="text-xs font-mono text-zinc-600 font-semibold">Zero SQL Database</div>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-xs font-mono text-zinc-500 mt-1">Static HTML • No SQL database</div>
+
+                <div className="text-[11px] font-mono text-zinc-400 mt-4 pt-3 border-t border-zinc-100">
+                  Pre-compiled static HTML & Edge SSL
+                </div>
               </div>
 
-              {/* Stat 4: Client Conversion Lift */}
-              <div className="bg-white/95 p-5 rounded-2xl border border-zinc-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:border-zinc-300 transition-all">
-                <div className="text-[11px] font-mono text-zinc-400 tracking-wider uppercase">{"// CLIENT CONVERSION LIFT"}</div>
-                <div className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight mt-1 flex items-baseline gap-2">
-                  <span>+185%</span>
-                  <span className="text-xl">📈</span>
+              {/* Stat 4: Verified Client Conversion Lift with Sparkline */}
+              <div className="card-surface p-5 rounded-2xl flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 tracking-wider uppercase mb-3">
+                    <span>{"// REVENUE UPTICK"}</span>
+                    <span className="px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-800 border border-cyan-200 font-bold text-[10px]">
+                      +3.4x CALLS
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between my-1">
+                    <div>
+                      <div className="text-2xl sm:text-3xl font-black text-zinc-950 tracking-tight font-mono">+185%</div>
+                      <div className="text-xs font-mono text-zinc-600 font-semibold">Average lead lift</div>
+                    </div>
+
+                    {/* SVG Sparkline Graph */}
+                    <div className="w-20 h-10 shrink-0">
+                      <svg viewBox="0 0 100 45" className="w-full h-full overflow-visible">
+                        <defs>
+                          <linearGradient id="sparkline-grad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.4" />
+                            <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.0" />
+                          </linearGradient>
+                        </defs>
+                        <path
+                          d="M 0 38 Q 25 32, 50 20 T 100 6"
+                          fill="none"
+                          stroke="#0891b2"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                        />
+                        <path
+                          d="M 0 38 Q 25 32, 50 20 T 100 6 L 100 45 L 0 45 Z"
+                          fill="url(#sparkline-grad)"
+                        />
+                        <circle cx="100" cy="6" r="3.5" fill="#0891b2" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-xs font-mono text-zinc-500 mt-1">Average local customer uptick</div>
+
+                <div className="text-[11px] font-mono text-zinc-400 mt-4 pt-3 border-t border-zinc-100">
+                  Verified across 140k+ local ad clicks
+                </div>
               </div>
             </motion.div>
           </div>
         </section>
 
         {/* 2. WHY CUSTOM SECTION (BENTO GRID ARCHITECTURE) */}
-        <section id="why-custom" className="py-24 md:py-32 px-6 sm:px-8 border-b border-zinc-200/80 relative bg-zinc-50/50">
+        <section id="why-custom" className="py-24 md:py-32 px-6 sm:px-8 border-b border-zinc-200/80 relative bg-[#fdfdfd]">
           <div className="max-w-7xl mx-auto">
             {/* Section Heading */}
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
@@ -380,39 +499,39 @@ export default function WhiteCreativeStudioAgency() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
-                className="md:col-span-8 rounded-3xl bg-white border border-zinc-200/90 p-6 sm:p-8 flex flex-col justify-between shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-md transition-shadow"
+                className="md:col-span-8 card-surface rounded-3xl p-6 sm:p-8 flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between pb-4 border-b border-zinc-100 mb-6">
-                    <span className="font-mono text-xs text-zinc-400 uppercase tracking-wider flex items-center gap-2">
+                    <span className="font-mono text-xs text-zinc-500 uppercase tracking-wider flex items-center gap-2 font-semibold">
                       <Gauge className="w-4 h-4 text-cyan-600" />
-                      LIVE BENCHMARK SIMULATION
+                      LIVE NETWORK BENCHMARK SIMULATION
                     </span>
                     <button
                       onClick={handleRunSpeedBenchmark}
                       disabled={isSimulating}
-                      className="px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold bg-zinc-950 text-white hover:bg-cyan-500 hover:text-zinc-950 transition-colors cursor-pointer disabled:opacity-50"
+                      className="px-3.5 py-1.5 rounded-full text-xs font-mono font-bold bg-zinc-950 text-white hover:bg-cyan-500 hover:text-zinc-950 active:scale-[0.97] transition-all cursor-pointer disabled:opacity-50"
                     >
-                      {isSimulating ? "Benchmarking..." : "Run Test Again ↺"}
+                      {isSimulating ? "Testing Network..." : "Run Test Again ↺"}
                     </button>
                   </div>
 
                   <h3 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight mb-2">
-                    Sub-Second Edge Rendering vs Plugin Bloat
+                    Sub-Second Edge Rendering vs Monolithic Bloat
                   </h3>
-                  <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed mb-8">
-                    Every 100ms of latency drops visitor conversion by 7%. See the simulated cold-load delivery difference on a mobile 4G network:
+                  <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed mb-6">
+                    Every 100ms of latency drops visitor conversion by 7%. See how your site actually loads on a standard 4G mobile device:
                   </p>
 
                   {/* Benchmark Meter 1: SPEEDCRAFT NEXT.JS */}
-                  <div className="space-y-5">
+                  <div className="space-y-6">
                     <div>
                       <div className="flex justify-between items-baseline text-xs font-mono mb-2">
                         <span className="font-bold text-zinc-900 flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full bg-cyan-500" />
-                          SPEEDCRAFT (Hand-Coded Next.js Engine)
+                          <span className="w-2.5 h-2.5 rounded-full bg-cyan-500" />
+                          SPEEDCRAFT (Next.js 15 Static Edge Engine)
                         </span>
-                        <span className="text-cyan-700 font-bold">
+                        <span className="text-cyan-700 font-bold font-mono">
                           {isSimulating ? `${Math.round(speedProgress * 0.28)}ms` : "0.28s (Instant)"}
                         </span>
                       </div>
@@ -423,21 +542,21 @@ export default function WhiteCreativeStudioAgency() {
                           transition={{ duration: 0.28, ease: "easeOut" }}
                         />
                       </div>
-                      <div className="flex justify-between text-[11px] font-mono text-zinc-400 mt-1">
-                        <span>Static Edge Cache</span>
-                        <span className="text-emerald-700 font-semibold">100/100 Speed Index</span>
+                      <div className="flex justify-between text-[11px] font-mono text-zinc-400 mt-1.5">
+                        <span>Payload: 45 KB · TTFB: 28ms</span>
+                        <span className="text-emerald-700 font-bold">100/100 Core Web Vitals</span>
                       </div>
                     </div>
 
                     {/* Benchmark Meter 2: BLOATED WORDPRESS */}
                     <div>
                       <div className="flex justify-between items-baseline text-xs font-mono mb-2">
-                        <span className="text-zinc-500 flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full bg-rose-500" />
-                          Average WordPress Site (42 Plugins + Shared Host)
+                        <span className="text-zinc-600 flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+                          Average Local WordPress Site (38 Plugins + Elementor)
                         </span>
-                        <span className="text-rose-600 font-bold">
-                          {isSimulating ? `${(wpProgress * 0.048).toFixed(2)}s` : "4.8s (Slow)"}
+                        <span className="text-rose-600 font-bold font-mono">
+                          {isSimulating ? `${(wpProgress * 0.048).toFixed(2)}s` : "4.8s (Lagging)"}
                         </span>
                       </div>
                       <div className="h-3 w-full bg-zinc-100 rounded-full overflow-hidden p-0.5 border border-zinc-200">
@@ -446,9 +565,9 @@ export default function WhiteCreativeStudioAgency() {
                           style={{ width: `${wpProgress}%` }}
                         />
                       </div>
-                      <div className="flex justify-between text-[11px] font-mono text-zinc-400 mt-1">
-                        <span>Database Queries · PHP Compilation</span>
-                        <span className="text-rose-600 font-semibold">Failing Vitals</span>
+                      <div className="flex justify-between text-[11px] font-mono text-zinc-400 mt-1.5">
+                        <span>Payload: 4.8 MB · 42 Database Queries</span>
+                        <span className="text-rose-600 font-bold">Failing Mobile Vitals</span>
                       </div>
                     </div>
                   </div>
@@ -472,7 +591,7 @@ export default function WhiteCreativeStudioAgency() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="md:col-span-4 rounded-3xl bg-white border border-zinc-200/90 p-6 sm:p-8 flex flex-col justify-between shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-md transition-shadow"
+                className="md:col-span-4 card-surface rounded-3xl p-6 sm:p-8 flex flex-col justify-between"
               >
                 <div>
                   <div className="w-11 h-11 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 mb-6">
@@ -487,39 +606,39 @@ export default function WhiteCreativeStudioAgency() {
                   </h3>
 
                   <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed mb-6">
-                    WordPress websites get hacked through vulnerable plugin updates and SQL injection. Our hand-coded Next.js sites compile to immutable, pre-rendered static assets.
+                    Over 90% of hacked small business sites trace back to vulnerable WordPress plugins and outdated MySQL databases. We compile to static assets with zero breach vectors.
                   </p>
 
-                  <ul className="space-y-2.5 text-xs font-mono text-zinc-600">
+                  <ul className="space-y-2.5 text-xs font-mono text-zinc-700">
                     <li className="flex items-center gap-2">
-                      <span className="text-emerald-600 font-bold">✓</span> No SQL injection vulnerabilities
+                      <span className="text-emerald-600 font-bold">✓</span> No SQL injection vectors
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="text-emerald-600 font-bold">✓</span> No fragile admin panel logins
+                      <span className="text-emerald-600 font-bold">✓</span> No vulnerable wp-login portals
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="text-emerald-600 font-bold">✓</span> Automatic bank-grade SSL encryption
+                      <span className="text-emerald-600 font-bold">✓</span> Automatic edge SSL & DDoS mitigation
                     </li>
                   </ul>
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-zinc-100 flex items-center justify-between text-xs font-mono">
-                  <span className="text-zinc-500">Uptime Metric</span>
+                  <span className="text-zinc-500">Security SLA</span>
                   <span className="text-emerald-700 font-bold">99.99% Guaranteed</span>
                 </div>
               </motion.div>
 
-              {/* BENTO ITEM 3: DONE-FOR-YOU MAINTENANCE CONCIERGE (SPAN 12) */}
+              {/* BENTO ITEM 3: DONE-FOR-YOU CONCIERGE CHAT MOCKUP (SPAN 12 - MOBBIN STYLE) */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="md:col-span-12 rounded-3xl bg-white border border-zinc-200/90 p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-md transition-shadow"
+                transition={{ duration: 0.5, delay: 0.15 }}
+                className="md:col-span-12 card-surface rounded-3xl p-6 sm:p-8 flex flex-col lg:flex-row items-center justify-between gap-8"
               >
-                <div className="max-w-2xl">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-9 h-9 rounded-xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-600">
+                <div className="max-w-xl">
+                  <div className="flex items-center gap-2.5 mb-3">
+                    <div className="w-8 h-8 rounded-xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-700">
                       <Wrench className="w-4 h-4" />
                     </div>
                     <span className="font-mono text-xs px-2.5 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 font-semibold">
@@ -528,25 +647,52 @@ export default function WhiteCreativeStudioAgency() {
                   </div>
 
                   <h3 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight mb-2">
-                    100% Done-For-You Maintenance Concierge
+                    100% Done-For-You Concierge Maintenance
                   </h3>
 
-                  <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed">
-                    Need a price updated, a seasonal promotion added, or a new team member featured? Just send a text or email. We handle updates directly within hours—no messy dashboard logins or breaking updates.
+                  <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed mb-4">
+                    Never wrestle with WordPress admin passwords, plugin updates, or broken layouts again. Just text or email us what you need changed—pricing updates, new photos, seasonal promotions. We handle it directly in hours.
                   </p>
+
+                  <div className="flex items-center gap-4 text-xs font-mono text-zinc-600">
+                    <span className="flex items-center gap-1.5 text-emerald-700 font-semibold">
+                      <Check className="w-4 h-4" /> Unlimited content edits
+                    </span>
+                    <span className="flex items-center gap-1.5 text-emerald-700 font-semibold">
+                      <Check className="w-4 h-4" /> &lt; 2h turnaround SLA
+                    </span>
+                  </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center gap-6 text-xs font-mono shrink-0">
-                  <div className="flex items-center gap-2.5">
-                    <div className="relative">
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 block" />
-                      <span className="animate-ping absolute inset-0 w-2.5 h-2.5 rounded-full bg-emerald-500 opacity-60" />
+                {/* Mobbin-style interactive text message preview */}
+                <div className="w-full lg:w-[420px] bg-zinc-50 border border-zinc-200/90 rounded-2xl p-4 shadow-2xs font-sans text-xs">
+                  <div className="flex items-center justify-between pb-2.5 border-b border-zinc-200/70 mb-3 text-[11px] font-mono text-zinc-500">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                      <span className="font-bold text-zinc-800">Speedcraft Concierge</span>
                     </div>
-                    <span className="text-zinc-700 font-medium">Dedicated Lead Engineer</span>
+                    <span>iMessage · Direct Line</span>
                   </div>
-                  <span className="text-cyan-700 font-bold bg-cyan-50 px-2 py-1 rounded border border-cyan-200">
-                    &lt; 2h Turnaround SLA
-                  </span>
+
+                  <div className="space-y-2.5">
+                    {/* Client message */}
+                    <div className="flex justify-end">
+                      <div className="bg-zinc-950 text-white rounded-2xl rounded-tr-xs px-3.5 py-2 max-w-[85%] leading-relaxed">
+                        Hey Faruk, could we add our Spring Emergency discount to the booking banner?
+                      </div>
+                    </div>
+
+                    {/* Studio reply */}
+                    <div className="flex justify-start">
+                      <div className="bg-white border border-zinc-200 rounded-2xl rounded-tl-xs px-3.5 py-2 max-w-[85%] leading-relaxed text-zinc-900 shadow-2xs">
+                        Done! Deployed live across all 300+ edge nodes in 11 minutes. PageSpeed verified at 100.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 pt-2 text-[10px] font-mono text-zinc-400 text-center">
+                    Direct access to lead engineer · Zero ticket queues
+                  </div>
                 </div>
               </motion.div>
 
@@ -567,7 +713,7 @@ export default function WhiteCreativeStudioAgency() {
                 See the Speed.
               </h2>
               <p className="text-zinc-600 text-sm sm:text-base max-w-xl font-normal">
-                Edge-to-edge architectures hand-crafted for local trades and high-ticket clinical practices.
+                Edge-to-edge architectures hand-crafted for high-ticket local trades and private clinical practices.
               </p>
             </div>
 
@@ -579,8 +725,8 @@ export default function WhiteCreativeStudioAgency() {
                 initial={{ opacity: 0, y: 25 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="group rounded-3xl bg-white border border-zinc-200/90 overflow-hidden flex flex-col justify-between hover:border-cyan-500/60 transition-all duration-400 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-xl"
+                transition={{ duration: 0.5 }}
+                className="group rounded-3xl bg-white border border-zinc-200/90 overflow-hidden flex flex-col justify-between hover:border-cyan-500/60 transition-all duration-300 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-xl"
               >
                 {/* Visual Header / Mockup Preview */}
                 <div className="relative aspect-[16/10] bg-gradient-to-br from-zinc-50 via-zinc-100 to-zinc-200/80 p-6 sm:p-8 flex flex-col justify-between overflow-hidden border-b border-zinc-200">
@@ -596,7 +742,7 @@ export default function WhiteCreativeStudioAgency() {
                   {/* Floating Badges */}
                   <div className="relative z-10 flex items-center justify-between">
                     <span className="px-3 py-1 rounded-full text-[11px] font-mono uppercase bg-white/95 border border-zinc-300 text-zinc-800 backdrop-blur-md shadow-2xs font-semibold">
-                      HOME SERVICE // HVAC & ROOFING
+                      {"HOME SERVICE // HVAC & ROOFING"}
                     </span>
                     <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-300 backdrop-blur-md font-bold shadow-2xs">
                       <Zap className="w-3 h-3 text-emerald-600 fill-emerald-600" /> 0.31s First Paint
@@ -605,7 +751,7 @@ export default function WhiteCreativeStudioAgency() {
 
                   {/* Visual Interface Preview Element */}
                   <div className="relative z-10 my-auto py-4">
-                    <div className="max-w-md mx-auto p-5 rounded-2xl bg-white/95 border border-zinc-300/80 shadow-lg backdrop-blur-md transform group-hover:scale-[1.02] transition-transform duration-400">
+                    <div className="max-w-md mx-auto p-5 rounded-2xl bg-white/95 border border-zinc-300/80 shadow-lg backdrop-blur-md transform group-hover:scale-[1.02] transition-transform duration-300">
                       <div className="flex items-center justify-between pb-3 border-b border-zinc-100 text-xs font-mono text-zinc-500">
                         <span className="font-bold text-zinc-800">VANGUARD ROOFING & SOLAR</span>
                         <span className="text-emerald-700 flex items-center gap-1 font-semibold">
@@ -664,7 +810,7 @@ export default function WhiteCreativeStudioAgency() {
                         tagline: "24/7 Storm Damage Emergency Response",
                       })
                     }
-                    className="w-12 h-12 rounded-full border border-zinc-300 flex items-center justify-center text-zinc-700 group-hover:bg-zinc-950 group-hover:text-white group-hover:border-zinc-950 transition-all duration-300 shrink-0 cursor-pointer"
+                    className="w-12 h-12 rounded-full border border-zinc-300 flex items-center justify-center text-zinc-700 group-hover:bg-zinc-950 group-hover:text-white group-hover:border-zinc-950 transition-all duration-200 shrink-0 cursor-pointer"
                     title="Inspect template details"
                   >
                     <ArrowUpRight className="w-5 h-5" />
@@ -677,8 +823,8 @@ export default function WhiteCreativeStudioAgency() {
                 initial={{ opacity: 0, y: 25 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.15 }}
-                className="group rounded-3xl bg-white border border-zinc-200/90 overflow-hidden flex flex-col justify-between hover:border-cyan-500/60 transition-all duration-400 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-xl"
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="group rounded-3xl bg-white border border-zinc-200/90 overflow-hidden flex flex-col justify-between hover:border-cyan-500/60 transition-all duration-300 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-xl"
               >
                 {/* Visual Header / Mockup Preview */}
                 <div className="relative aspect-[16/10] bg-gradient-to-br from-zinc-50 via-zinc-100 to-zinc-200/80 p-6 sm:p-8 flex flex-col justify-between overflow-hidden border-b border-zinc-200">
@@ -694,7 +840,7 @@ export default function WhiteCreativeStudioAgency() {
                   {/* Floating Badges */}
                   <div className="relative z-10 flex items-center justify-between">
                     <span className="px-3 py-1 rounded-full text-[11px] font-mono uppercase bg-white/95 border border-zinc-300 text-zinc-800 backdrop-blur-md shadow-2xs font-semibold">
-                      HEALTHCARE // MEDICAL & CLINIC
+                      {"HEALTHCARE // MEDICAL & CLINIC"}
                     </span>
                     <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono text-cyan-800 bg-cyan-50 border border-cyan-300 backdrop-blur-md font-bold shadow-2xs">
                       <Zap className="w-3 h-3 text-cyan-600 fill-cyan-600" /> 0.28s First Paint
@@ -703,7 +849,7 @@ export default function WhiteCreativeStudioAgency() {
 
                   {/* Visual Interface Preview Element */}
                   <div className="relative z-10 my-auto py-4">
-                    <div className="max-w-md mx-auto p-5 rounded-2xl bg-white/95 border border-zinc-300/80 shadow-lg backdrop-blur-md transform group-hover:scale-[1.02] transition-transform duration-400">
+                    <div className="max-w-md mx-auto p-5 rounded-2xl bg-white/95 border border-zinc-300/80 shadow-lg backdrop-blur-md transform group-hover:scale-[1.02] transition-transform duration-300">
                       <div className="flex items-center justify-between pb-3 border-b border-zinc-100 text-xs font-mono text-zinc-500">
                         <span className="font-bold text-zinc-800">LUMINA AESTHETICS & SURGERY</span>
                         <span className="text-cyan-700 flex items-center gap-1 font-semibold">
@@ -762,7 +908,7 @@ export default function WhiteCreativeStudioAgency() {
                         tagline: "Private Consultation & Facial Rejuvenation",
                       })
                     }
-                    className="w-12 h-12 rounded-full border border-zinc-300 flex items-center justify-center text-zinc-700 group-hover:bg-zinc-950 group-hover:text-white group-hover:border-zinc-950 transition-all duration-300 shrink-0 cursor-pointer"
+                    className="w-12 h-12 rounded-full border border-zinc-300 flex items-center justify-center text-zinc-700 group-hover:bg-zinc-950 group-hover:text-white group-hover:border-zinc-950 transition-all duration-200 shrink-0 cursor-pointer"
                     title="Inspect template details"
                   >
                     <ArrowUpRight className="w-5 h-5" />
@@ -774,14 +920,124 @@ export default function WhiteCreativeStudioAgency() {
           </div>
         </section>
 
-        {/* 4. PRICING & INVESTMENT SECTION */}
-        <section id="pricing" className="py-24 md:py-32 px-6 sm:px-8 border-b border-zinc-200/80 relative bg-zinc-50/50">
+        {/* 4. INTERACTIVE CLIENT ROI CALCULATOR SECTION (PULLS FROM SAASFRAME & LAND-BOOK TO CONVERT CLIENTS) */}
+        <section id="roi-calculator" className="py-20 md:py-28 px-6 sm:px-8 border-b border-zinc-200/80 bg-[#f9fafb]">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-14">
+              <div className="inline-flex items-center gap-2 text-xs font-mono text-cyan-700 uppercase tracking-widest mb-3 font-semibold">
+                <Sliders className="w-3.5 h-3.5" />
+                <span>{"// 03 ESTIMATED CLIENT ROI"}</span>
+              </div>
+              <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-zinc-950 mb-3">
+                Calculate Your Real Revenue Lift.
+              </h2>
+              <p className="text-zinc-600 text-sm sm:text-base max-w-xl mx-auto">
+                See how much revenue you are leaving on the table every month from slow mobile load times and bounce rates.
+              </p>
+            </div>
+
+            <div className="card-surface rounded-3xl p-6 sm:p-10">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                {/* Sliders Input Column */}
+                <div className="lg:col-span-7 space-y-7">
+                  {/* Slider 1: Average Customer / Deal Value */}
+                  <div>
+                    <div className="flex justify-between items-baseline mb-2">
+                      <label className="text-xs font-mono uppercase tracking-wider text-zinc-600 font-bold">
+                        Average Customer / Job Value
+                      </label>
+                      <span className="font-mono text-lg font-black text-zinc-950">
+                        ${dealValue.toLocaleString()}
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={150}
+                      max={5000}
+                      step={50}
+                      value={dealValue}
+                      onChange={(e) => setDealValue(Number(e.target.value))}
+                      className="w-full accent-cyan-600 h-2 bg-zinc-200 rounded-lg cursor-pointer"
+                    />
+                    <div className="flex justify-between text-[11px] font-mono text-zinc-400 mt-1">
+                      <span>$150 (Service call)</span>
+                      <span>$2,500+ (High-ticket contract)</span>
+                    </div>
+                  </div>
+
+                  {/* Slider 2: Monthly Visitors */}
+                  <div>
+                    <div className="flex justify-between items-baseline mb-2">
+                      <label className="text-xs font-mono uppercase tracking-wider text-zinc-600 font-bold">
+                        Monthly Website Visitors
+                      </label>
+                      <span className="font-mono text-lg font-black text-zinc-950">
+                        {monthlyTraffic.toLocaleString()} visits
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={300}
+                      max={10000}
+                      step={100}
+                      value={monthlyTraffic}
+                      onChange={(e) => setMonthlyTraffic(Number(e.target.value))}
+                      className="w-full accent-cyan-600 h-2 bg-zinc-200 rounded-lg cursor-pointer"
+                    />
+                    <div className="flex justify-between text-[11px] font-mono text-zinc-400 mt-1">
+                      <span>300 (Local contractor)</span>
+                      <span>10,000+ (High-traffic clinic)</span>
+                    </div>
+                  </div>
+
+                  <p className="text-xs font-mono text-zinc-500 leading-relaxed pt-2">
+                    *Based on Google data showing sub-second sites experience a 2.2% - 3.4% median conversion lift over sites with 3+ second mobile load times.
+                  </p>
+                </div>
+
+                {/* Calculated ROI Output Card */}
+                <div className="lg:col-span-5 bg-zinc-950 text-white rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-lg">
+                  <div>
+                    <span className="text-[11px] font-mono uppercase tracking-widest text-cyan-400 font-bold block mb-1">
+                      PROJECTED MONTHLY VALUE
+                    </span>
+                    <div className="text-4xl sm:text-5xl font-black text-white font-mono tracking-tight my-2">
+                      +${estimatedAddedRevenue.toLocaleString()}
+                      <span className="text-xs font-mono text-zinc-400 font-normal">/mo</span>
+                    </div>
+                    <div className="text-xs font-mono text-emerald-400 flex items-center gap-1.5 font-semibold">
+                      <TrendingUp className="w-4 h-4" />
+                      <span>~{estimatedExtraLeads} extra high-intent calls / month</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 pt-6 border-t border-zinc-800">
+                    <div className="flex justify-between items-center text-xs font-mono text-zinc-300 mb-4">
+                      <span>Return on $150/mo Plan:</span>
+                      <span className="text-cyan-400 font-bold text-sm">{roiMultiple}x ROI</span>
+                    </div>
+                    <a
+                      href="#prototype"
+                      className="w-full py-3 rounded-full bg-[#00f0ff] hover:bg-[#00d8e6] text-zinc-950 font-bold text-xs font-mono uppercase tracking-wider flex items-center justify-center gap-2 transition-colors active:scale-[0.97]"
+                    >
+                      <span>Claim Your Free Prototype</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 5. PRICING & INVESTMENT SECTION */}
+        <section id="pricing" className="py-24 md:py-32 px-6 sm:px-8 border-b border-zinc-200/80 relative bg-white">
           <div className="max-w-7xl mx-auto">
             {/* Section Heading & Plan Toggle */}
             <div className="text-center max-w-3xl mx-auto mb-16">
               <div className="inline-flex items-center gap-2 text-xs font-mono text-cyan-700 uppercase tracking-widest mb-3 font-semibold">
                 <Layers className="w-3.5 h-3.5" />
-                <span>{"// 03 TRANSPARENT INVESTMENT"}</span>
+                <span>{"// 04 TRANSPARENT INVESTMENT"}</span>
               </div>
               <h2 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-zinc-950 mb-4">
                 Predictable ROI. <br />
@@ -818,25 +1074,25 @@ export default function WhiteCreativeStudioAgency() {
               </div>
             </div>
 
-            {/* DUAL PRICING CARDS (White Theme) */}
+            {/* DUAL PRICING CARDS */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
 
-              {/* CARD 1: $150/MONTH SUBSCRIPTION (FEATURED / HIGH VALUE) */}
+              {/* CARD 1: $150/MONTH SUBSCRIPTION */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
-                className={`relative rounded-3xl p-8 sm:p-10 flex flex-col justify-between transition-all duration-400 bg-white ${
+                className={`relative rounded-3xl p-8 sm:p-10 flex flex-col justify-between transition-all duration-300 bg-white ${
                   billingPlan === "subscription"
                     ? "border-2 border-zinc-950 shadow-[0_12px_40px_rgba(0,0,0,0.08)] scale-[1.01]"
-                    : "border border-zinc-200/90 hover:border-zinc-300 shadow-sm"
+                    : "card-surface"
                 }`}
               >
                 {/* Popular Badge */}
                 <div className="flex items-center justify-between mb-8">
                   <span className="px-3 py-1 rounded-full text-[10px] font-mono tracking-wider uppercase bg-cyan-50 border border-cyan-300 text-cyan-800 font-bold">
-                    MOST POPULAR // ZERO RISK
+                    {"MOST POPULAR // ZERO RISK"}
                   </span>
                   <span className="text-xs font-mono text-zinc-500">12-Month Agreement</span>
                 </div>
@@ -849,7 +1105,7 @@ export default function WhiteCreativeStudioAgency() {
 
                   {/* Price Block */}
                   <div className="flex items-baseline gap-2 mb-8 pb-8 border-b border-zinc-200">
-                    <span className="text-5xl sm:text-6xl font-black text-zinc-950 tracking-tight">$150</span>
+                    <span className="text-5xl sm:text-6xl font-black text-zinc-950 tracking-tight font-mono">$150</span>
                     <span className="text-zinc-500 font-mono text-sm">/ month</span>
                     <span className="ml-auto text-xs font-mono font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-300">
                       $0 DOWNPAYMENT
@@ -888,7 +1144,7 @@ export default function WhiteCreativeStudioAgency() {
                 <a
                   href="#prototype"
                   onClick={() => handleSelectPlan("subscription")}
-                  className="w-full py-4 rounded-full bg-[#00f0ff] hover:bg-[#00d2e0] text-zinc-950 font-bold text-xs font-mono uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(0,240,255,0.4)] transition-all duration-300"
+                  className="w-full py-4 rounded-full bg-[#00f0ff] hover:bg-[#00d8e6] text-zinc-950 font-bold text-xs font-mono uppercase tracking-wider flex items-center justify-center gap-2 glow-cyan-btn transition-all active:scale-[0.97]"
                 >
                   <span>Select $150/Mo Plan</span>
                   <ArrowRight className="w-4 h-4" />
@@ -900,11 +1156,11 @@ export default function WhiteCreativeStudioAgency() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.15 }}
-                className={`relative rounded-3xl p-8 sm:p-10 flex flex-col justify-between transition-all duration-400 bg-white ${
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className={`relative rounded-3xl p-8 sm:p-10 flex flex-col justify-between transition-all duration-300 bg-white ${
                   billingPlan === "lumpSum"
                     ? "border-2 border-zinc-950 shadow-[0_12px_40px_rgba(0,0,0,0.08)] scale-[1.01]"
-                    : "border border-zinc-200/90 hover:border-zinc-300 shadow-sm"
+                    : "card-surface"
                 }`}
               >
                 {/* Ownership Badge */}
@@ -923,7 +1179,7 @@ export default function WhiteCreativeStudioAgency() {
 
                   {/* Price Block */}
                   <div className="flex items-baseline gap-2 mb-8 pb-8 border-b border-zinc-200">
-                    <span className="text-5xl sm:text-6xl font-black text-zinc-950 tracking-tight">$1,200</span>
+                    <span className="text-5xl sm:text-6xl font-black text-zinc-950 tracking-tight font-mono">$1,200</span>
                     <span className="text-zinc-500 font-mono text-sm">build</span>
                     <span className="text-zinc-400 font-mono text-sm">+ $50/mo care</span>
                   </div>
@@ -960,7 +1216,7 @@ export default function WhiteCreativeStudioAgency() {
                 <a
                   href="#prototype"
                   onClick={() => handleSelectPlan("lumpSum")}
-                  className="w-full py-4 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs font-mono uppercase tracking-wider flex items-center justify-center gap-2 shadow-xs transition-all duration-300"
+                  className="w-full py-4 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs font-mono uppercase tracking-wider flex items-center justify-center gap-2 shadow-xs transition-all active:scale-[0.97]"
                 >
                   <span>Select Build & Own ($1,200)</span>
                   <ArrowRight className="w-4 h-4" />
@@ -981,7 +1237,7 @@ export default function WhiteCreativeStudioAgency() {
           </div>
         </section>
 
-        {/* 5. FOOTER / PROTOTYPE REQUEST INTAKE */}
+        {/* 6. FOOTER / PROTOTYPE REQUEST INTAKE */}
         <footer id="prototype" className="pt-24 pb-16 px-6 sm:px-8 relative overflow-hidden bg-white">
           <div className="max-w-7xl mx-auto">
 
@@ -992,7 +1248,7 @@ export default function WhiteCreativeStudioAgency() {
                 <div>
                   <div className="inline-flex items-center gap-2 text-xs font-mono text-cyan-700 uppercase tracking-widest mb-4 font-semibold">
                     <Send className="w-3.5 h-3.5" />
-                    <span>{"// 04 HIGH-SPEED ENGAGEMENT"}</span>
+                    <span>{"// 05 HIGH-SPEED ENGAGEMENT"}</span>
                   </div>
 
                   <h2 className="text-4xl sm:text-6xl font-black tracking-tight text-zinc-950 leading-[0.98] mb-6">
@@ -1044,7 +1300,7 @@ export default function WhiteCreativeStudioAgency() {
                   
                   <div className="flex items-center justify-between pb-6 mb-8 border-b border-zinc-200">
                     <span className="font-mono text-xs uppercase tracking-widest text-zinc-500 font-bold">
-                      {"REQUEST INTAKE // 04"}
+                      {"REQUEST INTAKE // 05"}
                     </span>
                     <span className="font-mono text-xs text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-300 font-bold">
                       24H PROTOTYPE SLA
@@ -1163,7 +1419,7 @@ export default function WhiteCreativeStudioAgency() {
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="group w-full py-4 rounded-full bg-zinc-950 text-white font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-3 transition-all duration-300 hover:bg-[#00f0ff] hover:text-zinc-950 hover:shadow-[0_4px_25px_rgba(0,240,255,0.45)] cursor-pointer disabled:opacity-50"
+                        className="group w-full py-4 rounded-full bg-zinc-950 text-white font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-3 transition-all duration-300 hover:bg-[#00f0ff] hover:text-zinc-950 hover:shadow-[0_4px_25px_rgba(0,240,255,0.45)] cursor-pointer active:scale-[0.97] disabled:opacity-50"
                       >
                         {isSubmitting ? (
                           <span className="flex items-center gap-2">

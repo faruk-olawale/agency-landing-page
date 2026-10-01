@@ -23,7 +23,27 @@
   }
 }
 
-/* Engineering Grid Texture for Light Mode */
+/* Layered elevation shadows (Godly / Awwwards / Linear design system) */
+.card-surface {
+  background: #ffffff;
+  border: 1px solid rgba(228, 228, 231, 0.85);
+  box-shadow: 
+    0px 0px 0px 1px rgba(0, 0, 0, 0.03),
+    0px 1px 2px -1px rgba(0, 0, 0, 0.04),
+    0px 2px 8px 0px rgba(0, 0, 0, 0.02);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-surface:hover {
+  border-color: rgba(212, 212, 216, 1);
+  box-shadow: 
+    0px 0px 0px 1px rgba(0, 0, 0, 0.06),
+    0px 8px 24px -4px rgba(0, 0, 0, 0.06),
+    0px 2px 6px 0px rgba(0, 0, 0, 0.03);
+  transform: translateY(-2px);
+}
+
+/* Engineering & Dot Matrix Grid Textures */
 .bg-grid-pattern-light {
   background-size: 48px 48px;
   background-image: 
@@ -31,50 +51,37 @@
     linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
 }
 
-/* Hollow / Outlined Typography for "Slow Website." on light background */
+.bg-dot-pattern {
+  background-image: radial-gradient(rgba(0, 0, 0, 0.07) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Editorial Brutalist Typography for "Slow Website." */
 .hollow-text-light {
   color: transparent;
   -webkit-text-stroke: 1.8px #09090b;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .hollow-text-light:hover {
   -webkit-text-stroke: 1.8px #0891b2;
-  color: rgba(8, 145, 178, 0.06);
-  text-shadow: 0 0 24px rgba(6, 182, 212, 0.35);
+  color: rgba(8, 145, 178, 0.05);
+  text-shadow: 0 0 24px rgba(6, 182, 212, 0.3);
 }
 
-/* Subtle Film Grain (Very gentle for light mode depth) */
-.bg-noise-light {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.015'/%3E%3C/svg%3E");
-}
-
-/* Premium Button Glow Effects */
+/* Button & Badge Sheens */
 .glow-cyan-btn {
-  box-shadow: 0 4px 20px -2px rgba(6, 182, 212, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 18px -2px rgba(6, 182, 212, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glow-cyan-btn:hover {
-  box-shadow: 0 8px 30px 2px rgba(6, 182, 212, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  box-shadow: 0 6px 25px 0px rgba(6, 182, 212, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  transform: translateY(-1px);
 }
 
-/* Micro-animations */
-@keyframes pulseSubtle {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
-}
-
-.animate-pulse-subtle {
-  animation: pulseSubtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes glowBadge {
-  0%, 100% { box-shadow: 0 0 15px -3px rgba(16, 185, 129, 0.25); }
-  50% { box-shadow: 0 0 25px 2px rgba(16, 185, 129, 0.45); }
-}
-
-.glow-emerald {
-  animation: glowBadge 3s ease-in-out infinite;
+.glow-cyan-btn:active {
+  transform: scale(0.97);
 }
 
 /* Custom Scrollbar for clean white theme */
@@ -83,11 +90,11 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f8fafc;
+  background: #fafafa;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #d4d4d8;
   border-radius: 3px;
 }
 
