@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Sparkles, HelpCircle, Shield, ArrowRight } from "lucide-react";
+import { Check, Sparkles, Shield, ArrowRight } from "lucide-react";
 
 interface PricingSectionProps {
   onSelectPlan?: (planName: string) => void;

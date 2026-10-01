@@ -1,6 +1,6 @@
 "use client";
 
-import { Zap, ShieldCheck, Wrench, CheckCircle, ArrowUpRight } from "lucide-react";
+import { Zap, ShieldCheck, Wrench, ArrowUpRight } from "lucide-react";
 
 export default function FeaturesSection() {
   const features = [

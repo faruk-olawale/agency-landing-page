@@ -2,100 +2,95 @@
 
 @layer base {
   :root {
-    --bg-space: #050505;
-    --text-primary: #f5f5f5;
-    --cyan-accent: #00f0ff;
-    --citrus-neon: #ccff00;
+    --bg-main: #ffffff;
+    --text-primary: #09090b;
+    --text-secondary: #52525b;
+    --cyan-accent: #00d2e0;
+    --citrus-neon: #65a30d;
   }
 
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #050505;
-    color: #f5f5f5;
+    background-color: #ffffff;
+    color: #09090b;
   }
   
   ::selection {
-    background-color: #00f0ff;
-    color: #050505;
+    background-color: #06b6d4;
+    color: #ffffff;
   }
 }
 
-/* Engineering Grid Texture */
-.bg-grid-pattern {
+/* Engineering Grid Texture for Light Mode */
+.bg-grid-pattern-light {
   background-size: 48px 48px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
 }
 
-.bg-radial-mask {
-  mask-image: radial-gradient(circle at center, black 40%, transparent 85%);
-  -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 85%);
-}
-
-/* Subtle Film Grain */
-.bg-noise {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.035'/%3E%3C/svg%3E");
-}
-
-/* Hollow / Outlined Typography for "Slow Website" */
-.hollow-text {
+/* Hollow / Outlined Typography for "Slow Website." on light background */
+.hollow-text-light {
   color: transparent;
-  -webkit-text-stroke: 1.5px rgba(245, 245, 245, 0.45);
+  -webkit-text-stroke: 1.8px #09090b;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.hollow-text:hover {
-  -webkit-text-stroke: 1.5px #00f0ff;
-  color: rgba(0, 240, 255, 0.1);
-  text-shadow: 0 0 35px rgba(0, 240, 255, 0.6);
+.hollow-text-light:hover {
+  -webkit-text-stroke: 1.8px #0891b2;
+  color: rgba(8, 145, 178, 0.06);
+  text-shadow: 0 0 24px rgba(6, 182, 212, 0.35);
 }
 
-/* Premium Glow Effects */
+/* Subtle Film Grain (Very gentle for light mode depth) */
+.bg-noise-light {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.015'/%3E%3C/svg%3E");
+}
+
+/* Premium Button Glow Effects */
 .glow-cyan-btn {
-  box-shadow: 0 0 25px -4px rgba(0, 240, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 20px -2px rgba(6, 182, 212, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .glow-cyan-btn:hover {
-  box-shadow: 0 0 40px 2px rgba(0, 240, 255, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 30px 2px rgba(6, 182, 212, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
-.glow-citrus-btn {
-  box-shadow: 0 0 25px -4px rgba(204, 255, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+/* Micro-animations */
+@keyframes pulseSubtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
 
-.glow-citrus-btn:hover {
-  box-shadow: 0 0 40px 2px rgba(204, 255, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+.animate-pulse-subtle {
+  animation: pulseSubtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Glassmorphism Card Specular border */
-.glass-panel {
-  background: rgba(14, 14, 17, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+@keyframes glowBadge {
+  0%, 100% { box-shadow: 0 0 15px -3px rgba(16, 185, 129, 0.25); }
+  50% { box-shadow: 0 0 25px 2px rgba(16, 185, 129, 0.45); }
 }
 
-.glass-panel:hover {
-  border-color: rgba(255, 255, 255, 0.18);
+.glow-emerald {
+  animation: glowBadge 3s ease-in-out infinite;
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar for clean white theme */
 ::-webkit-scrollbar {
   width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #050505;
+  background: #f8fafc;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1f1f23;
+  background: #cbd5e1;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #00f0ff;
+  background: #06b6d4;
 }

@@ -14,12 +14,12 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "SPEEDCRAFT // Dark Mode Creative Studio | Ultra-Fast Web Experiences",
+  title: "SPEEDCRAFT // High-Performance Creative Studio | Ultra-Fast Web Experiences",
   description:
     "Hand-coded, sub-second web experiences for local businesses. No bloated WordPress, just pure performance that converts with 100/100 PageSpeed guaranteed.",
   keywords: [
     "creative studio",
-    "dark mode agency",
+    "web performance agency",
     "ultra fast websites",
     "Next.js agency",
     "custom web design",
@@ -34,8 +34,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} scroll-smooth dark`}>
-      <body className="min-h-screen bg-[#050505] text-[#f5f5f5] font-sans antialiased selection:bg-cyan-400 selection:text-black">
+    <html lang="en" className={`${inter.variable} scroll-smooth`}>
+      <body className="min-h-screen bg-white text-zinc-900 font-sans antialiased selection:bg-cyan-200 selection:text-zinc-900">
         {children}
       </body>
     </html>

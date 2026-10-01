@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { ExternalLink, Zap, CheckCircle2, ArrowRight } from "lucide-react";
+import { ExternalLink, Zap, CheckCircle2 } from "lucide-react";
 import DemoModal, { DemoItem } from "./DemoModal";
 
 export default function PortfolioSection() {

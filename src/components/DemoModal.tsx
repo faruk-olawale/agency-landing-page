@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { X, ExternalLink, Monitor, Smartphone, CheckCircle, Zap, Shield, ArrowRight } from "lucide-react";
+import { X, Monitor, Smartphone, CheckCircle, ArrowRight } from "lucide-react";
 
 export interface DemoItem {
   id: string;

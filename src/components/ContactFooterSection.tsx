@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Zap, CheckCircle2, Send, ArrowRight, ShieldCheck, Clock, Globe } from "lucide-react";
+import { Zap, CheckCircle2, ArrowRight, ShieldCheck, Clock, Globe } from "lucide-react";
 
 interface ContactFooterSectionProps {
   selectedPlan?: string;

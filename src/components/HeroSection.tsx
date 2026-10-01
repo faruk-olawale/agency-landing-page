@@ -1,6 +1,6 @@
 "use client";
 
-import { Zap, CheckCircle2, ShieldCheck, ArrowRight, Activity } from "lucide-react";
+import { Zap, CheckCircle2, ArrowRight } from "lucide-react";
 
 export default function HeroSection() {
   const scrollToContact = () => {
