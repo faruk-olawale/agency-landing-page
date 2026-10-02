@@ -2,6 +2,34 @@ import fs from "node:fs";
 import path from "node:path";
 import { Resend } from "resend";
 
+// Load .env.local and .env
+function loadEnv() {
+  const envFiles = [".env.local", ".env"];
+  for (const file of envFiles) {
+    const fullPath = path.resolve(process.cwd(), file);
+    if (fs.existsSync(fullPath)) {
+      try {
+        const content = fs.readFileSync(fullPath, "utf8");
+        for (const line of content.split("\n")) {
+          const trimmed = line.trim();
+          if (!trimmed || trimmed.startsWith("#")) continue;
+          const eqIdx = trimmed.indexOf("=");
+          if (eqIdx !== -1) {
+            const key = trimmed.slice(0, eqIdx).trim();
+            const val = trimmed.slice(eqIdx + 1).trim().replace(/^["']|["']$/g, "");
+            if (!process.env[key]) {
+              process.env[key] = val;
+            }
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+}
+loadEnv();
+
 interface LeadRecord {
   company: string;
   website: string;
@@ -116,6 +144,11 @@ async function main() {
     resendClient = new Resend(resendApiKey);
   }
 
+  const testToArgIdx = args.indexOf("--test-to");
+  const testToEmail = testToArgIdx !== -1 ? args[testToArgIdx + 1] : null;
+  const fromEmail = process.env.OUTREACH_FROM_EMAIL || "Speedcraft Studio <onboarding@resend.dev>";
+  if (testToEmail) console.log(` Test-To Redirect: ${green(testToEmail)} (All emails routed to test inbox)`);
+
   const previewCardsHtml: string[] = [];
 
   for (let i = 0; i < queue.length; i++) {
@@ -124,6 +157,7 @@ async function main() {
     const domainClean = p.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
     const previewUrl = `${studioDomain}/preview/${slug}`;
     const contactGreeting = p.contactName && p.contactName !== "there" ? p.contactName : `${p.company} Team`;
+    const targetRecipient = testToEmail || p.email;
 
     const subject = `quick question regarding ${domainClean} mobile load speed`;
     const emailBodyText = `Hey ${contactGreeting},
@@ -145,7 +179,7 @@ Direct: https://speedcraft.dev`;
 
     console.log(dim("─".repeat(68)));
     console.log(`${bold(`[${i + 1}/${queue.length}]`)} ${cyan(bold(p.company))} (${p.city}, ${p.niche})`);
-    console.log(` Target Email : ${green(p.email)}`);
+    console.log(` Target Email : ${green(targetRecipient)}${testToEmail ? dim(` (Original: ${p.email})`) : ""}`);
     console.log(` PageSpeed    : ${red(bold(`${p.mobilePageSpeed}/100`))} (Load Time: ${p.mobileLoadTimeSec}s | Waste: ~$${p.estLostMonthlySpendAud} AUD/mo)`);
     console.log(` Prototype URL: ${cyan(previewUrl)}`);
     console.log(` Subject      : ${subject}`);
@@ -165,7 +199,7 @@ Direct: https://speedcraft.dev`;
           </div>
         </div>
         <div style="font-size:13px; color:#52525b; margin-bottom:12px;">
-          <strong>To:</strong> <code style="background:#f4f4f5; padding:2px 6px; border-radius:4px;">${p.email}</code><br>
+          <strong>To:</strong> <code style="background:#f4f4f5; padding:2px 6px; border-radius:4px;">${targetRecipient}</code><br>
           <strong>Subject:</strong> <code>${subject}</code><br>
           <strong>Live Prototype:</strong> <a href="${previewUrl}" target="_blank" style="color:#0891b2; font-weight:bold;">${previewUrl}</a>
         </div>
@@ -177,8 +211,8 @@ Direct: https://speedcraft.dev`;
       try {
         process.stdout.write(` Dispatching email via Resend... `);
         const sendRes = await resendClient.emails.send({
-          from: process.env.OUTREACH_FROM_EMAIL || "Faruk <faruk@speedcraft.dev>",
-          to: p.email,
+          from: fromEmail,
+          to: targetRecipient,
           subject,
           text: emailBodyText,
         });
@@ -186,7 +220,7 @@ Direct: https://speedcraft.dev`;
         console.log(green(`✅ Dispatched! (ID: ${sendRes.data?.id})`));
         sentLog.push({
           company: p.company,
-          email: p.email,
+          email: targetRecipient,
           sentAt: new Date().toISOString(),
           previewUrl,
           id: sendRes.data?.id,
@@ -199,9 +233,13 @@ Direct: https://speedcraft.dev`;
         }
       } catch (err: any) {
         console.log(red(`❌ Failed to send: ${err.message}`));
+        if (err.message.includes("domain") || err.message.includes("testing emails")) {
+          console.log(yellow(`\n💡 Tip: To send to external domains, verify your sending domain at https://resend.com/domains`));
+          console.log(yellow(`Or test sending to your own email: npm run send:outreach -- --live --test-to ${process.env.CONTACT_EMAIL || "your@email.com"}\n`));
+        }
         sentLog.push({
           company: p.company,
-          email: p.email,
+          email: targetRecipient,
           sentAt: new Date().toISOString(),
           previewUrl,
           status: "failed",
