@@ -819,7 +819,7 @@ function PrototypeContent() {
               </div>
 
               <a
-                href={`mailto:faruk@speedcraft.dev?subject=${encodeURIComponent(`Activate $150/mo Prototype for ${lead.company}`)}&body=${encodeURIComponent(`Hi Faruk,\n\nI reviewed the live sub-second prototype for ${lead.company} (${lead.website}).\n\nLet's get this activated under the $150 AUD/month plan.\n\nPhone: ${lead.phone}\nCompany: ${lead.company}\nBest time to call:`)}`}
+                href={`mailto:farukolawale509@gmail.com?subject=${encodeURIComponent(`Activate $150/mo Prototype for ${lead.company}`)}&body=${encodeURIComponent(`Hi Faruk,\n\nI reviewed the live sub-second prototype for ${lead.company} (${lead.website}).\n\nLet's get this activated under the $150 AUD/month plan.\n\nPhone: ${lead.phone}\nCompany: ${lead.company}\nBest time to call:`)}`}
                 className="w-full py-4 rounded-full bg-[#5B4BD6] hover:bg-[#4939C7] text-white font-bold text-sm text-center transition-all shadow-md flex items-center justify-center gap-2"
               >
                 <span>Claim $150/mo Plan</span>
@@ -863,7 +863,7 @@ function PrototypeContent() {
               </div>
 
               <a
-                href={`mailto:faruk@speedcraft.dev?subject=${encodeURIComponent(`Buyout Option for ${lead.company}`)}&body=${encodeURIComponent(`Hi Faruk,\n\nI want to discuss the $1,200 one-time build option for ${lead.company}.\n\nPlease call me or reply here.`)}`}
+                href={`mailto:farukolawale509@gmail.com?subject=${encodeURIComponent(`Buyout Option for ${lead.company}`)}&body=${encodeURIComponent(`Hi Faruk,\n\nI want to discuss the $1,200 one-time build option for ${lead.company}.\n\nPlease call me or reply here.`)}`}
                 className="w-full py-4 rounded-full bg-[#160F29] hover:bg-zinc-800 text-white font-bold text-sm text-center transition-all shadow-sm flex items-center justify-center gap-2"
               >
                 <span>Inquire About Buyout</span>
@@ -872,8 +872,11 @@ function PrototypeContent() {
             </div>
           </div>
 
-          <div className="text-center pt-8 border-t border-zinc-200 text-xs text-zinc-500 font-mono">
-            Direct Developer Line: <a href="tel:+61400000000" className="text-[#160F29] font-bold hover:underline">+61 400 000 000</a> • Email: <a href="mailto:faruk@speedcraft.dev" className="text-[#5B4BD6] font-bold hover:underline">faruk@speedcraft.dev</a>
+          <div className="text-center pt-8 border-t border-zinc-200 text-xs text-zinc-500 font-mono flex items-center justify-center gap-2">
+            <span>Direct Engineer Inquiries:</span>
+            <a href="mailto:farukolawale509@gmail.com" className="text-[#5B4BD6] font-bold hover:underline">
+              farukolawale509@gmail.com
+            </a>
           </div>
         </div>
       </section>
@@ -894,7 +897,7 @@ function PrototypeContent() {
           <div className="flex items-center gap-6 text-xs text-zinc-600 font-medium">
             <Link href="/" className="hover:text-[#5B4BD6]">Main Studio</Link>
             <Link href="/outreach" className="hover:text-[#5B4BD6]">Audited Leads</Link>
-            <a href="mailto:faruk@speedcraft.dev" className="hover:text-[#5B4BD6]">Contact Developer</a>
+            <a href="mailto:farukolawale509@gmail.com" className="hover:text-[#5B4BD6]">Contact Developer</a>
             <span className="text-zinc-400">© 2026 Speedcraft</span>
           </div>
         </div>
