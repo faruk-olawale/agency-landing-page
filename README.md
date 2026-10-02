@@ -60,6 +60,27 @@ npm run start
 
 ---
 
+## 🎯 Automated Outreach & Prospect Speed Audit CLI
+
+Speedcraft includes a built-in terminal prospecting engine to audit potential clients (HVAC, Dental, Legal, Roofing, Plumbing) and generate ready-to-send cold emails with verified speed and ad-spend metrics:
+
+```bash
+# Basic domain scan
+npm run audit -- https://targetcompany.com
+
+# Full personalized scan with business name and owner
+npm run audit -- https://targetcompany.com --name "Apex Roofing" --owner "David" --niche roofing
+```
+
+### What It Measures & Detects:
+- **Server TTFB & Page Download Duration**: Measures millisecond latency.
+- **Mobile PageSpeed & Core Web Vitals**: Pinpoints mobile performance grade.
+- **CMS & Bloat Detection**: Identifies WordPress, Elementor, and active plugins.
+- **Ad Spend Waste**: Computes estimated Google Ads bounce leakage based on high-ticket niche CPCs.
+- **Ready-to-Send Pitches**: Automatically formats cold emails and 300-char LinkedIn InMails ready to copy and send.
+
+---
+
 ## 📄 License
 
 MIT © [faruk-olawale](https://github.com/faruk-olawale)
