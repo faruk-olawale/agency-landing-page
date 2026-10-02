@@ -695,20 +695,38 @@ Direct Inquiries: farukolawale509@gmail.com`;
         {activeTab === "active" && (
           <div className="space-y-4">
             {sourceMode === "google_maps" && mapsResults.length === 0 ? (
-              <div className="bg-white border border-zinc-200 rounded-2xl p-12 text-center space-y-4">
+              <div className="bg-white border border-zinc-200 rounded-2xl p-10 text-center space-y-4">
                 <MapPin className="w-12 h-12 text-[#5B4BD6] mx-auto opacity-75" />
-                <div className="space-y-1">
-                  <h3 className="text-base font-bold text-zinc-900">Query Google Maps Live</h3>
-                  <p className="text-xs text-zinc-500 max-w-md mx-auto">
-                    Type a trade niche (e.g. "Emergency Plumber", "HVAC") and city in the search bar above, then click <strong>Search Google Maps</strong> to fetch live prospects.
-                  </p>
+                <div className="space-y-2 max-w-lg mx-auto">
+                  <h3 className="text-base font-bold text-zinc-900">Google Maps Discovery Status</h3>
+                  {mapsMetadata?.hint ? (
+                    <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 text-left space-y-1.5">
+                      <div className="font-bold flex items-center gap-1.5 text-amber-950">
+                        <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                        <span>Google Cloud Action Required</span>
+                      </div>
+                      <p className="leading-relaxed">{mapsMetadata.hint}</p>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-zinc-500">
+                      Query any city and trade niche in the search bar above to fetch live prospects.
+                    </p>
+                  )}
                 </div>
-                <button
-                  onClick={() => handleGoogleMapsSearch("Emergency Plumber", "Dallas, TX")}
-                  className="px-5 py-2.5 bg-[#5B4BD6] hover:bg-[#4939C7] text-white rounded-xl text-xs font-bold transition-all shadow-sm"
-                >
-                  Try Sample Search: Dallas Plumbers
-                </button>
+                <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                  <button
+                    onClick={() => setSourceMode("vault")}
+                    className="px-5 py-2.5 bg-[#160F29] hover:bg-zinc-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
+                  >
+                    View Audited Lead Vault (181 Verified Leads)
+                  </button>
+                  <button
+                    onClick={() => handleGoogleMapsSearch(mapsQuery, mapsLocation)}
+                    className="px-5 py-2.5 bg-[#5B4BD6] hover:bg-[#4939C7] text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
+                  >
+                    Retry Google Maps Query
+                  </button>
+                </div>
               </div>
             ) : activeLeads.length === 0 ? (
               <div className="bg-white border border-zinc-200 rounded-2xl p-12 text-center space-y-3">
@@ -725,7 +743,7 @@ Direct Inquiries: farukolawale509@gmail.com`;
                     setSelectedNiche("all");
                     setSearch("");
                   }}
-                  className="px-4 py-2 bg-zinc-900 text-white rounded-lg text-xs font-semibold mt-2"
+                  className="px-4 py-2 bg-zinc-900 text-white rounded-lg text-xs font-semibold mt-2 cursor-pointer"
                 >
                   View Audited Lead Vault
                 </button>
@@ -764,12 +782,12 @@ Direct Inquiries: farukolawale509@gmail.com`;
                             <div className="text-xs text-zinc-500 flex items-center gap-1.5 mt-1">
                               <Globe className="w-3 h-3 text-zinc-400 shrink-0" />
                               <a
-                                href={lead.website}
+                                href={lead.website || "#"}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="hover:underline text-zinc-600 truncate max-w-[220px]"
                               >
-                                {lead.website.replace(/^https?:\/\//, "")}
+                                {lead.website ? lead.website.replace(/^https?:\/\//, "") : "No website on file"}
                               </a>
                             </div>
                           </div>
@@ -846,13 +864,16 @@ Direct Inquiries: farukolawale509@gmail.com`;
                             <span>Send via Gmail</span>
                           </button>
                         ) : (
-                          <button
-                            onClick={() => handleGmailClick(lead)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#5B4BD6] hover:bg-[#4939C7] text-white rounded-md font-semibold transition-all shadow-2xs cursor-pointer"
+                          <a
+                            href={lead.website || "#"}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 rounded-md font-semibold transition-all shadow-2xs"
+                            title="No direct email on file - visit website form"
                           >
-                            <Mail className="w-3 h-3" />
-                            <span>Send Pitch</span>
-                          </button>
+                            <Globe className="w-3 h-3 text-zinc-500" />
+                            <span>Website Form</span>
+                          </a>
                         )}
 
                         {/* COPY PITCH BUTTON */}

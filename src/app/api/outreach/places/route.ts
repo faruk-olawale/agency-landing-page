@@ -29,6 +29,7 @@ interface PlaceResult {
   coldEmailSubject: string;
   coldEmailBody: string;
   linkedInMessage: string;
+  isVerifiedWebsite?: boolean;
 }
 
 const LOG_FILE_PATH = path.resolve(process.cwd(), "leads", "sent_outreach_log.json");
@@ -49,7 +50,6 @@ function getSentCompanySet(): Set<string> {
   }
 }
 
-// Country & currency detection from location query
 function detectLocale(location: string): { country: string; countryCode: string; currency: string; currencySymbol: string; defaultCpc: number } {
   const loc = location.toLowerCase();
   if (loc.includes("uk") || loc.includes("united kingdom") || loc.includes("london") || loc.includes("manchester") || loc.includes("birmingham") || loc.includes("scotland") || loc.includes("england")) {
@@ -61,11 +61,9 @@ function detectLocale(location: string): { country: string; countryCode: string;
   if (loc.includes("australia") || loc.includes("sydney") || loc.includes("melbourne") || loc.includes("brisbane") || loc.includes("perth") || loc.includes("adelaide") || loc.includes("nsw") || loc.includes("vic") || loc.includes("qld")) {
     return { country: "Australia", countryCode: "AU", currency: "AUD", currencySymbol: "$", defaultCpc: 42 };
   }
-  // Default to US
   return { country: "United States", countryCode: "US", currency: "USD", currencySymbol: "$", defaultCpc: 58 };
 }
 
-// Generate realistic audit data for discovered business
 function enrichBusinessWithAudit(raw: {
   name: string;
   website: string;
@@ -76,16 +74,16 @@ function enrichBusinessWithAudit(raw: {
   rating?: number;
   userRatingsTotal?: number;
   address?: string;
+  isVerifiedWebsite?: boolean;
 }): PlaceResult {
   const locale = detectLocale(raw.location || raw.city);
-  const domainClean = raw.website ? raw.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "") : `${raw.name.toLowerCase().replace(/[^a-z0-9]/g, "")}.com`;
-  const website = raw.website || `https://${domainClean}`;
+  const domainClean = raw.website ? raw.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "") : "";
+  const website = raw.website || "";
 
-  // Deterministic realistic benchmark based on company name hash
   const hash = raw.name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const mobilePageSpeed = 14 + (hash % 16); // 14 to 29 score
-  const mobileLoadTimeSec = Number((3.2 + (hash % 20) * 0.1).toFixed(2)); // 3.2s to 5.1s
-  const ttfbMs = 1600 + (hash % 15) * 90; // 1600ms to 2950ms
+  const mobilePageSpeed = 14 + (hash % 16);
+  const mobileLoadTimeSec = Number((3.2 + (hash % 20) * 0.1).toFixed(2));
+  const ttfbMs = 1600 + (hash % 15) * 90;
 
   const cmsList = ["WordPress", "Wix", "Squarespace", "Webflow", "Joomla"];
   const cms = cmsList[hash % cmsList.length];
@@ -102,12 +100,14 @@ function enrichBusinessWithAudit(raw: {
   const cpcEstimate = locale.defaultCpc;
   const estLostMonthlySpend = Math.round(cpcEstimate * 22 * (1 - mobilePageSpeed / 100));
   const contactName = `${raw.name} Team`;
-  const email = `contact@${domainClean}`;
 
-  const coldEmailSubject = `quick question regarding ${domainClean} mobile load speed`;
+  // Only assign email if real website exists; never construct fake domains that bounce
+  const email = raw.isVerifiedWebsite && domainClean ? `info@${domainClean}` : "";
+
+  const coldEmailSubject = `quick question regarding ${domainClean || raw.name} mobile load speed`;
   const coldEmailBody = `Hey ${contactName},
 
-Noticed you're driving high-intent search traffic to ${domainClean}, but the mobile landing page takes ${mobileLoadTimeSec}s to load (Google Mobile PageSpeed: ${mobilePageSpeed}/100).
+Noticed you're driving high-intent search traffic to ${domainClean || raw.name}, but the mobile landing page takes ${mobileLoadTimeSec}s to load (Google Mobile PageSpeed: ${mobilePageSpeed}/100).
 
 Because Google penalizes pages over 2.5s with lower Quality Scores, you're paying higher cost-per-click while losing ~${Math.round((100 - mobilePageSpeed) * 0.42)}% of mobile visitors before the page renders.
 
@@ -119,7 +119,7 @@ Best,
 Faruk — Lead Engineer, Speedcraft Studio
 Direct Inquiries: farukolawale509@gmail.com`;
 
-  const linkedInMessage = `Hey ${contactName}, saw ${domainClean}. Mobile takes ${mobileLoadTimeSec}s (PageSpeed: ${mobilePageSpeed}/100), leaking paid Google traffic. I built a 0.28s Next.js prototype for ${raw.name} scoring 100/100. Would you like to review the live preview?`;
+  const linkedInMessage = `Hey ${contactName}, saw ${domainClean || raw.name}. Mobile takes ${mobileLoadTimeSec}s (PageSpeed: ${mobilePageSpeed}/100), leaking paid Google traffic. I built a 0.28s Next.js prototype for ${raw.name} scoring 100/100. Would you like to review the live preview?`;
 
   return {
     company: raw.name,
@@ -148,68 +148,69 @@ Direct Inquiries: farukolawale509@gmail.com`;
     coldEmailSubject,
     coldEmailBody,
     linkedInMessage,
+    isVerifiedWebsite: raw.isVerifiedWebsite,
   };
 }
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const query = searchParams.get("query") || "Emergency Plumbers";
-    const location = searchParams.get("location") || "Sydney, Australia";
+    const query = searchParams.get("query") || "Emergency Plumber";
+    const location = searchParams.get("location") || "Dallas, TX";
 
     const apiKey = process.env.GOOGLE_PLACES_API_KEY;
     const sentCompanies = getSentCompanySet();
 
-    // 1. LIVE GOOGLE PLACES API (When API key is present)
+    let googleErrorMessage: string | null = null;
+
+    // 1. LIVE GOOGLE PLACES API (NEW + LEGACY)
     if (apiKey && apiKey.trim().length > 0 && !apiKey.includes("placeholder")) {
       try {
-        const textSearchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
-          `${query} in ${location}`
-        )}&key=${apiKey}`;
+        // Attempt 1: Places API (New) - modern REST v1
+        const newApiUrl = "https://places.googleapis.com/v1/places:searchText";
+        const newApiRes = await fetch(newApiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Goog-Api-Key": apiKey,
+            "X-Goog-FieldMask":
+              "places.displayName,places.formattedAddress,places.websiteUri,places.nationalPhoneNumber,places.rating,places.userRatingCount,places.googleMapsUri",
+          },
+          body: JSON.stringify({
+            textQuery: `${query} in ${location}`,
+          }),
+        });
 
-        const res = await fetch(textSearchUrl);
-        const data = await res.json();
+        const newData = await newApiRes.json();
 
-        if (data.status === "OK" && Array.isArray(data.results)) {
-          // Fetch details for top 12 places to get real websites & phone numbers
-          const placePromises = data.results.slice(0, 12).map(async (place: any) => {
-            let website = "";
-            let phone = "";
-            let formattedAddress = place.formatted_address || "";
-
-            try {
-              const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,website,formatted_phone_number,formatted_address,rating,user_ratings_total&key=${apiKey}`;
-              const dRes = await fetch(detailsUrl);
-              const dData = await dRes.json();
-              if (dData.result) {
-                website = dData.result.website || "";
-                phone = dData.result.formatted_phone_number || "";
-                formattedAddress = dData.result.formatted_address || formattedAddress;
-              }
-            } catch {}
+        if (newData.places && Array.isArray(newData.places) && newData.places.length > 0) {
+          const results = newData.places.map((place: any) => {
+            const name = place.displayName?.text || "Local Trade";
+            const website = place.websiteUri || place.googleMapsUri || "";
+            const phone = place.nationalPhoneNumber || "Contact via Website";
+            const address = place.formattedAddress || "";
 
             return enrichBusinessWithAudit({
-              name: place.name,
-              website: website || `https://${place.name.toLowerCase().replace(/[^a-z0-9]/g, "")}.com`,
-              phone: phone || "Contact via Website",
+              name,
+              website,
+              phone,
               city: location.split(",")[0].trim(),
               location,
               niche: query,
               rating: place.rating,
-              userRatingsTotal: place.user_ratings_total,
-              address: formattedAddress,
+              userRatingsTotal: place.userRatingCount,
+              address,
+              isVerifiedWebsite: Boolean(place.websiteUri),
             });
           });
 
-          const results = await Promise.all(placePromises);
-
-          // Deduplicate: filter out any already sent
+          // Deduplicate
           const uncontacted = results.filter(
-            (b) => !sentCompanies.has(b.company.toLowerCase()) && !sentCompanies.has(b.email.toLowerCase())
+            (b) => !sentCompanies.has(b.company.toLowerCase()) && (!b.email || !sentCompanies.has(b.email.toLowerCase()))
           );
 
           return NextResponse.json({
-            source: "google_places_api_live",
+            source: "google_places_api_new",
             totalFound: results.length,
             uncontactedCount: uncontacted.length,
             results: uncontacted,
@@ -217,54 +218,68 @@ export async function GET(req: NextRequest) {
             location,
           });
         }
-      } catch (apiErr) {
-        console.error("Google Places API live request error:", apiErr);
+
+        // If Places API (New) gave an error message, record it
+        if (newData.error) {
+          googleErrorMessage = `Google Cloud: ${newData.error.message || newData.error.status}`;
+        }
+
+        // Attempt 2: Legacy Places Text Search fallback
+        const legacyUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
+          `${query} in ${location}`
+        )}&key=${apiKey}`;
+
+        const legacyRes = await fetch(legacyUrl);
+        const legacyData = await legacyRes.json();
+
+        if (legacyData.status === "OK" && Array.isArray(legacyData.results) && legacyData.results.length > 0) {
+          const results = legacyData.results.slice(0, 12).map((place: any) => {
+            return enrichBusinessWithAudit({
+              name: place.name,
+              website: "",
+              phone: "Contact via Website",
+              city: location.split(",")[0].trim(),
+              location,
+              niche: query,
+              rating: place.rating,
+              userRatingsTotal: place.user_ratings_total,
+              address: place.formatted_address,
+              isVerifiedWebsite: false,
+            });
+          });
+
+          const uncontacted = results.filter((b) => !sentCompanies.has(b.company.toLowerCase()));
+
+          return NextResponse.json({
+            source: "google_places_api_legacy",
+            totalFound: results.length,
+            uncontactedCount: uncontacted.length,
+            results: uncontacted,
+            query,
+            location,
+          });
+        }
+
+        if (legacyData.error_message && !googleErrorMessage) {
+          googleErrorMessage = legacyData.error_message;
+        }
+      } catch (err: any) {
+        console.error("Places API fetch exception:", err);
+        googleErrorMessage = err.message;
       }
     }
 
-    // 2. SMART SEARCH ENGINE (Provides instant high-speed discovery for any niche & city)
-    // Generates realistic businesses matching the user's specific search and location
-    const cityClean = location.split(",")[0].trim();
-    const nicheClean = query.replace(/(emergency|24\/7|repairs|services)/gi, "").trim();
-
-    const samplePrefixes = [
-      "Precision",
-      "Apex",
-      "Metro 24/7",
-      "Prime",
-      "Citywide",
-      "Pro Elite",
-      "Master",
-      "Premier",
-      "Reliant",
-      "Rapid Response",
-    ];
-
-    const generated = samplePrefixes.map((prefix) => {
-      const company = `${prefix} ${nicheClean || "Trade"} ${cityClean}`;
-      const domainSlug = `${prefix.toLowerCase().replace(/[^a-z0-9]/g, "")}${nicheClean.toLowerCase().replace(/[^a-z0-9]/g, "")}${cityClean.toLowerCase().replace(/[^a-z0-9]/g, "")}.com`;
-      return enrichBusinessWithAudit({
-        name: company,
-        website: `https://${domainSlug}`,
-        phone: "Contact via Website",
-        city: cityClean,
-        location,
-        niche: query,
-      });
-    });
-
-    // Exclude any that have been contacted
-    const uncontacted = generated.filter(
-      (b) => !sentCompanies.has(b.company.toLowerCase()) && !sentCompanies.has(b.email.toLowerCase())
-    );
-
+    // 2. VAULT RECOMMENDATION / ERROR RESPONSE
     return NextResponse.json({
-      source: "google_places_engine",
+      source: "google_cloud_diagnostic",
+      googleError: googleErrorMessage,
       hasLiveKey: Boolean(apiKey && apiKey.length > 5),
-      hint: "Add GOOGLE_PLACES_API_KEY in .env.local to query the official Google Cloud Places API live.",
-      totalFound: generated.length,
-      uncontactedCount: uncontacted.length,
-      results: uncontacted,
+      hint: googleErrorMessage
+        ? `${googleErrorMessage}. Please enable 'Places API (New)' and ensure Billing is active in Google Cloud Console.`
+        : "Add GOOGLE_PLACES_API_KEY in .env.local to query Google Maps live.",
+      totalFound: 0,
+      uncontactedCount: 0,
+      results: [],
       query,
       location,
     });
