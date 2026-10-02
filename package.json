@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "audit": "npx tsx scripts/audit.ts",
-    "leads:au": "npx tsx scripts/generate-australian-leads.ts"
+    "leads:au": "npx tsx scripts/generate-australian-leads.ts",
+    "send:outreach": "npx tsx scripts/send-outreach.ts"
   },
   "dependencies": {
     "framer-motion": "^13.4.5",
