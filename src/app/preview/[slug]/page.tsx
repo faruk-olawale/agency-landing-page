@@ -36,11 +36,13 @@ import {
   SendHorizontal,
   ChevronDown
 } from "lucide-react";
-import leadsData from "../../../../leads/australia_leads_audit.json";
+import leadsData from "../../../../leads/global_leads_audit.json";
 
 interface LeadRecord {
   company: string;
   website: string;
+  country?: string;
+  countryCode?: string;
   city: string;
   niche: string;
   contactName: string;
@@ -53,8 +55,12 @@ interface LeadRecord {
   detectedPlugins: string;
   htmlWeightKb: number;
   scriptsCount: number;
-  cpcEstimateAud: number;
-  estLostMonthlySpendAud: number;
+  currency?: string;
+  currencySymbol?: string;
+  cpcEstimate?: number;
+  estLostMonthlySpend?: number;
+  cpcEstimateAud?: number;
+  estLostMonthlySpendAud?: number;
 }
 
 function PrototypeContent() {
@@ -73,27 +79,36 @@ function PrototypeContent() {
     });
 
     const company = searchParams.get("name") || found?.company || slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Your Company";
-    const website = searchParams.get("domain") || found?.website || (slug ? `https://${slug}.com.au` : "https://yourcompany.com.au");
-    const city = searchParams.get("city") || found?.city || "Australia";
+    const country = searchParams.get("country") || found?.country || "Australia";
+    const countryCode = searchParams.get("cc") || found?.countryCode || "AU";
+    const currency = searchParams.get("currency") || found?.currency || "AUD";
+    const currencySymbol = searchParams.get("symbol") || found?.currencySymbol || "$";
+    const website = searchParams.get("domain") || found?.website || (slug ? `https://${slug}.com` : "https://yourcompany.com");
+    const city = searchParams.get("city") || found?.city || (country === "Australia" ? "Sydney" : "Local Metro");
     const niche = searchParams.get("niche") || found?.niche || "Professional Services";
     const phone = searchParams.get("phone") || found?.phone || "1300 000 000";
     const email = searchParams.get("email") || found?.email || "info@" + website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
     const mobilePageSpeed = Number(searchParams.get("speed")) || found?.mobilePageSpeed || 24;
     const mobileLoadTimeSec = Number(searchParams.get("load")) || found?.mobileLoadTimeSec || 3.8;
-    const estLostMonthlySpendAud = Number(searchParams.get("waste")) || found?.estLostMonthlySpendAud || 780;
+    const estLostMonthlySpend = Number(searchParams.get("waste")) || found?.estLostMonthlySpend || found?.estLostMonthlySpendAud || 780;
     const cms = found?.cms || "WordPress / Monolith";
     const detectedPlugins = found?.detectedPlugins || "Elementor, Revolution Slider, Contact Form 7";
 
     return {
       company,
       website,
+      country,
+      countryCode,
+      currency,
+      currencySymbol,
       city,
       niche,
       phone,
       email,
       mobilePageSpeed,
       mobileLoadTimeSec,
-      estLostMonthlySpendAud,
+      estLostMonthlySpend,
+      estLostMonthlySpendAud: estLostMonthlySpend,
       cms,
       detectedPlugins,
     };
