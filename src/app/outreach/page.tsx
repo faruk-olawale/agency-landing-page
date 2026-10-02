@@ -90,7 +90,7 @@ Noticed you guys are driving traffic to ${domainClean}, but the mobile landing p
 Because Google penalizes pages over 2.5s with lower Quality Scores, you're likely paying up to 35% higher cost-per-click while losing ~${Math.round((100 - lead.mobilePageSpeed) * 0.45)}% of mobile visitors to back-button bounces.
 
 I run Speedcraft Studio. I hand-coded a sub-second prototype for ${lead.company} that loads in 0.28s and scores a verified 100/100 Core Web Vitals:
-👉 ${previewUrl}
+Link: ${previewUrl}
 
 Zero strings attached — take a look on your mobile phone to feel the speed difference.
 
@@ -119,7 +119,7 @@ Noticed you guys are driving traffic to ${domainClean}, but the mobile landing p
 Because Google penalizes pages over 2.5s with lower Quality Scores, you're likely paying up to 35% higher cost-per-click while losing ~${Math.round((100 - lead.mobilePageSpeed) * 0.45)}% of mobile visitors to back-button bounces.
 
 I run Speedcraft Studio. I hand-coded a sub-second prototype for ${lead.company} that loads in 0.28s and scores a verified 100/100 Core Web Vitals:
-👉 ${previewUrl}
+Link: ${previewUrl}
 
 Zero strings attached — take a look on your mobile phone to feel the speed difference.
 
@@ -149,7 +149,7 @@ Noticed you guys are driving traffic to ${domainClean}, but the mobile landing p
 Because Google penalizes pages over 2.5s with lower Quality Scores, you're likely paying up to 35% higher cost-per-click while losing ~${Math.round((100 - lead.mobilePageSpeed) * 0.45)}% of mobile visitors to back-button bounces.
 
 I run Speedcraft Studio. I hand-coded a sub-second prototype for ${lead.company} that loads in 0.28s and scores a verified 100/100 Core Web Vitals:
-👉 ${previewUrl}
+Link: ${previewUrl}
 
 Zero strings attached — take a look on your mobile phone to feel the speed difference.
 
@@ -353,7 +353,7 @@ Direct: https://agency-landing-page-smoky-psi.vercel.app`;
                       <div className="font-semibold">Resend Sending Restricted:</div>
                       <div className="text-[11px] mt-0.5">{errorMsg}</div>
                       <div className="text-[11px] mt-1 font-semibold text-zinc-900">
-                        👉 Use the blue "Send via Gmail" button below to send directly from your personal inbox with 100% deliverability!
+                        Use the "Send via Gmail" button below to send directly from your personal inbox with 100% deliverability.
                       </div>
                     </div>
                   </div>

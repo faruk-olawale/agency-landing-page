@@ -218,7 +218,7 @@ function PrototypeContent() {
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 group">
               <div className="w-7 h-7 rounded-lg bg-zinc-800 border border-zinc-700/80 flex items-center justify-center text-zinc-100 font-bold text-xs">
-                ⚡
+                <Zap className="w-3.5 h-3.5 text-zinc-100" />
               </div>
               <span className="font-semibold text-sm tracking-tight text-white">
                 Speedcraft
@@ -332,7 +332,7 @@ function PrototypeContent() {
               </div>
 
               <p className="text-[11px] text-zinc-500 leading-snug">
-                🚨 Monolithic PHP database execution & unoptimized scripts create back-button dropoffs before the hero loads.
+                Monolithic PHP database execution and unoptimized scripts create back-button dropoffs before the hero loads.
               </p>
             </div>
 
@@ -379,7 +379,7 @@ function PrototypeContent() {
               </div>
 
               <p className="text-[11px] text-zinc-400 leading-snug">
-                ⚡ Static edge caching serves pages instantaneously without database queries. Google Ads Quality Scores reach tier 10.
+                Static edge caching serves pages instantaneously without database queries. Google Ads Quality Scores reach tier 10.
               </p>
             </div>
           </div>

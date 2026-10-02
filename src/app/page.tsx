@@ -28,6 +28,8 @@ import {
   Mic,
   ArrowUp,
   RotateCcw,
+  Heart,
+  AlertCircle,
 } from "lucide-react";
 
 export default function WhiteCreativeStudioAgency() {
@@ -646,13 +648,16 @@ export default function WhiteCreativeStudioAgency() {
 
                   <ul className="space-y-2.5 text-xs font-mono text-zinc-700">
                     <li className="flex items-center gap-2">
-                      <span className="text-emerald-600 font-bold">✓</span> No SQL injection vectors
+                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>No SQL injection vectors</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="text-emerald-600 font-bold">✓</span> No vulnerable wp-login portals
+                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>No vulnerable wp-login portals</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="text-emerald-600 font-bold">✓</span> Automatic edge SSL & DDoS mitigation
+                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>Automatic edge SSL & DDoS mitigation</span>
                     </li>
                   </ul>
                 </div>
@@ -846,7 +851,7 @@ export default function WhiteCreativeStudioAgency() {
                                       className="absolute -top-3 -left-2 flex items-center z-10 select-none"
                                     >
                                       <div className="bg-white rounded-full px-1.5 py-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-zinc-200/80 flex items-center gap-0.5">
-                                        <span className="text-[11px] leading-none">❤️</span>
+                                        <Heart className="w-2.5 h-2.5 text-red-500 fill-red-500" />
                                         <span className="text-[9px] font-bold text-zinc-600 font-sans">1</span>
                                       </div>
                                     </motion.div>
@@ -895,7 +900,7 @@ export default function WhiteCreativeStudioAgency() {
                               className="flex justify-start pt-0.5"
                             >
                               <div className="relative bg-[#e9e9eb] text-zinc-950 px-3 py-1.5 rounded-[18px] rounded-bl-[4px] max-w-[85%] font-normal">
-                                Holy cow that was fast! 😭 Our old agency took 4 days just to reply. You guys are unreal 🙌
+                                Holy cow that was fast! Our old agency took 4 days just to reply. You guys are unreal.
                                 {/* Incoming Bubble Tail */}
                                 <svg className="absolute -bottom-[0.5px] -left-[5px] w-[14px] h-[14px] text-[#e9e9eb] fill-current pointer-events-none" viewBox="0 0 14 14">
                                   <path d="M14,0 C14,7.732 7.732,14 0,14 C4.5,14 8,11 9.5,8 C10.2,6 10.5,3.5 10.5,0 Z" />
@@ -1005,7 +1010,7 @@ export default function WhiteCreativeStudioAgency() {
                           <div className="h-8 px-4 rounded-lg bg-[#00f0ff] text-zinc-950 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
                             Book Inspection <ArrowRight className="w-3 h-3" />
                           </div>
-                          <span className="text-xs font-mono text-zinc-600 font-medium">Google Rating 4.9 ★ (140+)</span>
+                          <span className="text-xs font-mono text-zinc-600 font-medium">Google Rating 4.9/5 (140+ reviews)</span>
                         </div>
                       </div>
                     </div>
@@ -1580,7 +1585,7 @@ export default function WhiteCreativeStudioAgency() {
                       {/* Error feedback banner */}
                       {errorMessage && (
                         <div className="p-4 rounded-2xl bg-rose-50 border border-rose-300 text-rose-800 text-xs font-mono flex items-center gap-2.5">
-                          <span>⚠️</span>
+                          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                           <span>{errorMessage}</span>
                         </div>
                       )}

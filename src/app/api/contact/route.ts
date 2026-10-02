@@ -40,7 +40,7 @@ export async function POST(req: Request) {
           body: JSON.stringify({
             embeds: [
               {
-                title: "⚡ New Speedcraft Lead Alert",
+                title: "New Speedcraft Lead Alert",
                 color: 0x10b981, // Emerald green
                 fields: [
                   { name: "Client Name", value: name, inline: true },
@@ -62,7 +62,7 @@ export async function POST(req: Request) {
     // 3. Fallback dev mode if API key is not yet configured
     if (!apiKey || apiKey === "re_your_api_key_here" || apiKey.includes("placeholder")) {
       console.warn(
-        "⚠️ [SPEEDCRAFT STUDIO] RESEND_API_KEY is not configured yet. Lead details captured:",
+        "[SPEEDCRAFT STUDIO] RESEND_API_KEY is not configured yet. Lead details captured:",
         { name, email, website, selectedTier }
       );
       return NextResponse.json({
@@ -79,7 +79,7 @@ export async function POST(req: Request) {
       from: "Speedcraft Studio <onboarding@resend.dev>",
       to: [recipientEmail],
       replyTo: email,
-      subject: `⚡ New Lead: ${name} (${selectedTier || "Mockup Request"})`,
+      subject: `New Lead: ${name} (${selectedTier || "Mockup Request"})`,
       html: `
         <!DOCTYPE html>
         <html>
