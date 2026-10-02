@@ -48,4 +48,4 @@ These companies have the most painful speed bottlenecks and are losing the most 
    - If you prefer LinkedIn or SMS, copy the **LinkedIn Pitch**.
    - Send 10–15 messages every morning.
 4. When they reply asking for the preview link, send them your Speedcraft prototype link:
-   `https://speedcraft.dev?preview=[CompanyName]#prototype`
+   `https://agency-landing-page-smoky-psi.vercel.app?preview=[CompanyName]#prototype`
