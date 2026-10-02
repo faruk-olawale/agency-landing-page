@@ -217,6 +217,10 @@ Direct: https://speedcraft.dev`;
           text: emailBodyText,
         });
 
+        if (sendRes.error) {
+          throw new Error(sendRes.error.message);
+        }
+
         console.log(green(`✅ Dispatched! (ID: ${sendRes.data?.id})`));
         sentLog.push({
           company: p.company,
