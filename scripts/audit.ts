@@ -388,4 +388,7 @@ async function main() {
   }
 }
 
-main();
+// Only execute when run directly from CLI
+if (process.argv[1] && process.argv[1].endsWith("audit.ts")) {
+  main();
+}

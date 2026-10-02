@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "audit": "npx tsx scripts/audit.ts"
+    "audit": "npx tsx scripts/audit.ts",
+    "leads:au": "npx tsx scripts/generate-australian-leads.ts"
   },
   "dependencies": {
     "framer-motion": "^13.4.5",
