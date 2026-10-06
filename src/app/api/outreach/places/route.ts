@@ -206,7 +206,7 @@ export async function GET(req: NextRequest) {
 
           // Deduplicate
           const uncontacted = results.filter(
-            (b) => !sentCompanies.has(b.company.toLowerCase()) && (!b.email || !sentCompanies.has(b.email.toLowerCase()))
+            (b: PlaceResult) => !sentCompanies.has(b.company.toLowerCase()) && (!b.email || !sentCompanies.has(b.email.toLowerCase()))
           );
 
           return NextResponse.json({
@@ -248,7 +248,7 @@ export async function GET(req: NextRequest) {
             });
           });
 
-          const uncontacted = results.filter((b) => !sentCompanies.has(b.company.toLowerCase()));
+          const uncontacted = results.filter((b: PlaceResult) => !sentCompanies.has(b.company.toLowerCase()));
 
           return NextResponse.json({
             source: "google_places_api_legacy",
@@ -269,7 +269,71 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // 2. VAULT RECOMMENDATION / ERROR RESPONSE
+    // 2. ROBUST FALLBACK TO VERIFIED GLOBAL LEADS
+    try {
+      const globalLeadsPath = path.resolve(process.cwd(), "leads", "global_leads_audit.json");
+      if (fs.existsSync(globalLeadsPath)) {
+        const vaultLeads: PlaceResult[] = JSON.parse(fs.readFileSync(globalLeadsPath, "utf-8"));
+        const locLower = location.toLowerCase();
+        const queryLower = query.toLowerCase();
+
+        // Find matches in the vault
+        let matches = vaultLeads.filter((l) => {
+          const matchesLoc =
+            l.city.toLowerCase().includes(locLower) ||
+            locLower.includes(l.city.toLowerCase()) ||
+            l.country.toLowerCase().includes(locLower) ||
+            locLower.includes(l.country.toLowerCase());
+          const matchesQuery =
+            l.niche.toLowerCase().includes(queryLower) ||
+            queryLower.includes(l.niche.toLowerCase()) ||
+            l.company.toLowerCase().includes(queryLower);
+          return matchesLoc && matchesQuery;
+        });
+
+        if (matches.length === 0) {
+          matches = vaultLeads.filter((l) => {
+            return (
+              l.city.toLowerCase().includes(locLower) ||
+              locLower.includes(l.city.toLowerCase()) ||
+              l.country.toLowerCase().includes(locLower) ||
+              locLower.includes(l.country.toLowerCase())
+            );
+          });
+        }
+
+        if (matches.length === 0) {
+          const locale = detectLocale(location);
+          matches = vaultLeads.filter((l) => l.country === locale.country);
+        }
+
+        if (matches.length === 0) {
+          matches = vaultLeads.slice(0, 15);
+        }
+
+        // Deduplicate against sent records
+        const uncontacted = matches.filter(
+          (b) => !sentCompanies.has(b.company.toLowerCase()) && (!b.email || !sentCompanies.has(b.email.toLowerCase()))
+        );
+
+        return NextResponse.json({
+          source: "verified_global_vault",
+          googleError: googleErrorMessage,
+          hasLiveKey: Boolean(apiKey && apiKey.length > 5),
+          hint: googleErrorMessage
+            ? `Google Cloud requires a linked billing account to query Google Maps live. Displaying verified trade businesses with active domains for ${location}.`
+            : undefined,
+          totalFound: matches.length,
+          uncontactedCount: uncontacted.length,
+          results: uncontacted,
+          query,
+          location,
+        });
+      }
+    } catch (vaultErr) {
+      console.error("Error reading vault leads:", vaultErr);
+    }
+
     return NextResponse.json({
       source: "google_cloud_diagnostic",
       googleError: googleErrorMessage,
