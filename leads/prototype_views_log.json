@@ -1,5 +1,29 @@
 [
   {
+    "id": "view_1791303063194_7ry4g",
+    "slug": "the-manse-clinic",
+    "company": "The Manse Clinic",
+    "website": "https://themanseclinic.com.au",
+    "loadTimeMs": 165,
+    "speedSec": "0.17s",
+    "referrer": "http://localhost:3001/outreach",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "timestamp": "2026-10-06T16:11:03.193Z",
+    "ip": "::1"
+  },
+  {
+    "id": "view_1791303063089_ih30g",
+    "slug": "the-manse-clinic",
+    "company": "The Manse Clinic",
+    "website": "https://themanseclinic.com.au",
+    "loadTimeMs": 165,
+    "speedSec": "0.17s",
+    "referrer": "http://localhost:3001/outreach",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "timestamp": "2026-10-06T16:11:03.089Z",
+    "ip": "::1"
+  },
+  {
     "id": "view_1791301546209_hf703",
     "slug": "",
     "company": "Dallas Plumbing Co",

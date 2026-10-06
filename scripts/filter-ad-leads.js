@@ -245,8 +245,8 @@ async function main() {
   // Write finalized qualified array to target output file
   fs.writeFileSync(outputPath, JSON.stringify(qualifiedLeads, null, 2), "utf-8");
 
-  // Also write to leads/ directory for direct dashboard access if leads directory exists
-  if (fs.existsSync(path.resolve(process.cwd(), "leads"))) {
+  // Also write to leads/ directory for direct dashboard access if leads directory exists (only on full runs)
+  if (!RUN_LIMIT && fs.existsSync(path.resolve(process.cwd(), "leads"))) {
     try {
       fs.writeFileSync(leadsFolderOutputPath, JSON.stringify(qualifiedLeads, null, 2), "utf-8");
     } catch (e) {
