@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Zap,
   ShieldCheck,
@@ -41,6 +42,65 @@ import {
   Search,
 } from "lucide-react";
 import leadsData from "../../../../leads/global_leads_audit.json";
+
+/* ────────────────────────────────────────────────────────────────────────────
+   DYNAMIC INDUSTRY HERO BACKGROUND IMAGES & DATA NORMALIZATION
+   - High-resolution, optimized photography per industry
+   - Fallback to executive modern office building for unlisted niches
+──────────────────────────────────────────────────────────────────────────── */
+export const industryImageMap: Record<string, string> = {
+  plumber: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1920&q=80",
+  real_estate: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1920&q=80",
+  law_firm: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=1920&q=80",
+  dentist: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1920&q=80",
+  hvac: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1920&q=80",
+  landscaping: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1920&q=80",
+  locksmith: "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=1920&q=80",
+  roofing: "https://images.unsplash.com/photo-1632759145351-1d592919f522?auto=format&fit=crop&w=1920&q=80",
+  electrician: "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=1920&q=80",
+  cleaning: "https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?auto=format&fit=crop&w=1920&q=80",
+  solar: "https://images.unsplash.com/photo-1508873535684-277a3cbcc4e8?auto=format&fit=crop&w=1920&q=80",
+  pest_control: "https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&w=1920&q=80",
+  tree_care: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1920&q=80",
+  restoration: "https://images.unsplash.com/photo-1584467735871-8e85353a8413?auto=format&fit=crop&w=1920&q=80",
+  default: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1920&q=80",
+};
+
+/**
+ * Normalizes industry string by converting to lowercase and replacing spaces/hyphens with underscores.
+ * Matches exact dictionary keys first, then falls back to industry keywords or default.
+ */
+export function normalizeIndustryKey(industry: string = ""): string {
+  if (!industry) return "default";
+  const normalized = industry.toLowerCase().trim().replace(/[\s-]+/g, "_");
+  
+  if (industryImageMap[normalized]) {
+    return normalized;
+  }
+
+  // Smart fuzzy fallbacks for real-world client data
+  if (normalized.includes("plumb") || normalized.includes("drain") || normalized.includes("pipe")) return "plumber";
+  if (normalized.includes("real_estate") || normalized.includes("realt") || normalized.includes("property")) return "real_estate";
+  if (normalized.includes("law") || normalized.includes("legal") || normalized.includes("solicitor") || normalized.includes("attorney")) return "law_firm";
+  if (normalized.includes("dent") || normalized.includes("smile") || normalized.includes("ortho")) return "dentist";
+  if (normalized.includes("hvac") || normalized.includes("air_cond") || normalized.includes("cool") || normalized.includes("heat")) return "hvac";
+  if (normalized.includes("landscap") || normalized.includes("garden") || normalized.includes("turf")) return "landscaping";
+  if (normalized.includes("lock") || normalized.includes("key") || normalized.includes("security")) return "locksmith";
+  if (normalized.includes("roof")) return "roofing";
+  if (normalized.includes("electr") || normalized.includes("spark")) return "electrician";
+  if (normalized.includes("clean") || normalized.includes("janitor")) return "cleaning";
+  if (normalized.includes("solar") || normalized.includes("energy")) return "solar";
+  if (normalized.includes("pest") || normalized.includes("termite")) return "pest_control";
+  if (normalized.includes("tree") || normalized.includes("arborist") || normalized.includes("stump")) return "tree_care";
+  if (normalized.includes("restor") || normalized.includes("water_damage") || normalized.includes("flood")) return "restoration";
+
+  return "default";
+}
+
+export function getIndustryHeroImage(industry: string = ""): string {
+  const key = normalizeIndustryKey(industry);
+  return industryImageMap[key] || industryImageMap["default"];
+}
 
 /* ────────────────────────────────────────────────────────────────────────────
    VISUAL DESIGN SYSTEM: EXACT HYBRID OF use.live + quickfleet.co
@@ -327,6 +387,11 @@ function PrototypeContent() {
   const [leadFilterQuery, setLeadFilterQuery] = useState("");
   const [bannerExpanded, setBannerExpanded] = useState(false);
 
+  // Dynamic Industry-Specific Hero Background Image
+  const heroBgImage = useMemo(() => {
+    return getIndustryHeroImage(lead.niche);
+  }, [lead.niche]);
+
   // Filtered leads for the prospect switcher drawer
   const filteredPresetLeads = useMemo(() => {
     if (!leadFilterQuery.trim()) return PRESET_LEADS;
@@ -422,7 +487,7 @@ function PrototypeContent() {
         heroHeadline: (
           <>
             {lead.city}&apos;s Trusted <br className="hidden sm:inline" />
-            <span className="text-[#0A997D]">Legal Defence &amp; Counsel</span>.
+            <span className="text-[#6FD9C1]">Legal Defence &amp; Counsel</span>.
           </>
         ),
         heroSub: `Experienced legal practitioners fighting for your rights across Greater ${lead.city}. Transparent fixed fees, urgent court representation, and strategic counsel with zero jargon.`,
@@ -577,7 +642,7 @@ function PrototypeContent() {
         heroHeadline: (
           <>
             {lead.city}&apos;s Premier <br className="hidden sm:inline" />
-            <span className="text-[#0A997D]">Dental Care &amp; Pain Relief</span>.
+            <span className="text-[#6FD9C1]">Dental Care &amp; Pain Relief</span>.
           </>
         ),
         heroSub: `Gentle, state-of-the-art family and cosmetic dentistry across Greater ${lead.city}. Instant health fund claiming (HICAPS), modern pain-free techniques, and same-day emergency relief.`,
@@ -732,7 +797,7 @@ function PrototypeContent() {
         heroHeadline: (
           <>
             {lead.city}&apos;s 24/7 Emergency <br className="hidden sm:inline" />
-            <span className="text-[#0A997D]">Flood &amp; Disaster Restoration</span>.
+            <span className="text-[#6FD9C1]">Flood &amp; Disaster Restoration</span>.
           </>
         ),
         heroSub: `IICRC-certified emergency structural drying, floodwater extraction, and mold remediation across Greater ${lead.city}. Arriving on-site with industrial equipment in under 60 minutes with direct insurance billing.`,
@@ -887,7 +952,7 @@ function PrototypeContent() {
         heroHeadline: (
           <>
             {lead.city}&apos;s 24/7 Mobile <br className="hidden sm:inline" />
-            <span className="text-[#0A997D]">Locksmith &amp; Security Response</span>.
+            <span className="text-[#6FD9C1]">Locksmith &amp; Security Response</span>.
           </>
         ),
         heroSub: `Licensed mobile locksmiths arriving at your door or vehicle within 25 minutes across Greater ${lead.city}. Non-destructive door opening, high-security deadbolts, digital locks, and transponder key cutting on-site.`,
@@ -1042,7 +1107,7 @@ function PrototypeContent() {
         heroHeadline: (
           <>
             {lead.city}&apos;s Master <br className="hidden sm:inline" />
-            <span className="text-[#0A997D]">Landscape Design &amp; Construction</span>.
+            <span className="text-[#6FD9C1]">Landscape Design &amp; Construction</span>.
           </>
         ),
         heroSub: `Transforming outdoor spaces across Greater ${lead.city}. Turnkey landscape architecture, structural retaining walls, luxury paving, lush turf, and automated irrigation backed by structural guarantees.`,
@@ -1197,7 +1262,7 @@ function PrototypeContent() {
         heroHeadline: (
           <>
             {lead.city}&apos;s Certified <br className="hidden sm:inline" />
-            <span className="text-[#0A997D]">Tree Removal &amp; Arborist Services</span>.
+            <span className="text-[#6FD9C1]">Tree Removal &amp; Arborist Services</span>.
           </>
         ),
         heroSub: `Safe, fully insured tree removal, pruning, and emergency storm clearing across Greater ${lead.city}. AQF-qualified arborists, $20M public liability cover, high-reach crane access, and high-power stump grinding.`,
@@ -1352,7 +1417,7 @@ function PrototypeContent() {
         heroHeadline: (
           <>
             {lead.city}&apos;s Top-Rated <br className="hidden sm:inline" />
-            <span className="text-[#0A997D]">Commercial &amp; Home Cleaning</span>.
+            <span className="text-[#6FD9C1]">Commercial &amp; Home Cleaning</span>.
           </>
         ),
         heroSub: `Hospital-grade commercial office cleaning, end-of-lease bond cleans, and deep steam extraction across Greater ${lead.city}. Eco-safe formulations, police-checked staff, and 100% bond-back guarantees.`,
@@ -1507,7 +1572,7 @@ function PrototypeContent() {
         heroHeadline: (
           <>
             {lead.city}&apos;s High-Yield <br className="hidden sm:inline" />
-            <span className="text-[#0A997D]">Solar &amp; Battery Storage</span>.
+            <span className="text-[#6FD9C1]">Solar &amp; Battery Storage</span>.
           </>
         ),
         heroSub: `Cut electricity bills up to 80% with tier-1 solar panels and smart battery storage across Greater ${lead.city}. CEC-accredited engineering, 25-year performance warranties, and zero upfront finance options.`,
@@ -1662,7 +1727,7 @@ function PrototypeContent() {
         heroHeadline: (
           <>
             {lead.city}&apos;s Eco-Safe <br className="hidden sm:inline" />
-            <span className="text-[#0A997D]">Pest &amp; Termite Defence</span>.
+            <span className="text-[#6FD9C1]">Pest &amp; Termite Defence</span>.
           </>
         ),
         heroSub: `Rapid, child and pet-safe pest eradication across Greater ${lead.city}. Thermal termite inspections, guaranteed pest barriers, and certified treatments with zero toxic fumes.`,
@@ -1817,7 +1882,7 @@ function PrototypeContent() {
         heroHeadline: (
           <>
             {lead.city}&apos;s 24/7 Emergency <br className="hidden sm:inline" />
-            <span className="text-[#0A997D]">AC &amp; Heating Response</span>.
+            <span className="text-[#6FD9C1]">AC &amp; Heating Response</span>.
           </>
         ),
         heroSub: `Licensed master technicians on standby across Greater ${lead.city}. Upfront fixed quotes, guaranteed same-day arrival, and sub-second dispatch.`,
@@ -1972,7 +2037,7 @@ function PrototypeContent() {
         heroHeadline: (
           <>
             {lead.city}&apos;s Master <br className="hidden sm:inline" />
-            <span className="text-[#0A997D]">Roof Repair &amp; Restoration</span>.
+            <span className="text-[#6FD9C1]">Roof Repair &amp; Restoration</span>.
           </>
         ),
         heroSub: `Licensed, fully insured roofing contractors serving all suburbs across Greater ${lead.city}. Written quotes, zero overtime fees, and 25-year warranties.`,
@@ -2127,7 +2192,7 @@ function PrototypeContent() {
         heroHeadline: (
           <>
             {lead.city}&apos;s 24/7 Master <br className="hidden sm:inline" />
-            <span className="text-[#0A997D]">Electrical Emergency Response</span>.
+            <span className="text-[#6FD9C1]">Electrical Emergency Response</span>.
           </>
         ),
         heroSub: `Immediate safety dispatch across Greater ${lead.city}. Switchboard upgrades, outage restoration, upfront fixed pricing, and clean work.`,
@@ -2282,7 +2347,7 @@ function PrototypeContent() {
         heroHeadline: (
           <>
             {lead.city}&apos;s 24/7 Emergency <br className="hidden sm:inline" />
-            <span className="text-[#0A997D]">Plumbing Response</span>.
+            <span className="text-[#6FD9C1]">Plumbing Response</span>.
           </>
         ),
         heroSub: `Immediate dispatch across Greater ${lead.city}. Upfront fixed pricing, zero callout fees with work, and licensed master plumbers arriving in under 45 minutes.`,
@@ -2438,7 +2503,7 @@ function PrototypeContent() {
       heroHeadline: (
         <>
           {lead.city}&apos;s Trusted <br className="hidden sm:inline" />
-          <span className="text-[#0A997D]">{cleanNicheTitle} Specialists</span>.
+          <span className="text-[#6FD9C1]">{cleanNicheTitle} Specialists</span>.
         </>
       ),
       heroSub: `Delivering exceptional, reliable, and verified ${cleanNicheTitle.toLowerCase()} solutions across Greater ${lead.city}. Upfront transparent pricing, experienced professionals, and sub-second booking.`,
@@ -2701,25 +2766,34 @@ function PrototypeContent() {
 
         {/* ═══════════════════════════════════════════════════════════════
             HERO CONTAINER: MODERN UNIVERSAL CONVERSION HUB
-            - Clean, elevated porcelain/alabaster canvas (#FAF9F5 / #FFFFFF)
-            - Ambient micro-radial glow & architectural micro-dot grid
+            - Dynamic industry-specific hero background image
+            - High-contrast dark gradient overlay ensuring 100% legibility
             - Universal quote & consultation conversion hub for ANY business
             - Live status audio stage centerpiece with floating micro-badges
         ═══════════════════════════════════════════════════════════════ */}
         <div className="px-2 sm:px-4 md:px-6 pt-2 pb-8 max-w-[1360px] mx-auto">
-          <section className="relative rounded-[28px] sm:rounded-[36px] bg-gradient-to-b from-[#FAF9F5] via-[#FFFFFF] to-[#F5F2EA] text-[#0A0A0D] overflow-hidden border border-[#E5E0D5] shadow-[0_20px_50px_-20px_rgba(15,23,42,0.08)]">
+          <section className="relative rounded-[28px] sm:rounded-[36px] overflow-hidden border border-white/10 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.5)] text-white bg-slate-950">
             
-            {/* Ambient Lighting & Blueprint Grid */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              <div className="absolute -top-32 -right-24 w-96 h-96 rounded-full bg-[#0A997D]/10 blur-3xl" />
-              <div className="absolute -bottom-36 -left-20 w-96 h-96 rounded-full bg-[#F5B301]/10 blur-3xl" />
-              <div
-                className="absolute inset-0 opacity-[0.035]"
-                style={{
-                  backgroundImage: "radial-gradient(circle, #0F172A 1px, transparent 1px)",
-                  backgroundSize: "28px 28px",
-                }}
+            {/* Dynamic Industry Hero Background Image */}
+            <div className="absolute inset-0 z-0">
+              <Image
+                src={heroBgImage}
+                alt={`${lead.company} - ${lead.niche}`}
+                fill
+                priority={true}
+                sizes="(max-width: 1280px) 100vw, 1360px"
+                className="object-cover object-center"
+                style={{ objectFit: "cover" }}
               />
+              {/* Contrast Overlay: Dark gradient to guarantee white headline & CTA legibility */}
+              <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/65 to-black/85 backdrop-blur-[0.5px]" />
+              <div className="absolute inset-0 bg-slate-950/40 mix-blend-multiply" />
+            </div>
+
+            {/* Ambient Lighting Accents */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden z-1">
+              <div className="absolute -top-32 -right-24 w-96 h-96 rounded-full bg-[#0A997D]/25 blur-3xl" />
+              <div className="absolute -bottom-36 -left-20 w-96 h-96 rounded-full bg-[#F5B301]/15 blur-3xl" />
             </div>
 
             <div className="relative z-10 p-5 sm:p-8 md:p-14 lg:p-16">
@@ -2729,24 +2803,24 @@ function PrototypeContent() {
                 <div className="lg:col-span-7 space-y-5 sm:space-y-6">
                   
                   {/* Eyebrow Pill Tag */}
-                  <div className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 border border-black/10 shadow-xs backdrop-blur-md">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-black/50 px-3.5 py-1.5 border border-white/20 shadow-xs backdrop-blur-md">
                     <span className="qf-status-dot" />
-                    <span className="text-[11.5px] font-mono tracking-wider uppercase font-bold text-[#0A997D]">
+                    <span className="text-[11.5px] font-mono tracking-wider uppercase font-bold text-[#6FD9C1]">
                       {nicheConfig.badge}
                     </span>
                   </div>
 
                   {/* Main Punchy Headline */}
-                  <h1 className="text-[32px] sm:text-[46px] md:text-[54px] font-extrabold leading-[1.04] tracking-tight text-[#0A0A0D]">
+                  <h1 className="text-[32px] sm:text-[46px] md:text-[54px] font-extrabold leading-[1.04] tracking-tight text-white drop-shadow-md">
                     {nicheConfig.heroHeadline}
                   </h1>
 
-                  <p className="text-[15px] sm:text-[17px] text-[#475569] font-medium leading-relaxed max-w-xl">
+                  <p className="text-[15px] sm:text-[17px] text-white/90 font-medium leading-relaxed max-w-xl drop-shadow-sm">
                     {nicheConfig.heroSub}
                   </p>
 
                   {/* Universal Consultation & Instant Quote Hub */}
-                  <div className="rounded-[24px] bg-white p-4 sm:p-5 border border-black/[0.08] shadow-[0_14px_35px_-12px_rgba(0,0,0,0.08)] max-w-xl">
+                  <div className="rounded-[24px] bg-white p-4 sm:p-5 border border-black/[0.08] shadow-[0_14px_35px_-12px_rgba(0,0,0,0.08)] max-w-xl text-[#0A0A0D]">
                     {/* Header inside conversion hub */}
                     <div className="flex items-center justify-between pb-3 mb-3 border-b border-black/[0.06]">
                       <div className="flex items-center gap-2">
@@ -2865,10 +2939,10 @@ function PrototypeContent() {
                   </div>
 
                   {/* Trust Highlights */}
-                  <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-1 text-[12.5px] font-semibold text-[#475569]">
+                  <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-1 text-[12.5px] font-semibold text-white/95">
                     {nicheConfig.heroTrustBadges.map((badge, idx) => (
-                      <span key={idx} className="flex items-center gap-1.5">
-                        <Check className="w-4 h-4 text-[#0A997D]" />
+                      <span key={idx} className="flex items-center gap-1.5 bg-black/40 backdrop-blur-xs px-3 py-1 rounded-full border border-white/10 shadow-xs">
+                        <Check className="w-4 h-4 text-[#6FD9C1]" />
                         <span>{badge}</span>
                       </span>
                     ))}
