@@ -28,6 +28,7 @@ interface Lead {
   coldEmailSubject: string;
   coldEmailBody: string;
   linkedInMessage: string;
+  hasMarketingPixels?: boolean;
   isCustomImport?: boolean;
 }
 
@@ -104,19 +105,22 @@ export async function POST(req: NextRequest) {
     let scriptsCount = 42;
     let htmlWeightKb = 680;
     let extractedTitle = "";
+    let hasMarketingPixels = false;
 
-    // Live Audit: Attempt to fetch the actual website with speed profiling
+    // Live Audit: Attempt to fetch the actual website with speed profiling and pixel detection
     try {
       const startTime = performance.now();
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4500);
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
 
       const res = await fetch(fullUrl, {
         signal: controller.signal,
         headers: {
           "User-Agent":
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 SpeedcraftAudit/1.0",
+          Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         },
+        redirect: "follow",
       });
       clearTimeout(timeoutId);
 
@@ -126,6 +130,11 @@ export async function POST(req: NextRequest) {
       liveHtml = await res.text();
       htmlWeightKb = Math.round(Buffer.byteLength(liveHtml, "utf-8") / 1024);
       scriptsCount = (liveHtml.match(/<script/gi) || []).length;
+
+      // Marketing Pixel Detection (Zero-API Regex Scan)
+      const MARKETING_PIXELS_REGEX =
+        /AW-[0-9]+|googletagmanager\.com\/gtag\/js|GTM-[A-Z0-9]+|fbevents\.js|connect\.facebook\.net/i;
+      hasMarketingPixels = MARKETING_PIXELS_REGEX.test(liveHtml);
 
       // Title extraction
       const titleMatch = liveHtml.match(/<title[^>]*>([^<]+)<\/title>/i);
@@ -166,6 +175,7 @@ export async function POST(req: NextRequest) {
       loadTimeSec = +(Math.random() * 1.5 + 3.2).toFixed(2);
       htmlWeightKb = Math.round(loadTimeSec * 210);
       scriptsCount = Math.round(loadTimeSec * 14);
+      hasMarketingPixels = false;
     }
 
     // Derive mobile PageSpeed score (1-100)
@@ -184,8 +194,13 @@ export async function POST(req: NextRequest) {
 
     const contactName = body.contactName || `${company} Team`;
 
-    const coldEmailSubject = `Your Google Ads / ${company}`;
-    const coldEmailBody = `Hey ${contactName},
+    // Dynamic Email Generation based on detected advertising tracking
+    const coldEmailSubject = hasMarketingPixels
+      ? `Your Google Ads / ${company}`
+      : `Mobile site speed for ${domain}`;
+
+    const coldEmailBody = hasMarketingPixels
+      ? `Hey ${contactName},
 
 I noticed you're driving search traffic to ${domain}, but the mobile landing page takes about ${loadTimeSec} seconds to load.
 
@@ -200,9 +215,27 @@ Zero strings attached. If you like the feel of it, would you like me to set this
 
 Best,
 Faruk — Lead Engineer, Speedcraft Studio
+Direct: farukolawale509@gmail.com`
+      : `Hey ${contactName},
+
+I was looking up top local businesses in ${city} and came across ${domain}, but noticed your mobile site takes about ${loadTimeSec} seconds to load.
+
+Because Google strongly penalizes slow mobile pages in organic local search rankings, a significant number of prospective clients are bouncing before your site even loads and choosing faster competitors.
+
+I run Speedcraft Studio. To demonstrate what a modern, high-performance site feels like, I built a custom, instant-loading version of your landing page that opens in under half a second.
+
+Take a look on your phone to feel the speed difference:
+Link: https://agency-landing-page-smoky-psi.vercel.app/preview/${company.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-")}
+
+Zero strings attached. If you'd like to recapture lost organic search traffic and boost your mobile Google ranking, would you be open to a quick chat about deploying this to your actual domain?
+
+Best,
+Faruk — Lead Engineer, Speedcraft Studio
 Direct: farukolawale509@gmail.com`;
 
-    const linkedInMessage = `Hey ${contactName}, saw ${domain}. Your mobile site takes ${loadTimeSec}s to load, which means you're likely losing paid leads before they can call you. I built a lightning-fast test version that loads in under half a second so customers don't bounce: https://agency-landing-page-smoky-psi.vercel.app/preview/${company.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-")} — want to check it out?`;
+    const linkedInMessage = hasMarketingPixels
+      ? `Hey ${contactName}, saw ${domain}. Your mobile site takes ${loadTimeSec}s to load, which means you're likely losing paid leads before they can call you. I built a lightning-fast test version that loads in under half a second so customers don't bounce: https://agency-landing-page-smoky-psi.vercel.app/preview/${company.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-")} — want to check it out?`
+      : `Hey ${contactName}, saw ${domain}. Your mobile site takes ${loadTimeSec}s to load, which hurts your organic search rankings and causes visitors to bounce. I built a lightning-fast test version that loads in under half a second: https://agency-landing-page-smoky-psi.vercel.app/preview/${company.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-")} — want to check it out?`;
 
     const newLead: Lead = {
       company,
@@ -230,6 +263,7 @@ Direct: farukolawale509@gmail.com`;
       coldEmailSubject,
       coldEmailBody,
       linkedInMessage,
+      hasMarketingPixels,
       isCustomImport: true,
     };
 
@@ -254,7 +288,10 @@ Direct: farukolawale509@gmail.com`;
     return NextResponse.json({
       success: true,
       lead: newLead,
-      message: `Audited ${company} (${mobilePageSpeed}/100 Speed, ${loadTimeSec}s load time) and added to queue.`,
+      hasMarketingPixels,
+      message: `Audited ${company} (${mobilePageSpeed}/100 Speed, ${loadTimeSec}s load time, ${
+        hasMarketingPixels ? "🟢 Active Ad Tracking Detected" : "⚪ No Ad Pixels Found"
+      }) and added to queue.`,
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to audit lead";

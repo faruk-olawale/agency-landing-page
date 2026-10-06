@@ -52,6 +52,7 @@ export interface Lead {
   coldEmailSubject: string;
   coldEmailBody: string;
   linkedInMessage: string;
+  hasMarketingPixels?: boolean;
 }
 
 export interface SentRecord {
@@ -253,7 +254,10 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
         setAuditUrl("");
         setAuditCompany("");
         setAuditCity("");
-        showToast(`Audited ${data.lead.company} (${data.lead.mobilePageSpeed}/100 Speed) — added to queue!`);
+        const adStatusText = data.hasMarketingPixels
+          ? "🟢 Active Ad Tracking Detected"
+          : "⚪ No Ad Pixels Found";
+        showToast(`Audited ${data.lead.company} (${data.lead.mobilePageSpeed}/100 Speed • ${adStatusText}) — added to queue!`);
         setShowImportDrawer(false);
         setSourceMode("vault");
       } else {
@@ -413,6 +417,9 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
 
   const getEmailSubject = (lead: Lead, angle: "wasted_ads" | "direct_punchy" = pitchAngle): string => {
     const domainClean = lead.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
+    if (lead.hasMarketingPixels === false) {
+      return `Organic search traffic & speed / ${domainClean}`;
+    }
     if (angle === "wasted_ads") {
       return `Your Google Ads / ${lead.company}`;
     }
@@ -424,6 +431,44 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
     const previewUrl = getPreviewUrlForLead(lead, true);
     const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Team`;
 
+    // Pitch Angle: Organic SEO Visitors (Triggered when no ad pixels are detected)
+    if (lead.hasMarketingPixels === false) {
+      if (angle === "direct_punchy") {
+        return `Hey ${greeting},
+
+I noticed your mobile site at ${domainClean} takes ${lead.mobileLoadTimeSec} seconds to load.
+
+Google's search algorithm heavily penalizes slow mobile pages, meaning you are steadily dropping in organic rankings and losing search visitors to faster competitors before they even view your services.
+
+I built a sub-second, lightning-fast test version of your exact landing page:
+Link: ${previewUrl}
+
+If you want to recapture lost organic search traffic and boost your mobile Google ranking, would you be open to a quick chat about getting this live on your main domain?
+
+Best,
+Faruk — Lead Engineer, Speedcraft Studio
+Direct: farukolawale509@gmail.com`;
+      }
+
+      return `Hey ${greeting},
+
+I came across ${domainClean} while researching top local businesses in ${lead.city || "your area"}, but noticed your mobile site takes about ${lead.mobileLoadTimeSec} seconds to load.
+
+Because Google strongly penalizes slow mobile pages in organic local search rankings, a significant number of prospective clients are bouncing before your site even loads and choosing faster competitors.
+
+I run Speedcraft Studio. To demonstrate what a modern, high-performance site feels like, I built a custom, instant-loading version of your landing page that opens in under half a second.
+
+Take a look on your phone to feel the speed difference:
+Link: ${previewUrl}
+
+Zero strings attached. If you'd like to recapture lost organic search traffic and boost your mobile Google ranking, would you be open to a quick chat about deploying this to your actual domain?
+
+Best,
+Faruk — Lead Engineer, Speedcraft Studio
+Direct: farukolawale509@gmail.com`;
+    }
+
+    // Pitch Angle: Wasted Google Ads Spend (Triggered when marketing pixels are detected)
     if (angle === "wasted_ads") {
       return `Hey ${greeting},
 
@@ -463,6 +508,10 @@ Direct: farukolawale509@gmail.com`;
     const domainClean = lead.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
     const previewUrl = getPreviewUrlForLead(lead, true);
     const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Team`;
+
+    if (lead.hasMarketingPixels === false) {
+      return `Hey ${greeting}, saw ${domainClean}. Your mobile site takes ${lead.mobileLoadTimeSec}s to load, which hurts your organic search rankings and causes visitors to bounce. I built a lightning-fast test version that loads in under half a second: ${previewUrl} — want to check it out?`;
+    }
 
     return `Hey ${greeting}, saw ${domainClean}. Your mobile site takes ${lead.mobileLoadTimeSec}s to load, which means you're likely losing paid leads before they can call you. I built a lightning-fast test version that loads in under half a second so customers don't bounce: ${previewUrl} — want to check it out?`;
   };
@@ -541,7 +590,9 @@ Direct: farukolawale509@gmail.com`;
                   </span>
                 </div>
                 <p className="text-xs text-zinc-400 mt-0.5">
-                  High-converting, zero-jargon pitch focused strictly on business value & lost ad revenue.
+                  {activePitchLead.hasMarketingPixels === false
+                    ? "High-converting, zero-jargon pitch focused on recovering lost organic search visitors & mobile SEO bounce rate."
+                    : "High-converting, zero-jargon pitch focused strictly on business value & lost ad revenue."}
                 </p>
               </div>
               <button
@@ -562,7 +613,9 @@ Direct: farukolawale509@gmail.com`;
                     : "bg-white text-zinc-700 hover:bg-zinc-100 border border-zinc-200"
                 }`}
               >
-                Angle 1: Wasted Ad Spend (Recommended)
+                {activePitchLead.hasMarketingPixels === false
+                  ? "Angle 1: Lost Organic SEO Visitors (Recommended)"
+                  : "Angle 1: Wasted Ad Spend (Recommended)"}
               </button>
               <button
                 onClick={() => setPitchModalTab("email_direct")}
@@ -1213,6 +1266,32 @@ Direct: farukolawale509@gmail.com`;
                               <span className="text-[10px] font-semibold bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded">
                                 {lead.city}
                               </span>
+
+                              {/* AD-STATUS PILL */}
+                              {lead.hasMarketingPixels !== undefined ? (
+                                lead.hasMarketingPixels ? (
+                                  <span className="text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-2xs">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                    <span>🟢 Active Ad Tracking Detected</span>
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] font-medium bg-zinc-100 text-zinc-600 border border-zinc-200 px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-2xs">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                                    <span>⚪ No Ad Pixels Found</span>
+                                  </span>
+                                )
+                              ) : lead.coldEmailSubject?.toLowerCase().includes("ads") ? (
+                                <span className="text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-2xs">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                  <span>🟢 Active Ad Tracking Detected</span>
+                                </span>
+                              ) : (
+                                <span className="text-[10px] font-medium bg-zinc-100 text-zinc-600 border border-zinc-200 px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-2xs">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                                  <span>⚪ No Ad Pixels Found</span>
+                                </span>
+                              )}
+
                               {lead.rating && (
                                 <span className="text-[10px] font-mono text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
                                   {lead.rating}★ ({lead.userRatingsTotal || 0})
@@ -1250,7 +1329,7 @@ Direct: farukolawale509@gmail.com`;
                           </div>
                         </div>
 
-                        {/* EMAIL & AD WASTE */}
+                        {/* EMAIL & AD/ORGANIC WASTE */}
                         <div className="bg-zinc-50 rounded-lg p-3 text-xs flex flex-wrap items-center justify-between gap-2 border border-zinc-100">
                           <div className="space-y-0.5">
                             <div className="text-[11px] text-zinc-400">Target Contact:</div>
@@ -1259,9 +1338,13 @@ Direct: farukolawale509@gmail.com`;
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="text-[11px] text-zinc-400">Est. Ad Waste:</div>
-                            <div className="font-bold text-red-600 font-mono">
-                              ~{lead.currencySymbol || "$"}{lead.estLostMonthlySpend} {lead.currency || "USD"}/mo
+                            <div className="text-[11px] text-zinc-400">
+                              {lead.hasMarketingPixels === false ? "Organic Traffic Penalty:" : "Est. Ad Waste:"}
+                            </div>
+                            <div className={`font-bold font-mono ${lead.hasMarketingPixels === false ? "text-amber-600" : "text-red-600"}`}>
+                              {lead.hasMarketingPixels === false
+                                ? `~${Math.round((1 - lead.mobilePageSpeed / 100) * 45)}% Bounce Rate`
+                                : `~${lead.currencySymbol || "$"}${lead.estLostMonthlySpend} ${lead.currency || "USD"}/mo`}
                             </div>
                           </div>
                         </div>
