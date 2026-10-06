@@ -31,6 +31,14 @@ import {
   Sun,
   Bug,
   HeartPulse,
+  KeyRound,
+  Trees,
+  Flower2,
+  Brush,
+  Car,
+  Hammer,
+  Wind,
+  Search,
 } from "lucide-react";
 import leadsData from "../../../../leads/global_leads_audit.json";
 
@@ -182,13 +190,18 @@ interface LeadRecord {
 
 const PRESET_LEADS = [
   { slug: "jameson-law", name: "Jameson Law", city: "Sydney", niche: "Legal", phone: "02 8806 0866" },
-  { slug: "sydney-emergency-plumbing", name: "Sydney Emergency Plumbing", city: "Sydney", niche: "Plumbing", phone: "1300 882 190" },
+  { slug: "reztor-restoration", name: "Reztor Restoration", city: "Brisbane", niche: "Restoration", phone: "1300 739 867" },
+  { slug: "abbco-locksmiths-security", name: "ABBCO Locksmiths & Security", city: "Sydney", niche: "Locksmith", phone: "1300 855 025" },
   { slug: "skygate-dental", name: "Skygate Dental", city: "Brisbane", niche: "Dental", phone: "(07) 3130 0088" },
+  { slug: "adorn-landscaping", name: "Adorn Landscaping", city: "Sydney", niche: "Landscaping", phone: "1300 923 481" },
+  { slug: "sydney-tree-solutions", name: "Sydney Tree Solutions", city: "Sydney", niche: "Tree Care", phone: "1300 650 351" },
   { slug: "total-solar-solutions", name: "Total Solar Solutions", city: "Brisbane", niche: "Solar", phone: "1300 868 257" },
+  { slug: "pest-control-sydney", name: "Pest Control Sydney", city: "Sydney", niche: "Pest Control", phone: "1300 760 050" },
+  { slug: "total-cleaning-melbourne", name: "Total Cleaning Melbourne", city: "Melbourne", niche: "Cleaning", phone: "1300 558 721" },
   { slug: "powerhub-electrical", name: "PowerHub Electrical Services", city: "Melbourne", niche: "Electrical", phone: "1300 914 202" },
   { slug: "austin-air-heating", name: "Austin Air & Heating Experts", city: "Austin", niche: "HVAC", phone: "(512) 694-8119" },
-  { slug: "apex-roofing-contractors", name: "Apex Roofing Contractors", city: "Brisbane", niche: "Roofing", phone: "1300 452 881" },
-  { slug: "pest-control-sydney", name: "Pest Control Sydney", city: "Sydney", niche: "Pest Control", phone: "1300 760 050" },
+  { slug: "rainbird-roof-restorations", name: "Rainbird Roof Restorations", city: "Sydney", niche: "Roofing", phone: "1300 452 881" },
+  { slug: "sydney-emergency-plumbing", name: "Sydney Emergency Plumbing", city: "Sydney", niche: "Plumbing", phone: "1300 882 190" },
 ];
 
 function PrototypeContent() {
@@ -201,16 +214,26 @@ function PrototypeContent() {
   // ─── Lead Data Resolution ─────────────────────────────────────────────
   const lead = useMemo(() => {
     const normalizedSlug = slug.toLowerCase().replace(/[^a-z0-9]/g, "");
-    const found = (leadsData as LeadRecord[]).find((l) => {
+
+    // 1. Exact match on company or domain slug
+    let found = (leadsData as LeadRecord[]).find((l) => {
       const leadSlug = l.company.toLowerCase().replace(/[^a-z0-9]/g, "");
       const domainSlug = l.website.toLowerCase().replace(/[^a-z0-9]/g, "");
-      return (
-        leadSlug === normalizedSlug ||
-        leadSlug.includes(normalizedSlug) ||
-        domainSlug.includes(normalizedSlug) ||
-        normalizedSlug.includes(leadSlug)
-      );
+      return leadSlug === normalizedSlug || domainSlug === normalizedSlug;
     });
+
+    // 2. Substring match fallback
+    if (!found) {
+      found = (leadsData as LeadRecord[]).find((l) => {
+        const leadSlug = l.company.toLowerCase().replace(/[^a-z0-9]/g, "");
+        const domainSlug = l.website.toLowerCase().replace(/[^a-z0-9]/g, "");
+        return (
+          leadSlug.includes(normalizedSlug) ||
+          domainSlug.includes(normalizedSlug) ||
+          normalizedSlug.includes(leadSlug)
+        );
+      });
+    }
 
     const company =
       searchParams.get("name") ||
@@ -229,26 +252,43 @@ function PrototypeContent() {
     // Intelligently infer niche if not strictly defined in query or database
     let inferredNiche = searchParams.get("niche") || found?.niche || "";
     if (!inferredNiche) {
-      const s = slug.toLowerCase();
-      if (s.includes("law") || s.includes("legal") || s.includes("solicitor") || s.includes("attorney")) inferredNiche = "Legal";
-      else if (s.includes("dent") || s.includes("smile")) inferredNiche = "Dental";
-      else if (s.includes("solar") || s.includes("energy")) inferredNiche = "Solar";
-      else if (s.includes("pest") || s.includes("termite")) inferredNiche = "Pest Control";
-      else if (s.includes("lock")) inferredNiche = "Locksmith";
+      const s = (slug + " " + company).toLowerCase();
+      if (s.includes("law") || s.includes("legal") || s.includes("solicitor") || s.includes("attorney") || s.includes("barrister")) inferredNiche = "Legal";
+      else if (s.includes("dent") || s.includes("smile") || s.includes("ortho") || s.includes("implant")) inferredNiche = "Dental";
+      else if (s.includes("solar") || s.includes("energy") || s.includes("renew")) inferredNiche = "Solar";
+      else if (s.includes("lock") || s.includes("key") || s.includes("security")) inferredNiche = "Locksmith";
+      else if (s.includes("restor") || s.includes("water damage") || s.includes("flood") || s.includes("mold")) inferredNiche = "Restoration";
+      else if (s.includes("landscape") || s.includes("landscaping") || s.includes("garden") || s.includes("paving") || s.includes("turf")) inferredNiche = "Landscaping";
+      else if (s.includes("tree") || s.includes("arborist") || s.includes("lopping") || s.includes("stump")) inferredNiche = "Tree Care";
+      else if (s.includes("pest") || s.includes("termite") || s.includes("rodent")) inferredNiche = "Pest Control";
+      else if (s.includes("cosmetic") || s.includes("aesthetic") || s.includes("medspa") || s.includes("dermal") || s.includes("skin")) inferredNiche = "Cosmetic";
+      else if (s.includes("clean") || s.includes("carpet clean") || s.includes("janitorial")) inferredNiche = "Cleaning";
+      else if (s.includes("paint") || s.includes("painter")) inferredNiche = "Painting";
+      else if (s.includes("auto") || s.includes("mechanic") || s.includes("brake") || s.includes("tyre")) inferredNiche = "Automotive";
+      else if (s.includes("account") || s.includes("tax") || s.includes("cpa") || s.includes("bookkeep")) inferredNiche = "Accounting";
+      else if (s.includes("construct") || s.includes("builder") || s.includes("carpenter") || s.includes("renovat")) inferredNiche = "Construction";
+      else if (s.includes("software") || s.includes("tech") || s.includes("dev") || s.includes("saas") || s.includes("app")) inferredNiche = "Software";
       else if (s.includes("roof")) inferredNiche = "Roofing";
-      else if (s.includes("electr") || s.includes("power")) inferredNiche = "Electrician";
-      else if (s.includes("air") || s.includes("hvac") || s.includes("cool") || s.includes("heat")) inferredNiche = "HVAC";
-      else if (s.includes("restor") || s.includes("mold") || s.includes("flood")) inferredNiche = "Restoration";
-      else if (s.includes("plumb") || s.includes("drain") || s.includes("pipe")) inferredNiche = "Plumbing";
-      else inferredNiche = "General";
+      else if (s.includes("air") || s.includes("hvac") || s.includes("cool") || s.includes("heat") || s.includes("climate")) inferredNiche = "HVAC";
+      else if (s.includes("electr") || s.includes("power") || s.includes("spark")) inferredNiche = "Electrician";
+      else if (s.includes("plumb") || s.includes("drain") || s.includes("pipe") || s.includes("gas fit") || s.includes("hot water")) inferredNiche = "Plumbing";
+      else inferredNiche = "Professional Services";
     }
 
     // Standardized dialable phone
     let rawPhone = searchParams.get("phone") || found?.phone || "";
     if (!rawPhone || rawPhone.toLowerCase().includes("direct") || rawPhone.toLowerCase().includes("website")) {
-      if (countryCode === "AU") rawPhone = inferredNiche === "Legal" ? "02 8806 0866" : "1300 882 190";
-      else if (countryCode === "GB" || countryCode === "UK") rawPhone = "020 7946 0192";
-      else rawPhone = "(214) 736-9201";
+      if (countryCode === "AU") {
+        if (inferredNiche === "Legal") rawPhone = "02 8806 0866";
+        else if (inferredNiche === "Dental") rawPhone = "(07) 3130 0088";
+        else if (inferredNiche === "Locksmith") rawPhone = "1300 855 025";
+        else if (inferredNiche === "Restoration") rawPhone = "1300 739 867";
+        else rawPhone = "1300 882 190";
+      } else if (countryCode === "GB" || countryCode === "UK") {
+        rawPhone = "020 7946 0192";
+      } else {
+        rawPhone = "(214) 736-9201";
+      }
     }
 
     const email = searchParams.get("email") || found?.email || "contact@" + website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
@@ -284,7 +324,29 @@ function PrototypeContent() {
   const [formLoading, setFormLoading] = useState(false);
   const [activeProcessTab, setActiveProcessTab] = useState(0);
   const [activeLeadPicker, setActiveLeadPicker] = useState(false);
+  const [leadFilterQuery, setLeadFilterQuery] = useState("");
   const [bannerExpanded, setBannerExpanded] = useState(false);
+
+  // Filtered leads for the prospect switcher drawer
+  const filteredPresetLeads = useMemo(() => {
+    if (!leadFilterQuery.trim()) return PRESET_LEADS;
+    const q = leadFilterQuery.toLowerCase();
+    const matchesFromGlobal = (leadsData as LeadRecord[]).filter((l) => {
+      return (
+        l.company.toLowerCase().includes(q) ||
+        l.city.toLowerCase().includes(q) ||
+        l.niche.toLowerCase().includes(q)
+      );
+    }).slice(0, 15).map((l) => ({
+      slug: l.company.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, ""),
+      name: l.company,
+      city: l.city,
+      niche: l.niche,
+      phone: l.phone,
+    }));
+
+    return matchesFromGlobal.length > 0 ? matchesFromGlobal : PRESET_LEADS;
+  }, [leadFilterQuery]);
 
   // Form State
   const [bookingData, setBookingData] = useState({
@@ -661,7 +723,782 @@ function PrototypeContent() {
       };
     }
 
-    // 3. SOLAR & RENEWABLE ENERGY
+    // 3. RESTORATION & DISASTER RECOVERY
+    if (n.includes("restor") || n.includes("water damage") || n.includes("flood") || n.includes("mold") || n.includes("fire damage")) {
+      return {
+        nicheKey: "restoration",
+        tradeTitle: "Emergency Disaster, Flood & Mold Restoration",
+        badge: "60-Minute Rapid Disaster Response Across Greater City",
+        heroHeadline: (
+          <>
+            {lead.city}&apos;s 24/7 Emergency <br className="hidden sm:inline" />
+            <span className="text-[#6FD9C1]">Flood &amp; Disaster Restoration</span>.
+          </>
+        ),
+        heroSub: `IICRC-certified emergency structural drying, floodwater extraction, and mold remediation across Greater ${lead.city}. Arriving on-site with industrial equipment in under 60 minutes with direct insurance billing.`,
+        navBadge: `${lead.city} Disaster Response`,
+        navCta: "Call Emergency Crew",
+        navContactLabel: "Emergency Dispatch",
+        heroCta: "Request Immediate Water Extraction",
+        heroTrustBadges: [
+          "Direct Insurance Billing & Reports",
+          "Sub-Second 0.28s Load Speed",
+          "IICRC Certified Structural Drying",
+        ],
+        radarLabel: "DISASTER DISPATCH",
+        radarSub: `Emergency Intake: ${lead.city}`,
+        partyA: { label: "Property Owner", initials: "PO", bg: "#B5D4F4", text: "#0C447C" },
+        partyB: { label: "Restoration Tech", icon: ShieldCheck, bg: "#CECBF6", text: "#22184A" },
+        agreementPill: { left: "Direct Insurance Billing", right: "IICRC Certified" },
+        blueprintFrames: [
+          {
+            title: "▸ RAPID EXTRACTION TIMELINE",
+            desc: `On-site within 60 minutes across Greater ${lead.city} with truck-mounted water extractors to prevent permanent timber and drywall ruin.`,
+          },
+          {
+            title: "▸ INSURANCE CLAIM DOCUMENTATION",
+            desc: "Comprehensive thermal moisture mapping and psychrometric logs prepared to ensure rapid insurance approval.",
+          },
+          {
+            title: "▸ SUB-SECOND EDGE STACK",
+            desc: `Loads in 0.28s so property owners dealing with burst mains or flooding connect with your team immediately.`,
+          },
+        ],
+        stepsBadge: "How It Works",
+        stepsHeading: "Three Steps to Full Structural Recovery",
+        stepsSub: "We eliminated bureaucratic claim delays and secondary mold damage.",
+        steps: [
+          {
+            num: "01",
+            cardBadge: "1-Tap Dispatch",
+            cardNote: "60-Min Arrival",
+            title: "Immediate Disaster Dispatch",
+            desc: `Emergency call answered 24/7. Mobile restoration crews mobilized with industrial extraction units across ${lead.city}.`,
+            icon: Phone,
+            color: "#0A997D",
+            bgColor: "#6FD9C1",
+          },
+          {
+            num: "02",
+            cardBadge: "Thermal Scan",
+            cardNote: "Infrared Moisture Map",
+            title: "Extraction & Thermal Drying",
+            desc: "High-volume water extraction followed by industrial LGR dehumidifiers and HEPA air scrubbers.",
+            icon: Droplets,
+            color: "#633806",
+            bgColor: "#F5B301",
+          },
+          {
+            num: "03",
+            cardBadge: "Insurance Ready",
+            cardNote: "Full Clearance Cert",
+            title: "Sanitation & Insurance Sign-Off",
+            desc: "Antimicrobial treatment applied, moisture targets verified, and complete insurance reports submitted.",
+            icon: ShieldCheck,
+            color: "#0A997D",
+            bgColor: "#CECBF6",
+          },
+        ],
+        capabilitiesBadge: "Capabilities",
+        capabilitiesHeading: `Certified Disaster Recovery in ${lead.city}`,
+        capabilitiesSub: "IICRC-accredited restoration technicians with commercial structural drying suites.",
+        services: [
+          {
+            title: "Emergency Floodwater Extraction & Drying",
+            desc: `Immediate extraction of standing water, wet carpet salvage, and rapid subfloor drying across ${lead.city}.`,
+            tag: "60-Min Arrival",
+            price: "Insurance Claimable",
+            icon: Droplets,
+          },
+          {
+            title: "Certified Mold Remediation & Air Scrubbing",
+            desc: "Negative air containment, toxic mold spore eradication, and certified indoor air quality clearance testing.",
+            tag: "Safety Clearance",
+            price: "Written Report",
+            icon: Bug,
+          },
+          {
+            title: "Fire, Smoke & Soot Decontamination",
+            desc: "Thermal fogging, structural soot removal, and permanent smoke odour neutralisation for fire-affected buildings.",
+            tag: "Odour Neutral",
+            price: "Full Mitigation",
+            icon: Flame,
+          },
+          {
+            title: "Sewage Backup & Biohazard Sanitation",
+            desc: "Category 3 blackwater decontamination with medical-grade hospital disinfectants and hygienic clearance.",
+            tag: "Bio-Clean",
+            price: "Emergency Fixed",
+            icon: ShieldCheck,
+          },
+        ],
+        standardBadge: "RESTORATION STANDARD",
+        standardHeading: `Why ${lead.city} Property Managers Trust ${lead.company}`,
+        standardItems: [
+          { title: "Direct Insurer Billing", desc: "We bill major insurance underwriters directly to minimise your out-of-pocket stress." },
+          { title: "Industrial Equipment Fleet", desc: "Commercial desiccant and LGR dehumidifiers capable of drying multi-level buildings." },
+          { title: "Certified IICRC Techs", desc: "All technicians certified in Water Damage Restoration (WRT) and Applied Microbial Remediation (AMRT)." },
+          { title: "24/7 Standby Availability", desc: "Live crews ready 365 days a year for severe storm, pipe burst, and river flooding events." },
+        ],
+        auditHeadline: "Every 1-Second Mobile Delay Leaks 20% of High-Value Insurance Jobs",
+        auditSub: `When a home or business floods, every minute counts. Property owners tap the first number that loads. If your site takes 3 seconds, a competing restoration company wins a $5,000+ claim.`,
+        auditBenefits: [
+          "Edge CDN delivers 0.28s load times for instant emergency dispatch dialing.",
+          "Zero slow WordPress plugins delaying panicked property owners in crisis.",
+          `Saves an estimated ~${lead.currencySymbol}${lead.estLostMonthlySpend}/mo in leaked Google ad traffic.`,
+        ],
+        socialProofHeading: `Property Owners in ${lead.city} Trust ${lead.company}`,
+        testimonials: [
+          {
+            name: "Michael R.",
+            neighborhood: `${lead.city} Suburbs`,
+            quote: `Main water pipe burst while we were away, flooding the entire ground floor. ${lead.company} arrived in 35 minutes with extractors and dried our hardwood floors completely. Managed our insurance claim effortlessly.`,
+          },
+          {
+            name: "Lisa T.",
+            neighborhood: `${lead.city} North`,
+            quote: "Professional, polite, and exceptionally thorough with mold remediation in our apartment. Provided a full lab clearance certificate. Highly recommended.",
+          },
+        ],
+        formBadge: "EMERGENCY DISASTER INTAKE",
+        formTitle: `Request Emergency Restoration in ${lead.city}`,
+        formSub: "Immediate dispatch for water extraction, flood recovery, or mold inspection.",
+        formLocationPlaceholder: `Your Property Suburb in ${lead.city}`,
+        formUrgencyOptions: [
+          "Urgent Flood / Active Water Ruin (Immediate Dispatch)",
+          "Recent Flood (Dryout in Progress)",
+          "Toxic Mold Inspection & Air Quality Test",
+          "Fire & Smoke Damage Mitigation",
+        ],
+        formSubmitLabel: "Request Emergency Restoration Crew",
+        formSuccessHeading: "Emergency Restoration Dispatched",
+        formSuccessDesc: "Your test request was processed in 0.04s. In production, this immediately alerts on-duty disaster response crews.",
+        footerDesc: `IICRC-certified disaster recovery and floodwater restoration serving Greater ${lead.city}.`,
+        footerPhoneLabel: "Emergency Hotline:",
+      };
+    }
+
+    // 4. LOCKSMITH & PHYSICAL ACCESS SECURITY
+    if (n.includes("lock") || n.includes("key") || n.includes("security")) {
+      return {
+        nicheKey: "locksmith",
+        tradeTitle: "24/7 Mobile Locksmith & Key Specialists",
+        badge: "24/7 Rapid Mobile Lockout Dispatch Across City",
+        heroHeadline: (
+          <>
+            {lead.city}&apos;s 24/7 Mobile <br className="hidden sm:inline" />
+            <span className="text-[#6FD9C1]">Locksmith &amp; Security Response</span>.
+          </>
+        ),
+        heroSub: `Licensed mobile locksmiths arriving at your door or vehicle within 25 minutes across Greater ${lead.city}. Non-destructive door opening, high-security deadbolts, digital locks, and transponder key cutting on-site.`,
+        navBadge: `${lead.city} Mobile Van Active`,
+        navCta: "Call Locksmith",
+        navContactLabel: "Lockout Dispatch",
+        heroCta: "Request Lockout Dispatch",
+        heroTrustBadges: [
+          "Zero Damage Guarantee on Entry",
+          "Sub-Second 0.28s Load Speed",
+          "Licensed & Police Checked Master Locksmiths",
+        ],
+        radarLabel: "LOCKOUT RADAR",
+        radarSub: `Priority Lockout: ${lead.city}`,
+        partyA: { label: "Client", initials: "CL", bg: "#B5D4F4", text: "#0C447C" },
+        partyB: { label: "Master Locksmith", icon: KeyRound, bg: "#CECBF6", text: "#22184A" },
+        agreementPill: { left: "Fixed Price Quoted", right: "No Damage" },
+        blueprintFrames: [
+          {
+            title: "▸ 25-MINUTE ARRIVAL SLA",
+            desc: `Mobile workshops dispatched immediately across Greater ${lead.city} for locked-out residential, commercial, and automotive customers.`,
+          },
+          {
+            title: "▸ UPFRONT FIXED PRICING",
+            desc: "Clear upfront quote agreed over the phone before our technician travels. Zero surprise fees upon unlocking.",
+          },
+          {
+            title: "▸ SUB-SECOND EDGE STACK",
+            desc: `Loads in 0.28s so locked-out customers on mobile phones can tap and connect in seconds.`,
+          },
+        ],
+        stepsBadge: "How It Works",
+        stepsHeading: "Three Steps to Instant Entry & Security",
+        stepsSub: "We eliminated long outdoor waits, broken door frames, and inflated lock replacement fees.",
+        steps: [
+          {
+            num: "01",
+            cardBadge: "1-Tap Call",
+            cardNote: "24/7 Live Operator",
+            title: "Call or Request Urgent Dispatch",
+            desc: `Connect directly with our master locksmith van in ${lead.city}. We confirm your exact location and vehicle or lock type.`,
+            icon: Phone,
+            color: "#0A997D",
+            bgColor: "#6FD9C1",
+          },
+          {
+            num: "02",
+            cardBadge: "Mobile Van",
+            cardNote: "ETA: 20 Mins",
+            title: "Rapid Arrival & Non-Destructive Entry",
+            desc: "Our fully equipped mobile workshop arrives. Master picks and specialist tools gain entry without scratching your frame.",
+            icon: Navigation,
+            color: "#633806",
+            bgColor: "#F5B301",
+          },
+          {
+            num: "03",
+            cardBadge: "Secured",
+            cardNote: "Restricted Keying",
+            title: "Key Cutting & Security Check",
+            desc: "Need new keys or re-keying? New keys cut on-site and deadbolts upgraded immediately.",
+            icon: ShieldCheck,
+            color: "#0A997D",
+            bgColor: "#CECBF6",
+          },
+        ],
+        capabilitiesBadge: "Capabilities",
+        capabilitiesHeading: `Master Locksmith Capabilities in ${lead.city}`,
+        capabilitiesSub: "Licensed physical security specialists providing residential, commercial, and automotive solutions.",
+        services: [
+          {
+            title: "24/7 Emergency Door & Lockout Service",
+            desc: `Rapid, non-destructive entry for homes, apartments, and commercial offices locked out across ${lead.city}.`,
+            tag: "25-Min Arrival",
+            price: "Fixed Quote",
+            icon: KeyRound,
+          },
+          {
+            title: "Automotive Key Cutting & Transponder Programming",
+            desc: "Replacement car keys, remote key fobs, and transponder chip cloning for all Japanese, European, and local makes.",
+            tag: "All Car Makes",
+            price: "Same-Day Cut",
+            icon: Car,
+          },
+          {
+            title: "Digital Smart Locks & Keyless Entry",
+            desc: "Installation of biometric fingerprint, PIN keypad, and smartphone app deadbolts from Yale, Samsung, and Lockwood.",
+            tag: "Keyless Living",
+            price: "Supplied & Fitted",
+            icon: Sparkles,
+          },
+          {
+            title: "Commercial Master Key & Restricted Systems",
+            desc: "Restricted key duplication profiles and master suite hierarchy preventing unauthorized staff key copying.",
+            tag: "Master Suited",
+            price: "Commercial SLA",
+            icon: Briefcase,
+          },
+        ],
+        standardBadge: "LOCKSMITH STANDARD",
+        standardHeading: `Why ${lead.city} Residents Trust ${lead.company}`,
+        standardItems: [
+          { title: "Non-Destructive Entry", desc: "Specialist pick tools open 98% of residential locks without drilling or damaging hardware." },
+          { title: "Mobile Key Cutting", desc: "Computerised laser key-cutting machines onboard every service van for precise cuts." },
+          { title: "Master Locksmiths", desc: "Licensed under state security legislation with comprehensive background vetting." },
+          { title: "Warranty on All Locks", desc: "All supplied deadbolts, cylinders, and smart handles backed by 2-year warranty." },
+        ],
+        auditHeadline: "Every 1-Second Mobile Delay Leaks 20% of Urgent Lockout Calls",
+        auditSub: `Locked-out customers standing on the street need help immediately. If your website takes 3 seconds to open, they hit back and dial the next mobile van.`,
+        auditBenefits: [
+          "Loads in 0.28 seconds for instant mobile access right on the street.",
+          "Zero bloated WordPress scripts delaying the phone dialer.",
+          `Saves an estimated ~${lead.currencySymbol}${lead.estLostMonthlySpend}/mo in wasted Google ad clicks.`,
+        ],
+        socialProofHeading: `Residents & Drivers in ${lead.city} Trust ${lead.company}`,
+        testimonials: [
+          {
+            name: "Jessica P.",
+            neighborhood: `${lead.city} Suburbs`,
+            quote: `Locked myself out of my apartment at 11:00 PM. ${lead.company} was at my door in 20 minutes, unlocked the deadbolt cleanly without drilling, and charged the exact price quoted over the phone.`,
+          },
+          {
+            name: "Tom W.",
+            neighborhood: `${lead.city} CBD`,
+            quote: "Lost our only set of car keys at the beach. Their mobile technician cut and programmed a brand new transponder key right in the car park. Saved us a huge towing fee.",
+          },
+        ],
+        formBadge: "PRIORITY LOCKOUT INTAKE",
+        formTitle: `Request Mobile Locksmith in ${lead.city}`,
+        formSub: "Fill in your details for immediate 25-minute arrival or an upfront quote.",
+        formLocationPlaceholder: `Your Suburb / Vehicle Location in ${lead.city}`,
+        formUrgencyOptions: [
+          "Emergency Lockout (Locked Outside Right Now)",
+          "Lost Car Keys (Vehicle Lockout)",
+          "Re-Keying / Lock Replacement Today",
+          "Digital Smart Lock Installation Quote",
+        ],
+        formSubmitLabel: "Request Mobile Locksmith Dispatch",
+        formSuccessHeading: "Locksmith Dispatch Notified",
+        formSuccessDesc: "Your test request was processed in 0.04s. In production, this immediately alerts on-duty mobile vans.",
+        footerDesc: `Licensed mobile master locksmiths and physical access security specialists serving Greater ${lead.city}.`,
+        footerPhoneLabel: "Emergency Locksmith Line:",
+      };
+    }
+
+    // 5. LANDSCAPING & OUTDOOR LIVING
+    if (n.includes("landscape") || n.includes("landscaping") || n.includes("garden") || n.includes("turf") || n.includes("paving")) {
+      return {
+        nicheKey: "landscaping",
+        tradeTitle: "Landscape Design, Construction & Paving",
+        badge: "Award-Winning Landscape Design & Construction",
+        heroHeadline: (
+          <>
+            {lead.city}&apos;s Master <br className="hidden sm:inline" />
+            <span className="text-[#6FD9C1]">Landscape Design &amp; Construction</span>.
+          </>
+        ),
+        heroSub: `Transforming outdoor spaces across Greater ${lead.city}. Turnkey landscape architecture, structural retaining walls, luxury paving, lush turf, and automated irrigation backed by structural guarantees.`,
+        navBadge: `${lead.city} Landscape Studio`,
+        navCta: "Book Design Consult",
+        navContactLabel: "Consultation",
+        heroCta: "Request Landscape Consultation",
+        heroTrustBadges: [
+          "Structural Engineering Guarantees",
+          "Sub-Second 0.28s Load Speed",
+          "Licensed Structural Landscaping Contractors",
+        ],
+        radarLabel: "PROJECT DESIGN",
+        radarSub: `Landscape Intake: ${lead.city}`,
+        partyA: { label: "Homeowner", initials: "HO", bg: "#B5D4F4", text: "#0C447C" },
+        partyB: { label: "Lead Designer", icon: Flower2, bg: "#CECBF6", text: "#22184A" },
+        agreementPill: { left: "Fixed Project Quote", right: "7-Yr Guarantee" },
+        blueprintFrames: [
+          {
+            title: "▸ 3D ARCHITECTURAL CONCEPT DESIGN",
+            desc: `Full 3D digital renders, plant schedules, and structural civil drawings tailored to your property contour in ${lead.city}.`,
+          },
+          {
+            title: "▸ TURNKEY FIXED COST CONTRACTS",
+            desc: "Zero budget blowouts. Fixed-price agreements covering all site excavation, retaining walls, paving, and softscaping.",
+          },
+          {
+            title: "▸ SUB-SECOND EDGE STACK",
+            desc: `Loads in 0.28s showcasing high-resolution project transformations without lagging on mobile devices.`,
+          },
+        ],
+        stepsBadge: "How It Works",
+        stepsHeading: "Three Steps to Your Dream Outdoor Living Space",
+        stepsSub: "We eliminated contractor delays, poor drainage design, and unexpected cost additions.",
+        steps: [
+          {
+            num: "01",
+            cardBadge: "On-Site Review",
+            cardNote: "Site Feasibility",
+            title: "Initial Consultation & Concept",
+            desc: `We walk your property in ${lead.city}, analyze natural soil drainage, and formulate a custom design brief.`,
+            icon: Phone,
+            color: "#0A997D",
+            bgColor: "#6FD9C1",
+          },
+          {
+            num: "02",
+            cardBadge: "3D Render",
+            cardNote: "Fixed Scope",
+            title: "Detailed Design & Fixed Quote",
+            desc: "You receive 3D landscape visuals, material samples, and a comprehensive fixed-price construction schedule.",
+            icon: Flower2,
+            color: "#633806",
+            bgColor: "#F5B301",
+          },
+          {
+            num: "03",
+            cardBadge: "Construction",
+            cardNote: "Turnkey Delivery",
+            title: "Master Construction & Handover",
+            desc: "Our licensed civil landscapers complete excavation, retaining walls, paving, turf, and architectural planting.",
+            icon: ShieldCheck,
+            color: "#0A997D",
+            bgColor: "#CECBF6",
+          },
+        ],
+        capabilitiesBadge: "Capabilities",
+        capabilitiesHeading: `Landscaping Capabilities Across ${lead.city}`,
+        capabilitiesSub: "Structural and softscape solutions built to withstand the Australian climate.",
+        services: [
+          {
+            title: "Structural Retaining Walls & Stone Masonry",
+            desc: `Certified concrete sleeper, sandstone block, and timber retaining walls engineered for soil retention across ${lead.city}.`,
+            tag: "Engineered Walls",
+            price: "Engineered Cert",
+            icon: Hammer,
+          },
+          {
+            title: "Premium Porcelain, Travertine & Concrete Paving",
+            desc: "Precision poolside paving, patio extensions, alfresco entertaining zones, and durable stone pathways.",
+            tag: "Poolside Paving",
+            price: "Turnkey Fixed",
+            icon: Sparkles,
+          },
+          {
+            title: "Premium Turf Installation & Soil Enrichment",
+            desc: "Sir Walter DNA Certified Buffalo, TifTuf Bermuda, and automated sub-surface smart irrigation systems.",
+            tag: "Lush Living",
+            price: "Supplied & Laid",
+            icon: Flower2,
+          },
+          {
+            title: "Custom Timber Decking & Pergola Pergolas",
+            desc: "Hardwood Merbau, Spotted Gum, and low-maintenance composite decking engineered for long-term entertaining.",
+            tag: "Outdoor Entertaining",
+            price: "Custom Design",
+            icon: Award,
+          },
+        ],
+        standardBadge: "CONSTRUCTION STANDARD",
+        standardHeading: `Why ${lead.city} Property Owners Choose ${lead.company}`,
+        standardItems: [
+          { title: "Structural Licences", desc: "Fully insured and licensed structural landscaping contractors complying with building codes." },
+          { title: "Comprehensive Soil Drainage", desc: "Integrated ag-pipe and drainage pits preventing water pooling or foundation erosion." },
+          { title: "Planting Warranty", desc: "All supplied mature trees, shrubs, and turf backed by health and establishment warranties." },
+          { title: "Clean & Tidy Sites", desc: "Daily site cleanups with protective ground boards to safeguard your driveway." },
+        ],
+        auditHeadline: "Every 1-Second Mobile Delay Leaks 20% of High-Value Renovation Projects",
+        auditSub: `Homeowners planning a $20k–$80k backyard overhaul demand polish and speed. If your website takes 3 seconds to render photos, they switch to the next studio.`,
+        auditBenefits: [
+          "High-performance edge delivery renders photos in 0.28 seconds on mobile.",
+          "Zero bloated WordPress plugins slowing down project gallery viewing.",
+          `Saves an estimated ~${lead.currencySymbol}${lead.estLostMonthlySpend}/mo in wasted Google ad clicks.`,
+        ],
+        socialProofHeading: `Homeowners in ${lead.city} Trust ${lead.company}`,
+        testimonials: [
+          {
+            name: "David & Sarah C.",
+            neighborhood: `${lead.city} Hills`,
+            quote: `${lead.company} took our sloping, unusable backyard and built a breathtaking travertine pool terrace with stone retaining walls. Delivered on time and on budget.`,
+          },
+          {
+            name: "Greg M.",
+            neighborhood: `${lead.city} Suburbs`,
+            quote: "Superb communication from initial 3D concept to final turf laying. Our outdoor space feels like a 5-star resort. Outstanding work.",
+          },
+        ],
+        formBadge: "LANDSCAPE DESIGN CONSULTATION",
+        formTitle: `Book On-Site Landscape Consultation in ${lead.city}`,
+        formSub: "Discuss your outdoor living vision with our senior design team.",
+        formLocationPlaceholder: `Your Property Suburb in ${lead.city}`,
+        formUrgencyOptions: [
+          "Ready to Build This Month",
+          "Planning Project for Next Quarter",
+          "New Home Build Handover Coming Soon",
+          "Pool Surrounds & Entertaining Upgrade Only",
+        ],
+        formSubmitLabel: "Request Landscape Consultation",
+        formSuccessHeading: "Design Request Received",
+        formSuccessDesc: "Your test request was processed in 0.04s. In production, this immediately schedules your on-site landscape design consultation.",
+        footerDesc: `Licensed landscape designers and structural construction contractors serving Greater ${lead.city}.`,
+        footerPhoneLabel: "Studio Line:",
+      };
+    }
+
+    // 6. TREE CARE & ARBORISTS
+    if (n.includes("tree") || n.includes("arborist") || n.includes("lopping") || n.includes("stump")) {
+      return {
+        nicheKey: "tree_care",
+        tradeTitle: "Certified Arborists & Tree Removal",
+        badge: "AQF Level 5 Arborists · 24/7 Storm Response",
+        heroHeadline: (
+          <>
+            {lead.city}&apos;s Certified <br className="hidden sm:inline" />
+            <span className="text-[#6FD9C1]">Tree Removal &amp; Arborist Services</span>.
+          </>
+        ),
+        heroSub: `Safe, fully insured tree removal, pruning, and emergency storm clearing across Greater ${lead.city}. AQF-qualified arborists, $20M public liability cover, high-reach crane access, and high-power stump grinding.`,
+        navBadge: `${lead.city} Arborist Crew`,
+        navCta: "Call Arborist",
+        navContactLabel: "Emergency Clearing",
+        heroCta: "Request Tree Assessment",
+        heroTrustBadges: [
+          "$20M Public Liability Insurance",
+          "Sub-Second 0.28s Load Speed",
+          "AQF-Qualified Professional Arborists",
+        ],
+        radarLabel: "ARBORIST RADAR",
+        radarSub: `Tree Assessment: ${lead.city}`,
+        partyA: { label: "Property Owner", initials: "PO", bg: "#B5D4F4", text: "#0C447C" },
+        partyB: { label: "Lead Arborist", icon: Trees, bg: "#CECBF6", text: "#22184A" },
+        agreementPill: { left: "Fixed Price Quoted", right: "Insured $20M" },
+        blueprintFrames: [
+          {
+            title: "▸ COUNCIL PERMIT ASSISTANCE",
+            desc: `Comprehensive Tree Management Plans and arborist impact reports prepared for fast council approval in ${lead.city}.`,
+          },
+          {
+            title: "▸ FULL PROPERTY PROTECTION",
+            desc: "Precision sectional dismantling and lowering ropes ensuring zero damage to roofs, fences, or garden beds.",
+          },
+          {
+            title: "▸ SUB-SECOND EDGE STACK",
+            desc: `Loads in 0.28s so property owners with storm-damaged or falling trees connect with your crew instantly.`,
+          },
+        ],
+        stepsBadge: "How It Works",
+        stepsHeading: "Three Steps to Safe Tree Clearing & Care",
+        stepsSub: "We eliminated hazardous guesswork, council permit stress, and messy debris left on your lawn.",
+        steps: [
+          {
+            num: "01",
+            cardBadge: "On-Site Review",
+            cardNote: "Arborist Hazard Scan",
+            title: "Free On-Site Assessment",
+            desc: `Our AQF arborist inspects the tree health, assesses property proximity, and outlines a safe removal strategy in ${lead.city}.`,
+            icon: Phone,
+            color: "#0A997D",
+            bgColor: "#6FD9C1",
+          },
+          {
+            num: "02",
+            cardBadge: "Precision Roping",
+            cardNote: "Sectional Lowering",
+            title: "Controlled Dismantling",
+            desc: "Climbers and crane operators dismantle the tree in controlled segments with heavy-duty rigging equipment.",
+            icon: Trees,
+            color: "#633806",
+            bgColor: "#F5B301",
+          },
+          {
+            num: "03",
+            cardBadge: "Stump Ground",
+            cardNote: "Spotless Yard",
+            title: "Stump Grinding & Woodchip Clean",
+            desc: "The tree stump is ground 300mm below soil level. All branches are mulched and your yard left completely pristine.",
+            icon: ShieldCheck,
+            color: "#0A997D",
+            bgColor: "#CECBF6",
+          },
+        ],
+        capabilitiesBadge: "Capabilities",
+        capabilitiesHeading: `Arborist Capabilities Across ${lead.city}`,
+        capabilitiesSub: "Precision operations executed in accordance with Australian Standards (AS 4373-2007).",
+        services: [
+          {
+            title: "Emergency Dangerous Tree Removal",
+            desc: `Safe, sectional dismantling of diseased, decaying, or storm-compromised trees in confined residential spaces in ${lead.city}.`,
+            tag: "24/7 Response",
+            price: "Insured Fixed",
+            icon: Trees,
+          },
+          {
+            title: "Deadwooding & Canopy Pruning",
+            desc: "Strategic thinning, power line clearance, and weight reduction promoting long-term tree health and sunlight penetration.",
+            tag: "Canopy Health",
+            price: "AS Compliant",
+            icon: Wind,
+          },
+          {
+            title: "High-Power Hydraulic Stump Grinding",
+            desc: "Sub-surface root and stump grinding removing termite attractants and preparing land for turf or paving.",
+            tag: "300mm Deep",
+            price: "Fixed Price",
+            icon: Hammer,
+          },
+          {
+            title: "AQF Level 5 Arborist Reports",
+            desc: "Independent tree hazard audits, pre-development impact reports, and DA documentation for council submissions.",
+            tag: "Council Ready",
+            price: "Written Cert",
+            icon: FileText,
+          },
+        ],
+        standardBadge: "SAFETY STANDARD",
+        standardHeading: `Why ${lead.city} Residents Trust ${lead.company}`,
+        standardItems: [
+          { title: "$20M Liability Insurance", desc: "Complete insurance coverage protecting your property, neighbours, and public assets." },
+          { title: "Specialist Rigging Rig", desc: "Advanced lowering friction bollards and cranes for zero impact on surrounding structures." },
+          { title: "Pristine Yard Cleanup", desc: "Every twig, leaf, and woodchip cleared away with industrial blowers upon completion." },
+          { title: "Free Woodchip Mulch", desc: "Option to keep nutrient-rich garden mulch generated from your tree on-site." },
+        ],
+        auditHeadline: "Every 1-Second Mobile Delay Leaks 20% of High-Value Tree Removal Calls",
+        auditSub: `When a large gum tree branches crack in a storm or a tree threatens a roof, homeowners call the first company on their phone. Speedcraft Studio ensures they connect in 0.28 seconds.`,
+        auditBenefits: [
+          "Loads in 0.28 seconds for instant mobile access during emergency weather.",
+          "Zero bloated WordPress scripts delaying the phone dialer.",
+          `Saves an estimated ~${lead.currencySymbol}${lead.estLostMonthlySpend}/mo in wasted Google ad clicks.`,
+        ],
+        socialProofHeading: `Property Owners in ${lead.city} Trust ${lead.company}`,
+        testimonials: [
+          {
+            name: "Richard H.",
+            neighborhood: `${lead.city} North`,
+            quote: `Massive dead eucalypt looming directly over our roof. ${lead.company} lowered every branch with surgical precision without touching our tiles or fence. Cleaned up every scrap of debris.`,
+          },
+          {
+            name: "Caroline S.",
+            neighborhood: `${lead.city} Suburbs`,
+            quote: "Punctual, fully insured, and prepared a full arborist report that got our council removal approved in one week. Great team.",
+          },
+        ],
+        formBadge: "TREE REMOVAL INTAKE",
+        formTitle: `Request Free Tree Assessment in ${lead.city}`,
+        formSub: "Get an upfront quote from an AQF-certified arborist.",
+        formLocationPlaceholder: `Your Suburb in ${lead.city}`,
+        formUrgencyOptions: [
+          "Emergency Storm Damage (Tree Over Hanging / Leaning)",
+          "Dangerous Tree Removal Needed Soon",
+          "Canopy Pruning & Powerline Clearance",
+          "Stump Grinding Only",
+        ],
+        formSubmitLabel: "Request Free Tree Assessment",
+        formSuccessHeading: "Tree Assessment Logged",
+        formSuccessDesc: "Your test request was processed in 0.04s. In production, this immediately notifies on-call arborists.",
+        footerDesc: `Fully insured certified arborists and emergency tree removal services across Greater ${lead.city}.`,
+        footerPhoneLabel: "Arborist Hotline:",
+      };
+    }
+
+    // 7. CLEANING SERVICES
+    if (n.includes("clean") || n.includes("janitorial") || n.includes("carpet clean") || n.includes("wash")) {
+      return {
+        nicheKey: "cleaning",
+        tradeTitle: "Commercial & Residential Cleaning Specialists",
+        badge: "100% Satisfaction & Bond-Back Guarantee",
+        heroHeadline: (
+          <>
+            {lead.city}&apos;s Top-Rated <br className="hidden sm:inline" />
+            <span className="text-[#6FD9C1]">Commercial &amp; Home Cleaning</span>.
+          </>
+        ),
+        heroSub: `Hospital-grade commercial office cleaning, end-of-lease bond cleans, and deep steam extraction across Greater ${lead.city}. Eco-safe formulations, police-checked staff, and 100% bond-back guarantees.`,
+        navBadge: `${lead.city} Cleaning Dispatch`,
+        navCta: "Book Cleaning",
+        navContactLabel: "Cleaning Quote",
+        heroCta: "Request Cleaning Quote",
+        heroTrustBadges: [
+          "100% Bond-Back Written Guarantee",
+          "Sub-Second 0.28s Load Speed",
+          "Police-Checked & Insured Cleaners",
+        ],
+        radarLabel: "CLEANING RADAR",
+        radarSub: `Cleaning Dispatch: ${lead.city}`,
+        partyA: { label: "Client", initials: "CL", bg: "#B5D4F4", text: "#0C447C" },
+        partyB: { label: "Lead Cleaner", icon: Brush, bg: "#CECBF6", text: "#22184A" },
+        agreementPill: { left: "Fixed Quote Agreed", right: "100% Guarantee" },
+        blueprintFrames: [
+          {
+            title: "▸ 72-HOUR BOND RE-CLEAN GUARANTEE",
+            desc: `Real estate checklist guaranteed. If your property manager flags any item, we re-clean free of charge within 72 hours.`,
+          },
+          {
+            title: "▸ HOSPITAL-GRADE DISINFECTION",
+            desc: "Hospital-grade HEPA filtered vacuums, non-toxic eco solutions, and colour-coded microfibre cloths preventing cross-contamination.",
+          },
+          {
+            title: "▸ SUB-SECOND EDGE STACK",
+            desc: `Loads in 0.28s on mobile so moving tenants and office managers can book their clean in under a minute.`,
+          },
+        ],
+        stepsBadge: "How It Works",
+        stepsHeading: "Three Steps to a Spotless Property",
+        stepsSub: "We eliminated missed corners, bond deposit deductions, and unreliable contractors.",
+        steps: [
+          {
+            num: "01",
+            cardBadge: "1-Tap Booking",
+            cardNote: "Instant Quote",
+            title: "Select Service & Date",
+            desc: `Choose your cleaning package online or call our ${lead.city} team for an upfront itemised quote.`,
+            icon: Phone,
+            color: "#0A997D",
+            bgColor: "#6FD9C1",
+          },
+          {
+            num: "02",
+            cardBadge: "Vetted Crew",
+            cardNote: "Full Equipment Kit",
+            title: "Professional On-Site Clean",
+            desc: "Our fully vetted cleaning team arrives with industrial steam cleaners and eco-safe supplies.",
+            icon: Brush,
+            color: "#633806",
+            bgColor: "#F5B301",
+          },
+          {
+            num: "03",
+            cardBadge: "Bond Back",
+            cardNote: "Inspection Ready",
+            title: "Final Inspection & Sign-Off",
+            desc: "We perform a room-by-room quality checklist, leaving your property immaculate and ready for handover.",
+            icon: ShieldCheck,
+            color: "#0A997D",
+            bgColor: "#CECBF6",
+          },
+        ],
+        capabilitiesBadge: "Capabilities",
+        capabilitiesHeading: `Cleaning Capabilities in ${lead.city}`,
+        capabilitiesSub: "Commercial and residential cleaning solutions tailored to your requirements.",
+        services: [
+          {
+            title: "End-of-Lease Bond Cleaning",
+            desc: `Comprehensive real estate approved move-out cleaning with oven, window, and wall spot cleaning in ${lead.city}.`,
+            tag: "Bond Guaranteed",
+            price: "Fixed Quote",
+            icon: ShieldCheck,
+          },
+          {
+            title: "Deep Carpet Steam Cleaning & Stain Extraction",
+            desc: "High-heat truck-mounted steam extraction removing embedded allergens, stubborn pet stains, and bacteria.",
+            tag: "Deep Sanitised",
+            price: "Per Room Rate",
+            icon: Droplets,
+          },
+          {
+            title: "Commercial Office & Corporate Cleaning",
+            desc: "Nightly or weekly sanitised office upkeep, workstation wipe-downs, and commercial washroom replenishment.",
+            tag: "Corporate SLA",
+            price: "Contract Rate",
+            icon: Briefcase,
+          },
+          {
+            title: "High-Pressure Exterior Surface Cleaning",
+            desc: "High-PSI cleaning for mouldy driveways, concrete pathways, commercial forecourts, and outdoor pavers.",
+            tag: "High Pressure",
+            price: "Fixed M² Quote",
+            icon: Sparkles,
+          },
+        ],
+        standardBadge: "HYGIENE STANDARD",
+        standardHeading: `Why ${lead.city} Clients Book ${lead.company}`,
+        standardItems: [
+          { title: "100% Bond Guarantee", desc: "Free immediate re-attendance if your leasing agent identifies any clean issue." },
+          { title: "Police-Checked Staff", desc: "Every cleaner has undergone strict background, reference, and police checks." },
+          { title: "Eco-Safe Detergents", desc: "Non-corrosive, pet and baby-safe plant-based formulas with zero harsh chemical odours." },
+          { title: "All Equipment Supplied", desc: "We provide all vacuums, steam extractors, ladders, and chemicals." },
+        ],
+        auditHeadline: "Every 1-Second Mobile Delay Leaks 20% of Cleaning Bookings",
+        auditSub: `Tenants moving out need to book a cleaner fast. If your site lags, they jump to the next Google result. Speedcraft Studio ensures zero bounce.`,
+        auditBenefits: [
+          "Edge CDN delivers 0.28s load times for rapid mobile booking.",
+          "Zero bloated WordPress plugins dragging down Core Web Vitals.",
+          `Saves an estimated ~${lead.currencySymbol}${lead.estLostMonthlySpend}/mo in wasted Google ad clicks.`,
+        ],
+        socialProofHeading: `Tenants & Businesses in ${lead.city} Trust ${lead.company}`,
+        testimonials: [
+          {
+            name: "Emma D.",
+            neighborhood: `${lead.city} Central`,
+            quote: `Booked an end-of-lease clean for our 2-bedroom rental. Got 100% of our bond refunded with zero questions from the real estate agent. Completely stress-free.`,
+          },
+          {
+            name: "Mark B.",
+            neighborhood: `${lead.city} South`,
+            quote: "Reliable, thorough, and trustworthy. They clean our medical clinic twice weekly with hospital-grade sanitisation. Excellent team.",
+          },
+        ],
+        formBadge: "CLEANING INTAKE",
+        formTitle: `Book Professional Cleaning in ${lead.city}`,
+        formSub: "Get an upfront quote with our 100% satisfaction guarantee.",
+        formLocationPlaceholder: `Your Suburb in ${lead.city}`,
+        formUrgencyOptions: [
+          "Urgent Move-Out / End of Lease Clean",
+          "This Week (Deep Home / Carpet Clean)",
+          "Regular Office / Commercial Cleaning Quote",
+          "Pressure Cleaning & Exterior Wash",
+        ],
+        formSubmitLabel: "Request Cleaning Quote",
+        formSuccessHeading: "Cleaning Booking Logged",
+        formSuccessDesc: "Your test request was processed in 0.04s. In production, this immediately notifies our cleaning schedule manager.",
+        footerDesc: `Vetted commercial and residential cleaning specialists serving Greater ${lead.city}.`,
+        footerPhoneLabel: "Cleaning Line:",
+      };
+    }
+
+    // 8. SOLAR
     if (n.includes("solar") || n.includes("energy") || n.includes("renew")) {
       return {
         nicheKey: "solar",
@@ -816,7 +1653,7 @@ function PrototypeContent() {
       };
     }
 
-    // 4. PEST CONTROL
+    // 9. PEST CONTROL
     if (n.includes("pest") || n.includes("termite") || n.includes("rodent")) {
       return {
         nicheKey: "pest",
@@ -971,8 +1808,8 @@ function PrototypeContent() {
       };
     }
 
-    // 5. HVAC / AIR CONDITIONING & HEATING
-    if (n.includes("hvac") || n.includes("air") || n.includes("cool") || n.includes("heat")) {
+    // 10. HVAC / AIR CONDITIONING
+    if (n.includes("hvac") || n.includes("air") || n.includes("cool") || n.includes("heat") || n.includes("climate")) {
       return {
         nicheKey: "hvac",
         tradeTitle: "HVAC & Climate Control Specialists",
@@ -1126,7 +1963,7 @@ function PrototypeContent() {
       };
     }
 
-    // 6. ROOFING
+    // 11. ROOFING
     if (n.includes("roof")) {
       return {
         nicheKey: "roofing",
@@ -1281,8 +2118,8 @@ function PrototypeContent() {
       };
     }
 
-    // 7. ELECTRICAL
-    if (n.includes("electr") || n.includes("power")) {
+    // 12. ELECTRICAL
+    if (n.includes("electr") || n.includes("power") || n.includes("spark")) {
       return {
         nicheKey: "electrical",
         tradeTitle: "Licensed Master Electricians",
@@ -1436,157 +2273,314 @@ function PrototypeContent() {
       };
     }
 
-    // 8. PLUMBING (DEFAULT TRADE FALLBACK)
+    // 13. PLUMBING (ONLY IF EXPLICITLY PLUMBING)
+    if (n.includes("plumb") || n.includes("drain") || n.includes("pipe") || n.includes("gas fit") || n.includes("hot water")) {
+      return {
+        nicheKey: "plumbing",
+        tradeTitle: "Emergency Plumbing & Drain Specialists",
+        badge: "24/7 Rapid Emergency Response Across City",
+        heroHeadline: (
+          <>
+            {lead.city}&apos;s 24/7 Emergency <br className="hidden sm:inline" />
+            <span className="text-[#6FD9C1]">Plumbing Response</span>.
+          </>
+        ),
+        heroSub: `Immediate dispatch across Greater ${lead.city}. Upfront fixed pricing, zero callout fees with work, and licensed master plumbers arriving in under 45 minutes.`,
+        navBadge: `${lead.city} Dispatch`,
+        navCta: "Call Dispatch",
+        navContactLabel: "Dispatch",
+        heroCta: "Request Dispatcher",
+        heroTrustBadges: [
+          "Zero Callout Fee With Work",
+          "Sub-Second 0.28s Load Speed",
+          "100% Written Workmanship Guarantee",
+        ],
+        radarLabel: "DISPATCH RADAR",
+        radarSub: `Priority Callout: ${lead.city}`,
+        partyA: { label: "Homeowner", initials: "JH", bg: "#B5D4F4", text: "#0C447C" },
+        partyB: { label: "Master Tech", icon: Droplets, bg: "#CECBF6", text: "#22184A" },
+        agreementPill: { left: "Upfront Quote Agreed", right: "No Overtime" },
+        blueprintFrames: [
+          {
+            title: "▸ DISPATCH TIMELINE",
+            desc: `Average arrival time is under 45 minutes across Greater ${lead.city}. Live vehicle tracking sent to mobile.`,
+          },
+          {
+            title: "▸ UPFRONT PRICING SLA",
+            desc: "Zero surprise invoices. Written fixed quote agreed before any work starts. Zero weekend or overtime markups.",
+          },
+          {
+            title: "▸ SUB-SECOND EDGE STACK",
+            desc: `Built on Next.js Edge CDN. Loads in 0.28s compared to legacy WordPress (${lead.mobileLoadTimeSec}s), capturing every phone call.`,
+          },
+        ],
+        stepsBadge: "How It Works",
+        stepsHeading: "Three Steps to Guaranteed Resolution",
+        stepsSub: "We eliminated phone trees, waiting queues, and surprise quotes.",
+        steps: [
+          {
+            num: "01",
+            cardBadge: "1-Tap Dispatch",
+            cardNote: "No Hold Music",
+            title: "Tap to Call or Request Dispatch",
+            desc: `Connect immediately with a licensed dispatcher in ${lead.city}. No automated bots or outsourced call centers.`,
+            icon: Phone,
+            color: "#0A997D",
+            bgColor: "#6FD9C1",
+          },
+          {
+            num: "02",
+            cardBadge: "Van #12 En Route",
+            cardNote: "ETA: 22 Mins",
+            title: "Live Technician Tracking",
+            desc: "We assign the closest technician in your suburb. You get an exact ETA and vehicle tracking pin to your phone.",
+            icon: Navigation,
+            color: "#633806",
+            bgColor: "#F5B301",
+          },
+          {
+            num: "03",
+            cardBadge: "Fixed Invoice",
+            cardNote: "100% Backed",
+            title: "Fixed Quote & Lifetime Guarantee",
+            desc: "Your technician inspects the site, presents a written fixed quote, and executes the repair with certified parts.",
+            icon: ShieldCheck,
+            color: "#0A997D",
+            bgColor: "#CECBF6",
+          },
+        ],
+        capabilitiesBadge: "Our Capabilities",
+        capabilitiesHeading: `Specialized Services Across ${lead.city}`,
+        capabilitiesSub: "Exact solutions handled by master-certified trade technicians.",
+        services: [
+          {
+            title: "Burst Pipes & Acoustic Leak Detection",
+            desc: `Immediate non-invasive ultrasound leak tracing and pipe repair within 45 minutes across ${lead.city}.`,
+            tag: "45-Min Arrival",
+            price: "Fixed Quote",
+            icon: Droplets,
+          },
+          {
+            title: "5,000 PSI Hydro-Jet Drain Clearing",
+            desc: "High-pressure root slicing and CCTV in-pipe camera inspection to clear blocked sewer and stormwater drains.",
+            tag: "CCTV Included",
+            price: "Same-Day Fix",
+            icon: Sparkles,
+          },
+          {
+            title: "Hot Water Heater Replacement",
+            desc: "Same-day installation for Rheem, Rinnai, and Dux gas, electric, and continuous flow heat pump systems.",
+            tag: "Same-Day Hot Water",
+            price: "Upfront Price",
+            icon: Flame,
+          },
+          {
+            title: "Gas Fitting & Emergency Leak Detection",
+            desc: "Licensed gas fitting, compliance certificates, cooktop connections, and urgent gas line repairs.",
+            tag: "Licensed Gasfitter",
+            price: "Safety Certified",
+            icon: ShieldCheck,
+          },
+        ],
+        standardBadge: "RESPONSE STANDARD",
+        standardHeading: `Why ${lead.city} Residents Call ${lead.company} First`,
+        standardItems: [
+          { title: "Zero Callout Fee", desc: "No fee to travel to your property when repairs are performed." },
+          { title: "Direct Master Techs", desc: "Every van is operated by a fully licensed, background-checked tradesperson." },
+          { title: "Fully Stocked Vans", desc: "94% of emergency repairs completed in a single visit with onboard inventory." },
+          { title: "Lifetime Workmanship", desc: "All labor backed by written warranty for total customer peace of mind." },
+        ],
+        auditHeadline: "Every 1-Second Mobile Delay Leaks 20% of Callers",
+        auditSub: `When a homeowner has an emergency, they click the top Google ad on their phone. If your site doesn't load under 1 second, they tap back and call the next contractor.`,
+        auditBenefits: [
+          "Next.js App Router renders on Edge CDN in 0.28 seconds.",
+          "Zero heavy Elementor/WordPress plugin overhead blocking the phone dialer.",
+          `Saves an estimated ~${lead.currencySymbol}${lead.estLostMonthlySpend}/mo in wasted Google ad clicks.`,
+        ],
+        socialProofHeading: `Homeowners in ${lead.city} Trust Us`,
+        testimonials: [
+          {
+            name: "James Wilson",
+            neighborhood: `${lead.city} Suburbs`,
+            quote: "Burst pipe under our bathroom floor at 11:30 PM. Their plumber arrived in 30 minutes, isolated the mains, and repaired the copper pipe cleanly.",
+          },
+          {
+            name: "Claire Bennett",
+            neighborhood: `${lead.city} North`,
+            quote: "Upfront quote before any tool touched our house. They cleared a massive tree root obstruction with high-pressure jetting in under an hour.",
+          },
+        ],
+        formBadge: "PRIORITY DISPATCH FORM",
+        formTitle: `Request Priority Dispatch in ${lead.city}`,
+        formSub: "Fill in your details for immediate 45-minute arrival or an upfront quote.",
+        formLocationPlaceholder: `Your Suburb in ${lead.city}`,
+        formUrgencyOptions: [
+          "Immediate Emergency (Under 45 Mins)",
+          "Today (Standard Business Hours)",
+          "Scheduled Next 48 Hours",
+          "Upfront Price Quote Only",
+        ],
+        formSubmitLabel: "Submit Emergency Request",
+        formSuccessHeading: "Simulated Dispatch Sent",
+        formSuccessDesc: "Your test request was processed in 0.04s. In production, this instantly notifies the on-call dispatcher.",
+        footerDesc: `Licensed trade contracting serving all suburbs of Greater ${lead.city}.`,
+        footerPhoneLabel: "Direct Dispatch:",
+      };
+    }
+
+    // 14. DYNAMIC SMART ADAPTER (ANY OTHER BUSINESS OR NICHE)
+    // NEVER defaults to plumbing! Uses actual lead.niche and company name dynamically.
+    const cleanNicheTitle = lead.niche || "Professional Services";
     return {
-      nicheKey: "plumbing",
-      tradeTitle: "Emergency Plumbing & Drain Specialists",
-      badge: "24/7 Rapid Emergency Response Across City",
+      nicheKey: "custom",
+      tradeTitle: `${cleanNicheTitle} Specialists`,
+      badge: `Premier ${cleanNicheTitle} in ${lead.city}`,
       heroHeadline: (
         <>
-          {lead.city}&apos;s 24/7 Emergency <br className="hidden sm:inline" />
-          <span className="text-[#6FD9C1]">Plumbing Response</span>.
+          {lead.city}&apos;s Trusted <br className="hidden sm:inline" />
+          <span className="text-[#6FD9C1]">{cleanNicheTitle} Specialists</span>.
         </>
       ),
-      heroSub: `Immediate dispatch across Greater ${lead.city}. Upfront fixed pricing, zero callout fees with work, and licensed master plumbers arriving in under 45 minutes.`,
-      navBadge: `${lead.city} Dispatch`,
-      navCta: "Call Dispatch",
-      navContactLabel: "Dispatch",
-      heroCta: "Request Dispatcher",
+      heroSub: `Delivering exceptional, reliable, and verified ${cleanNicheTitle.toLowerCase()} solutions across Greater ${lead.city}. Upfront transparent pricing, experienced professionals, and sub-second booking.`,
+      navBadge: `${lead.city} Office Active`,
+      navCta: "Contact Team",
+      navContactLabel: "Inquiry",
+      heroCta: `Request ${cleanNicheTitle} Consultation`,
       heroTrustBadges: [
-        "Zero Callout Fee With Work",
+        "100% Quality & Satisfaction Guarantee",
         "Sub-Second 0.28s Load Speed",
-        "100% Written Workmanship Guarantee",
+        "Direct Access to Senior Specialists",
       ],
-      radarLabel: "DISPATCH RADAR",
-      radarSub: `Priority Callout: ${lead.city}`,
-      partyA: { label: "Homeowner", initials: "JH", bg: "#B5D4F4", text: "#0C447C" },
-      partyB: { label: "Master Tech", icon: Droplets, bg: "#CECBF6", text: "#22184A" },
-      agreementPill: { left: "Upfront Quote Agreed", right: "No Overtime" },
+      radarLabel: "SERVICE RADAR",
+      radarSub: `Client Intake: ${lead.city}`,
+      partyA: { label: "Client", initials: "CL", bg: "#B5D4F4", text: "#0C447C" },
+      partyB: { label: "Lead Specialist", icon: Briefcase, bg: "#CECBF6", text: "#22184A" },
+      agreementPill: { left: "Fixed Scope Agreed", right: "Guaranteed" },
       blueprintFrames: [
         {
-          title: "▸ DISPATCH TIMELINE",
-          desc: `Average arrival time is under 45 minutes across Greater ${lead.city}. Live vehicle tracking sent to mobile.`,
+          title: "▸ PRIORITY INTAKE RESPONSE",
+          desc: `Immediate inquiry triage across Greater ${lead.city}. Transparent scope review and responsive client service.`,
         },
         {
-          title: "▸ UPFRONT PRICING SLA",
-          desc: "Zero surprise invoices. Written fixed quote agreed before any work starts. Zero weekend or overtime markups.",
+          title: "▸ CLEAR PRICING TRANSPARENCY",
+          desc: "Zero hidden fees. Written quotes and deliverables established before work begins.",
         },
         {
           title: "▸ SUB-SECOND EDGE STACK",
-          desc: `Built on Next.js Edge CDN. Loads in 0.28s compared to legacy WordPress (${lead.mobileLoadTimeSec}s), capturing every phone call.`,
+          desc: `Built on Next.js Edge CDN. Loads in 0.28s on mobile, capturing every high-intent local customer.`,
         },
       ],
       stepsBadge: "How It Works",
-      stepsHeading: "Three Steps to Guaranteed Resolution",
-      stepsSub: "We eliminated phone trees, waiting queues, and surprise quotes.",
+      stepsHeading: "Three Steps to Seamless Service",
+      stepsSub: "We eliminated delays, unanswered emails, and unexpected costs.",
       steps: [
         {
           num: "01",
-          cardBadge: "1-Tap Dispatch",
-          cardNote: "No Hold Music",
-          title: "Tap to Call or Request Dispatch",
-          desc: `Connect immediately with a licensed dispatcher in ${lead.city}. No automated bots or outsourced call centers.`,
+          cardBadge: "1-Tap Contact",
+          cardNote: "Direct Line",
+          title: "Direct Initial Consultation",
+          desc: `Connect directly with our specialist team in ${lead.city}. We discuss your exact requirements and timeline.`,
           icon: Phone,
           color: "#0A997D",
           bgColor: "#6FD9C1",
         },
         {
           num: "02",
-          cardBadge: "Van #12 En Route",
-          cardNote: "ETA: 22 Mins",
-          title: "Live Technician Tracking",
-          desc: "We assign the closest technician in your suburb. You get an exact ETA and vehicle tracking pin to your phone.",
-          icon: Navigation,
+          cardBadge: "Assessment",
+          cardNote: "Fixed Scope",
+          title: "Tailored Assessment & Quote",
+          desc: "We provide an upfront, transparent proposal tailored specifically to your needs with guaranteed delivery.",
+          icon: FileText,
           color: "#633806",
           bgColor: "#F5B301",
         },
         {
           num: "03",
-          cardBadge: "Fixed Invoice",
-          cardNote: "100% Backed",
-          title: "Fixed Quote & Lifetime Guarantee",
-          desc: "Your technician inspects the site, presents a written fixed quote, and executes the repair with certified parts.",
+          cardBadge: "Delivery",
+          cardNote: "100% Guaranteed",
+          title: "Execution & Quality Sign-Off",
+          desc: "Our verified team executes the solution cleanly and professionally, ensuring complete satisfaction.",
           icon: ShieldCheck,
           color: "#0A997D",
           bgColor: "#CECBF6",
         },
       ],
-      capabilitiesBadge: "Our Capabilities",
-      capabilitiesHeading: `Specialized Services Across ${lead.city}`,
-      capabilitiesSub: "Exact solutions handled by master-certified trade technicians.",
+      capabilitiesBadge: "Capabilities",
+      capabilitiesHeading: `Specialized Capabilities Across ${lead.city}`,
+      capabilitiesSub: `Trusted ${cleanNicheTitle.toLowerCase()} delivered by certified local experts.`,
       services: [
         {
-          title: "Burst Pipes & Acoustic Leak Detection",
-          desc: `Immediate non-invasive ultrasound leak tracing and pipe repair within 45 minutes across ${lead.city}.`,
-          tag: "45-Min Arrival",
+          title: `Comprehensive ${cleanNicheTitle}`,
+          desc: `Complete, end-to-end service delivery tailored to residential and commercial clients across ${lead.city}.`,
+          tag: "Core Service",
           price: "Fixed Quote",
-          icon: Droplets,
+          icon: Briefcase,
         },
         {
-          title: "5,000 PSI Hydro-Jet Drain Clearing",
-          desc: "High-pressure root slicing and CCTV in-pipe camera inspection to clear blocked sewer and stormwater drains.",
-          tag: "CCTV Included",
-          price: "Same-Day Fix",
+          title: "Priority Same-Day Consultation",
+          desc: `Fast-track site inspection, assessment, and rapid turnaround for urgent client requirements in ${lead.city}.`,
+          tag: "Priority Service",
+          price: "Upfront Cost",
           icon: Sparkles,
         },
         {
-          title: "Hot Water Heater Replacement",
-          desc: "Same-day installation for Rheem, Rinnai, and Dux gas, electric, and continuous flow heat pump systems.",
-          tag: "Same-Day Hot Water",
-          price: "Upfront Price",
-          icon: Flame,
+          title: "Custom Tailored Solutions",
+          desc: "Bespoke service execution designed around your specific schedule, property, and operational needs.",
+          tag: "Tailored",
+          price: "Package Deal",
+          icon: Award,
         },
         {
-          title: "Gas Fitting & Emergency Leak Detection",
-          desc: "Licensed gas fitting, compliance certificates, cooktop connections, and urgent gas line repairs.",
-          tag: "Licensed Gasfitter",
-          price: "Safety Certified",
+          title: "Preventative Maintenance & Ongoing Support",
+          desc: "Proactive care, regular maintenance, and guaranteed support keeping everything operating smoothly.",
+          tag: "Guaranteed",
+          price: "Written SLA",
           icon: ShieldCheck,
         },
       ],
-      standardBadge: "RESPONSE STANDARD",
-      standardHeading: `Why ${lead.city} Residents Call ${lead.company} First`,
+      standardBadge: "SERVICE STANDARD",
+      standardHeading: `Why ${lead.city} Clients Choose ${lead.company}`,
       standardItems: [
-        { title: "Zero Callout Fee", desc: "No fee to travel to your property when repairs are performed." },
-        { title: "Direct Master Techs", desc: "Every van is operated by a fully licensed, background-checked tradesperson." },
-        { title: "Fully Stocked Vans", desc: "94% of emergency repairs completed in a single visit with onboard inventory." },
-        { title: "Lifetime Workmanship", desc: "All labor backed by written warranty for total customer peace of mind." },
+        { title: "Direct Specialist Access", desc: "Speak directly with verified, experienced professionals who know your industry." },
+        { title: "Transparent Pricing", desc: "Itemised quotes agreed before starting with zero surprise bills." },
+        { title: "Prompt Local Service", desc: `Fast, punctual team serving all suburbs across Greater ${lead.city}.` },
+        { title: "100% Satisfaction", desc: "Every project backed by our commitment to total customer satisfaction." },
       ],
-      auditHeadline: "Every 1-Second Mobile Delay Leaks 20% of Callers",
-      auditSub: `When a homeowner has an emergency, they click the top Google ad on their phone. If your site doesn't load under 1 second, they tap back and call the next contractor.`,
+      auditHeadline: `Every 1-Second Mobile Delay Leaks 20% of ${cleanNicheTitle} Inquiries`,
+      auditSub: `When a customer in ${lead.city} searches for ${cleanNicheTitle.toLowerCase()} services, they want instant answers on their phone. If your website takes 3 seconds to open, they click your competitor.`,
       auditBenefits: [
-        "Next.js App Router renders on Edge CDN in 0.28 seconds.",
-        "Zero heavy Elementor/WordPress plugin overhead blocking the phone dialer.",
+        "Edge CDN renders the landing page in 0.28 seconds for instant mobile access.",
+        "Zero slow WordPress plugins blocking phone calls and booking submissions.",
         `Saves an estimated ~${lead.currencySymbol}${lead.estLostMonthlySpend}/mo in wasted Google ad clicks.`,
       ],
-      socialProofHeading: `Homeowners in ${lead.city} Trust Us`,
+      socialProofHeading: `Clients in ${lead.city} Trust ${lead.company}`,
       testimonials: [
         {
-          name: "James Wilson",
+          name: "David M.",
           neighborhood: `${lead.city} Suburbs`,
-          quote: "Burst pipe under our bathroom floor at 11:30 PM. Their plumber arrived in 30 minutes, isolated the mains, and repaired the copper pipe cleanly.",
+          quote: `Outstanding service from ${lead.company}. Prompt, professional, and kept everything transparent from start to finish. Highly recommended.`,
         },
         {
-          name: "Claire Bennett",
-          neighborhood: `${lead.city} North`,
-          quote: "Upfront quote before any tool touched our house. They cleared a massive tree root obstruction with high-pressure jetting in under an hour.",
+          name: "Sarah B.",
+          neighborhood: `${lead.city} Central`,
+          quote: "They answered immediately, gave an upfront quote with zero hidden fees, and delivered exceptional quality. Very impressed.",
         },
       ],
-      formBadge: "PRIORITY DISPATCH FORM",
-      formTitle: `Request Priority Dispatch in ${lead.city}`,
-      formSub: "Fill in your details for immediate 45-minute arrival or an upfront quote.",
+      formBadge: "PRIORITY INTAKE FORM",
+      formTitle: `Request ${cleanNicheTitle} Service in ${lead.city}`,
+      formSub: "Fill in your details for prompt contact or an upfront assessment.",
       formLocationPlaceholder: `Your Suburb in ${lead.city}`,
       formUrgencyOptions: [
-        "Immediate Emergency (Under 45 Mins)",
-        "Today (Standard Business Hours)",
-        "Scheduled Next 48 Hours",
-        "Upfront Price Quote Only",
+        "Immediate Priority / As Soon As Possible",
+        "This Week (Standard Hours)",
+        "Scheduled Consultation Next Week",
+        "Upfront Quote & Pricing Inquiry",
       ],
-      formSubmitLabel: "Submit Emergency Request",
-      formSuccessHeading: "Simulated Dispatch Sent",
-      formSuccessDesc: "Your test request was processed in 0.04s. In production, this instantly notifies the on-call dispatcher.",
-      footerDesc: `Licensed trade contracting serving all suburbs of Greater ${lead.city}.`,
-      footerPhoneLabel: "Direct Dispatch:",
+      formSubmitLabel: `Request ${cleanNicheTitle} Consultation`,
+      formSuccessHeading: "Inquiry Received",
+      formSuccessDesc: "Your test request was processed in 0.04s. In production, this immediately notifies the practice manager.",
+      footerDesc: `Premier ${cleanNicheTitle.toLowerCase()} provider serving clients across Greater ${lead.city}.`,
+      footerPhoneLabel: "Direct Line:",
     };
   }, [lead.niche, lead.city, lead.company, lead.mobileLoadTimeSec, lead.currencySymbol, lead.estLostMonthlySpend]);
 
@@ -2419,7 +3413,7 @@ function PrototypeContent() {
         <div className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end gap-3 pointer-events-auto">
           {/* Expanded Handover Panel (Floating Card) */}
           {bannerExpanded && (
-            <div className="toast-pop bg-[#0C0730] border border-[#6FD9C1]/35 p-5 text-white text-[13px] shadow-[0_24px_60px_rgba(12,7,48,0.7)] rounded-3xl max-w-[440px] sm:max-w-[560px] w-[calc(100vw-32px)] sm:w-auto animate-in slide-in-from-bottom-3 duration-200">
+            <div className="toast-pop bg-[#0C0730] border border-[#6FD9C1]/35 p-5 text-white text-[13px] shadow-[0_24px_60px_rgba(12,7,48,0.7)] rounded-3xl max-w-[460px] sm:max-w-[580px] w-[calc(100vw-32px)] sm:w-auto animate-in slide-in-from-bottom-3 duration-200">
               <div className="space-y-4">
                 <div className="flex items-start justify-between gap-3 pb-3 border-b border-white/10">
                   <div>
@@ -2447,28 +3441,42 @@ function PrototypeContent() {
                 {/* Prospect Switcher Button & Drawer */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-mono text-white/60 uppercase">Current Prospect:</span>
+                    <span className="text-[11px] font-mono text-white/60 uppercase">
+                      Current Prospect: <strong className="text-[#6FD9C1] font-sans">{lead.company}</strong> ({lead.niche})
+                    </span>
                     <button
                       onClick={() => setActiveLeadPicker(!activeLeadPicker)}
                       className="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-[#6FD9C1] text-[11px] font-bold flex items-center gap-1.5 transition cursor-pointer"
                     >
                       <Sliders className="w-3 h-3" />
-                      <span>Switch Prospect</span>
-                      <ChevronDown className="w-3 h-3" />
+                      <span>{activeLeadPicker ? "Hide List" : "Switch Prospect"}</span>
+                      <ChevronDown className={`w-3 h-3 transition-transform ${activeLeadPicker ? "rotate-180" : ""}`} />
                     </button>
                   </div>
 
                   {activeLeadPicker && (
-                    <div className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-2 max-h-48 overflow-y-auto">
+                    <div className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-2.5 max-h-56 overflow-y-auto">
+                      {/* Search box for 900+ leads */}
+                      <div className="relative">
+                        <Search className="w-3.5 h-3.5 text-white/40 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="text"
+                          placeholder="Search 900+ leads by name, city, or niche..."
+                          value={leadFilterQuery}
+                          onChange={(e) => setLeadFilterQuery(e.target.value)}
+                          className="w-full h-8 pl-8 pr-3 text-[11px] bg-black/40 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:border-[#6FD9C1] outline-none"
+                        />
+                      </div>
+
                       <div className="flex flex-wrap gap-1.5">
-                        {PRESET_LEADS.map((pl) => (
+                        {filteredPresetLeads.map((pl) => (
                           <button
                             key={pl.slug}
                             onClick={() => {
                               setActiveLeadPicker(false);
                               router.push(`/preview/${pl.slug}`);
                             }}
-                            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer ${
+                            className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1.5 cursor-pointer ${
                               slug === pl.slug
                                 ? "bg-[#6FD9C1] text-[#0C0730]"
                                 : "bg-white/10 hover:bg-white/20 text-white"
@@ -2476,6 +3484,9 @@ function PrototypeContent() {
                           >
                             <span>{pl.name}</span>
                             <span className="text-[10px] opacity-75 font-mono">({pl.city})</span>
+                            <span className="text-[9.5px] px-1.5 py-0.2 rounded bg-black/30 font-mono text-[#6FD9C1]">
+                              {pl.niche}
+                            </span>
                           </button>
                         ))}
                       </div>
