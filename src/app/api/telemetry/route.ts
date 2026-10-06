@@ -138,8 +138,9 @@ export async function POST(req: NextRequest) {
       timestamp,
       id: newEvent.id,
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Exception in /api/telemetry:", err);
-    return NextResponse.json({ error: err.message || "Failed to log telemetry" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Failed to log telemetry";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

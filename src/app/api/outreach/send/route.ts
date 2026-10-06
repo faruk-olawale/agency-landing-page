@@ -17,7 +17,7 @@ function getSentLog() {
   }
 }
 
-function appendToSentLog(record: any) {
+function appendToSentLog(record: Record<string, unknown>) {
   try {
     const list = getSentLog();
     list.unshift(record);
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     // 1. Conflict Prevention: Check if already sent
     const sentList = getSentLog();
     const existing = sentList.find(
-      (item: any) =>
+      (item: { company?: string; email?: string }) =>
         (company && item.company?.toLowerCase() === company.toLowerCase()) ||
         (to && item.email?.toLowerCase() === to.toLowerCase())
     );
@@ -99,7 +99,8 @@ export async function POST(req: NextRequest) {
     appendToSentLog(newRecord);
 
     return NextResponse.json({ success: true, id: sendRes.data?.id, record: newRecord });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to dispatch email" }, { status: 500 });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Failed to dispatch email";
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

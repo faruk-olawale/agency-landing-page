@@ -1,13 +1,23 @@
 [
   {
+    "company": "LinkPaddy Tech",
+    "email": "service@linkpaddy.vercel.app",
+    "sentAt": "2026-10-06T09:11:47.409Z",
+    "method": "gmail",
+    "status": "sent",
+    "previewUrl": "http://localhost:3001/preview/linkpaddy-tech",
+    "viewedAt": "2026-10-06T09:48:10.236Z",
+    "viewCount": 8
+  },
+  {
     "company": "Dallas Plumbing Co",
     "email": "service@dallasplumbing.com",
     "sentAt": "2026-10-06T02:35:41.832Z",
     "method": "gmail",
     "status": "sent",
     "previewUrl": "http://localhost:3001/preview/dallas-plumbing-co",
-    "viewedAt": "2026-10-06T05:37:53.781Z",
-    "viewCount": 1
+    "viewedAt": "2026-10-06T08:51:01.098Z",
+    "viewCount": 11
   },
   {
     "company": "Powerhub Electrical",
@@ -15,13 +25,17 @@
     "sentAt": "2026-10-02T02:49:23.469Z",
     "previewUrl": "https://speedcraft.dev/preview/powerhub-electrical",
     "id": "01a0fa84-33eb-772a-a553-0b43df6b95c0",
-    "status": "sent"
+    "status": "sent",
+    "viewedAt": "2026-10-06T08:51:01.098Z",
+    "viewCount": 10
   },
   {
     "company": "Powerhub Electrical",
     "email": "services@powerhubelectrical.com.au",
     "sentAt": "2026-10-02T02:58:40.128Z",
     "previewUrl": "https://agency-landing-page-smoky-psi.vercel.app/preview/powerhub-electrical",
-    "status": "sent"
+    "status": "sent",
+    "viewedAt": "2026-10-06T08:51:01.098Z",
+    "viewCount": 10
   }
 ]

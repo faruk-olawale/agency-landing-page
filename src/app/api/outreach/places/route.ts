@@ -40,7 +40,7 @@ function getSentCompanySet(): Set<string> {
     const raw = fs.readFileSync(LOG_FILE_PATH, "utf-8");
     const records = JSON.parse(raw);
     const s = new Set<string>();
-    records.forEach((r: any) => {
+    records.forEach((r: { company?: string; email?: string }) => {
       if (r.company) s.add(r.company.toLowerCase());
       if (r.email) s.add(r.email.toLowerCase());
     });
@@ -182,8 +182,18 @@ async function handlePlacesSearch(query: string, location: string) {
 
         const newData = await newApiRes.json();
 
+        interface GoogleNewPlace {
+          displayName?: { text?: string };
+          websiteUri?: string;
+          googleMapsUri?: string;
+          nationalPhoneNumber?: string;
+          formattedAddress?: string;
+          rating?: number;
+          userRatingCount?: number;
+        }
+
         if (newData.places && Array.isArray(newData.places) && newData.places.length > 0) {
-          const results = newData.places.map((place: any) => {
+          const results = (newData.places as GoogleNewPlace[]).map((place) => {
             const name = place.displayName?.text || "Local Trade";
             const website = place.websiteUri || place.googleMapsUri || "";
             const phone = place.nationalPhoneNumber || "Contact via Website";
@@ -231,10 +241,17 @@ async function handlePlacesSearch(query: string, location: string) {
         const legacyRes = await fetch(legacyUrl);
         const legacyData = await legacyRes.json();
 
+        interface GoogleLegacyPlace {
+          name?: string;
+          rating?: number;
+          user_ratings_total?: number;
+          formatted_address?: string;
+        }
+
         if (legacyData.status === "OK" && Array.isArray(legacyData.results) && legacyData.results.length > 0) {
-          const results = legacyData.results.slice(0, 12).map((place: any) => {
+          const results = (legacyData.results as GoogleLegacyPlace[]).slice(0, 12).map((place) => {
             return enrichBusinessWithAudit({
-              name: place.name,
+              name: place.name || "Local Trade",
               website: "",
               phone: "Contact via Website",
               city: location.split(",")[0].trim(),
@@ -242,7 +259,7 @@ async function handlePlacesSearch(query: string, location: string) {
               niche: query,
               rating: place.rating,
               userRatingsTotal: place.user_ratings_total,
-              address: place.formatted_address,
+              address: place.formatted_address || "",
               isVerifiedWebsite: false,
             });
           });
@@ -262,9 +279,9 @@ async function handlePlacesSearch(query: string, location: string) {
         if (legacyData.error_message && !googleErrorMessage) {
           googleErrorMessage = legacyData.error_message;
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Places API fetch exception:", err);
-        googleErrorMessage = err.message;
+        googleErrorMessage = err instanceof Error ? err.message : String(err);
       }
     }
 
@@ -346,9 +363,10 @@ async function handlePlacesSearch(query: string, location: string) {
       query,
       location,
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Failed to search places";
     console.error("Error in /api/outreach/places:", err);
-    return NextResponse.json({ error: err.message || "Failed to search places" }, { status: 500 });
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
 
@@ -365,8 +383,9 @@ export async function POST(req: NextRequest) {
     const query = body.query || "Emergency Plumber";
     const location = body.location || "Dallas, TX";
     return handlePlacesSearch(query, location);
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Invalid request" }, { status: 400 });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Invalid request";
+    return NextResponse.json({ error: msg }, { status: 400 });
   }
 }
 

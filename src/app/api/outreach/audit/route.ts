@@ -256,8 +256,9 @@ Direct: farukolawale509@gmail.com`;
       lead: newLead,
       message: `Audited ${company} (${mobilePageSpeed}/100 Speed, ${loadTimeSec}s load time) and added to queue.`,
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Failed to audit lead";
     console.error("Error in /api/outreach/audit:", err);
-    return NextResponse.json({ error: err.message || "Failed to audit lead" }, { status: 500 });
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -88,8 +88,9 @@ export async function POST(req: NextRequest) {
     saveSentLog(records);
 
     return NextResponse.json({ success: true, record: newRecord, count: records.length });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Failed to update sent log";
     console.error("Exception in /api/outreach/sent:", err);
-    return NextResponse.json({ error: err.message || "Failed to update sent log" }, { status: 500 });
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

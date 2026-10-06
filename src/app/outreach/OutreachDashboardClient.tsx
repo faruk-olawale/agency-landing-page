@@ -9,22 +9,12 @@ import {
   Copy,
   Check,
   Search,
-  ArrowRight,
-  TrendingDown,
-  Gauge,
   Send,
   AlertCircle,
-  Phone,
   CheckCircle2,
-  Flame,
   Globe,
   CheckCheck,
   RotateCcw,
-  ShieldCheck,
-  Building2,
-  Trash2,
-  Filter,
-  DollarSign,
   MapPin,
   Sparkles,
   RefreshCw,
@@ -32,7 +22,6 @@ import {
   Plus,
   UploadCloud,
   X,
-  FileSpreadsheet
 } from "lucide-react";
 import leadsData from "../../../leads/global_leads_audit.json";
 
@@ -119,7 +108,9 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
       if (cached) {
         const parsed: SentRecord[] = JSON.parse(cached);
         if (parsed.length > initialSentRecords.length) {
-          setSentRecords(parsed);
+          setTimeout(() => {
+            setSentRecords(parsed);
+          }, 0);
         }
       } else if (initialSentRecords.length > 0) {
         localStorage.setItem("speedcraft_sent_records", JSON.stringify(initialSentRecords));
@@ -232,8 +223,9 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
       } else {
         throw new Error(data.error || "No results found");
       }
-    } catch (err: any) {
-      showToast(`Search error: ${err.message}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Search error: ${msg}`);
     } finally {
       setIsSearchingMaps(false);
     }
@@ -267,8 +259,9 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
       } else {
         throw new Error(data.error || "Failed to audit website");
       }
-    } catch (err: any) {
-      showToast(`Audit error: ${err.message}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Audit error: ${msg}`);
     } finally {
       setIsAuditing(false);
     }
@@ -322,12 +315,34 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
     setSourceMode("vault");
   };
 
+  // Generate accurate preview URL for any lead (Vault or Google Maps)
+  const getPreviewUrlForLead = (lead: Lead, absolute: boolean = false): string => {
+    const slug = slugify(lead.company);
+    const origin = typeof window !== "undefined"
+      ? window.location.origin
+      : "https://agency-landing-page-smoky-psi.vercel.app";
+    const base = absolute ? origin : "";
+
+    const isVaultLead = (leadsData as Lead[]).some((l) => slugify(l.company) === slug);
+    if (!isVaultLead || sourceMode === "google_maps") {
+      const params = new URLSearchParams();
+      if (lead.company) params.set("name", lead.company);
+      if (lead.city) params.set("city", lead.city);
+      if (lead.niche) params.set("niche", lead.niche);
+      if (lead.phone) params.set("phone", lead.phone);
+      if (lead.website) params.set("domain", lead.website);
+      if (lead.mobilePageSpeed) params.set("speed", String(lead.mobilePageSpeed));
+      if (lead.mobileLoadTimeSec) params.set("load", String(lead.mobileLoadTimeSec));
+      if (lead.estLostMonthlySpend) params.set("waste", String(lead.estLostMonthlySpend));
+      return `${base}/preview/${slug}?${params.toString()}`;
+    }
+
+    return `${base}/preview/${slug}`;
+  };
+
   // Register a lead as sent in real time
   const markAsSent = async (lead: Lead, method: string = "manual") => {
-    const slug = slugify(lead.company);
-    const previewUrl = typeof window !== "undefined"
-      ? `${window.location.origin}/preview/${slug}`
-      : `https://agency-landing-page-smoky-psi.vercel.app/preview/${slug}`;
+    const previewUrl = getPreviewUrlForLead(lead, true);
 
     const newRecord: SentRecord = {
       company: lead.company,
@@ -405,11 +420,8 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
   };
 
   const getEmailBody = (lead: Lead, angle: "wasted_ads" | "direct_punchy" = pitchAngle): string => {
-    const slug = slugify(lead.company);
     const domainClean = lead.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
-    const previewUrl = typeof window !== "undefined"
-      ? `${window.location.origin}/preview/${slug}`
-      : `https://agency-landing-page-smoky-psi.vercel.app/preview/${slug}`;
+    const previewUrl = getPreviewUrlForLead(lead, true);
     const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Team`;
 
     if (angle === "wasted_ads") {
@@ -448,11 +460,8 @@ Direct: farukolawale509@gmail.com`;
   };
 
   const getLinkedInText = (lead: Lead): string => {
-    const slug = slugify(lead.company);
     const domainClean = lead.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
-    const previewUrl = typeof window !== "undefined"
-      ? `${window.location.origin}/preview/${slug}`
-      : `https://agency-landing-page-smoky-psi.vercel.app/preview/${slug}`;
+    const previewUrl = getPreviewUrlForLead(lead, true);
     const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Team`;
 
     return `Hey ${greeting}, saw ${domainClean}. Your mobile site takes ${lead.mobileLoadTimeSec}s to load, which means you're likely losing paid leads before they can call you. I built a lightning-fast test version that loads in under half a second so customers don't bounce: ${previewUrl} — want to check it out?`;
@@ -477,13 +486,7 @@ Direct: farukolawale509@gmail.com`;
 
   const sendViaApi = async (lead: Lead, angle: "wasted_ads" | "direct_punchy" = pitchAngle) => {
     setSendingMap((prev) => ({ ...prev, [lead.company]: "sending" }));
-    setErrorMsgMap((prev) => ({ ...prev, [lead.company]: "" }));
-
-    const slug = slugify(lead.company);
-    const previewUrl = typeof window !== "undefined"
-      ? `${window.location.origin}/preview/${slug}`
-      : `https://agency-landing-page-smoky-psi.vercel.app/preview/${slug}`;
-
+    const previewUrl = getPreviewUrlForLead(lead, true);
     const subject = getEmailSubject(lead, angle);
     const body = getEmailBody(lead, angle);
 
@@ -507,9 +510,10 @@ Direct: farukolawale509@gmail.com`;
 
       setSendingMap((prev) => ({ ...prev, [lead.company]: "sent" }));
       markAsSent(lead, "resend");
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
       setSendingMap((prev) => ({ ...prev, [lead.company]: "error" }));
-      setErrorMsgMap((prev) => ({ ...prev, [lead.company]: err.message }));
+      setErrorMsgMap((prev) => ({ ...prev, [lead.company]: msg }));
     }
   };
 
@@ -1090,11 +1094,11 @@ Direct: farukolawale509@gmail.com`;
                   onChange={(e) => setSelectedCountry(e.target.value)}
                   className="w-full px-3 py-2 text-xs bg-zinc-50 border border-zinc-200 rounded-lg focus:outline-none focus:border-[#5B4BD6] font-medium"
                 >
-                  <option value="all">All Countries ({vaultLeads.length})</option>
-                  <option value="Australia">Australia</option>
-                  <option value="United States">United States</option>
-                  <option value="United Kingdom">United Kingdom</option>
-                  <option value="Canada">Canada</option>
+                  {countries.map((c) => (
+                    <option key={c} value={c}>
+                      {c === "all" ? `All Countries (${vaultLeads.length})` : c}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -1189,8 +1193,6 @@ Direct: farukolawale509@gmail.com`;
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {activeLeads.map((lead) => {
-                  const slug = slugify(lead.company);
-                  const isCopied = copiedId === lead.company;
                   const sendStatus = sendingMap[lead.company] || "idle";
                   const errorMsg = errorMsgMap[lead.company];
 
@@ -1272,7 +1274,7 @@ Direct: farukolawale509@gmail.com`;
                               <div className="font-semibold">Resend Restricted:</div>
                               <div className="text-[11px] mt-0.5">{errorMsg}</div>
                               <div className="text-[11px] mt-1 font-semibold text-zinc-900">
-                                Use "Send via Gmail" below to dispatch from your verified inbox and clear this lead from your queue.
+                                Use &quot;Send via Gmail&quot; below to dispatch from your verified inbox and clear this lead from your queue.
                               </div>
                             </div>
                           </div>
@@ -1283,7 +1285,7 @@ Direct: farukolawale509@gmail.com`;
                       <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-zinc-100 text-xs">
                         {/* LIVE PROTOTYPE LINK */}
                         <Link
-                          href={`/preview/${slug}`}
+                          href={getPreviewUrlForLead(lead, false)}
                           target="_blank"
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#160F29] hover:bg-zinc-800 text-white rounded-md font-medium transition-all shadow-2xs"
                         >
