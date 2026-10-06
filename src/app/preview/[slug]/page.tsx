@@ -65,15 +65,15 @@ const customVisualStyles = `
 
   /* Pulsing live beacon dot */
   @keyframes qfPulse {
-    0% { box-shadow: 0 0 0 0 rgba(111, 217, 193, 0.7); }
-    70% { box-shadow: 0 0 0 9px rgba(111, 217, 193, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(111, 217, 193, 0); }
+    0% { box-shadow: 0 0 0 0 rgba(10, 153, 125, 0.7); }
+    70% { box-shadow: 0 0 0 9px rgba(10, 153, 125, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(10, 153, 125, 0); }
   }
   .qf-status-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #6FD9C1;
+    background: #0A997D;
     animation: qfPulse 2.4s infinite;
   }
 
@@ -88,7 +88,7 @@ const customVisualStyles = `
     display: block;
     width: 3.5px;
     border-radius: 999px;
-    background: #6FD9C1;
+    background: #0A997D;
     animation: eqScale 1.1s ease-in-out infinite alternate;
   }
   .live-eq span:nth-child(1) { height: 40%; animation-delay: 0.1s; }
@@ -422,7 +422,7 @@ function PrototypeContent() {
         heroHeadline: (
           <>
             {lead.city}&apos;s Trusted <br className="hidden sm:inline" />
-            <span className="text-[#6FD9C1]">Legal Defence &amp; Counsel</span>.
+            <span className="text-[#0A997D]">Legal Defence &amp; Counsel</span>.
           </>
         ),
         heroSub: `Experienced legal practitioners fighting for your rights across Greater ${lead.city}. Transparent fixed fees, urgent court representation, and strategic counsel with zero jargon.`,
@@ -577,7 +577,7 @@ function PrototypeContent() {
         heroHeadline: (
           <>
             {lead.city}&apos;s Premier <br className="hidden sm:inline" />
-            <span className="text-[#6FD9C1]">Dental Care &amp; Pain Relief</span>.
+            <span className="text-[#0A997D]">Dental Care &amp; Pain Relief</span>.
           </>
         ),
         heroSub: `Gentle, state-of-the-art family and cosmetic dentistry across Greater ${lead.city}. Instant health fund claiming (HICAPS), modern pain-free techniques, and same-day emergency relief.`,
@@ -728,24 +728,24 @@ function PrototypeContent() {
       return {
         nicheKey: "restoration",
         tradeTitle: "Emergency Disaster, Flood & Mold Restoration",
-        badge: "60-Minute Rapid Disaster Response Across Greater City",
+        badge: `Certified Disaster & Flood Restoration · ${lead.city}`,
         heroHeadline: (
           <>
             {lead.city}&apos;s 24/7 Emergency <br className="hidden sm:inline" />
-            <span className="text-[#6FD9C1]">Flood &amp; Disaster Restoration</span>.
+            <span className="text-[#0A997D]">Flood &amp; Disaster Restoration</span>.
           </>
         ),
         heroSub: `IICRC-certified emergency structural drying, floodwater extraction, and mold remediation across Greater ${lead.city}. Arriving on-site with industrial equipment in under 60 minutes with direct insurance billing.`,
         navBadge: `${lead.city} Disaster Response`,
         navCta: "Call Emergency Crew",
-        navContactLabel: "Emergency Dispatch",
-        heroCta: "Request Immediate Water Extraction",
+        navContactLabel: "Get Assessment",
+        heroCta: "Request Rapid Assessment & Quote",
         heroTrustBadges: [
           "Direct Insurance Billing & Reports",
           "Sub-Second 0.28s Load Speed",
           "IICRC Certified Structural Drying",
         ],
-        radarLabel: "DISASTER DISPATCH",
+        radarLabel: "RAPID RESTORATION",
         radarSub: `Emergency Intake: ${lead.city}`,
         partyA: { label: "Property Owner", initials: "PO", bg: "#B5D4F4", text: "#0C447C" },
         partyB: { label: "Restoration Tech", icon: ShieldCheck, bg: "#CECBF6", text: "#22184A" },
@@ -882,26 +882,26 @@ function PrototypeContent() {
     if (n.includes("lock") || n.includes("key") || n.includes("security")) {
       return {
         nicheKey: "locksmith",
-        tradeTitle: "24/7 Mobile Locksmith & Key Specialists",
-        badge: "24/7 Rapid Mobile Lockout Dispatch Across City",
+        tradeTitle: "Mobile Locksmith & Security Specialists",
+        badge: `Licensed Mobile Locksmith & Security · ${lead.city}`,
         heroHeadline: (
           <>
             {lead.city}&apos;s 24/7 Mobile <br className="hidden sm:inline" />
-            <span className="text-[#6FD9C1]">Locksmith &amp; Security Response</span>.
+            <span className="text-[#0A997D]">Locksmith &amp; Security Response</span>.
           </>
         ),
         heroSub: `Licensed mobile locksmiths arriving at your door or vehicle within 25 minutes across Greater ${lead.city}. Non-destructive door opening, high-security deadbolts, digital locks, and transponder key cutting on-site.`,
         navBadge: `${lead.city} Mobile Van Active`,
         navCta: "Call Locksmith",
-        navContactLabel: "Lockout Dispatch",
-        heroCta: "Request Lockout Dispatch",
+        navContactLabel: "Get Quote",
+        heroCta: "Request Upfront Quote & Service",
         heroTrustBadges: [
           "Zero Damage Guarantee on Entry",
           "Sub-Second 0.28s Load Speed",
           "Licensed & Police Checked Master Locksmiths",
         ],
-        radarLabel: "LOCKOUT RADAR",
-        radarSub: `Priority Lockout: ${lead.city}`,
+        radarLabel: "ACTIVE SERVICE UNIT",
+        radarSub: `Live Service: ${lead.city}`,
         partyA: { label: "Client", initials: "CL", bg: "#B5D4F4", text: "#0C447C" },
         partyB: { label: "Master Locksmith", icon: KeyRound, bg: "#CECBF6", text: "#22184A" },
         agreementPill: { left: "Fixed Price Quoted", right: "No Damage" },
@@ -1015,21 +1015,21 @@ function PrototypeContent() {
             quote: "Lost our only set of car keys at the beach. Their mobile technician cut and programmed a brand new transponder key right in the car park. Saved us a huge towing fee.",
           },
         ],
-        formBadge: "PRIORITY LOCKOUT INTAKE",
-        formTitle: `Request Mobile Locksmith in ${lead.city}`,
-        formSub: "Fill in your details for immediate 25-minute arrival or an upfront quote.",
-        formLocationPlaceholder: `Your Suburb / Vehicle Location in ${lead.city}`,
+        formBadge: "PRIORITY SERVICE INTAKE",
+        formTitle: `Request Locksmith Service in ${lead.city}`,
+        formSub: "Fill in your details for prompt 25-minute arrival or an upfront fixed quote.",
+        formLocationPlaceholder: `Your Suburb in ${lead.city}`,
         formUrgencyOptions: [
-          "Emergency Lockout (Locked Outside Right Now)",
-          "Lost Car Keys (Vehicle Lockout)",
+          "Standard Service / Upfront Quote",
+          "Urgent Lockout Assistance (Need Entry Now)",
           "Re-Keying / Lock Replacement Today",
           "Digital Smart Lock Installation Quote",
         ],
-        formSubmitLabel: "Request Mobile Locksmith Dispatch",
-        formSuccessHeading: "Locksmith Dispatch Notified",
-        formSuccessDesc: "Your test request was processed in 0.04s. In production, this immediately alerts on-duty mobile vans.",
+        formSubmitLabel: "Request Locksmith Quote & Service",
+        formSuccessHeading: "Quote Request Received",
+        formSuccessDesc: "Your test request was processed in 0.04s. In production, this immediately alerts the local service team.",
         footerDesc: `Licensed mobile master locksmiths and physical access security specialists serving Greater ${lead.city}.`,
-        footerPhoneLabel: "Emergency Locksmith Line:",
+        footerPhoneLabel: "Direct Locksmith Line:",
       };
     }
 
@@ -1042,7 +1042,7 @@ function PrototypeContent() {
         heroHeadline: (
           <>
             {lead.city}&apos;s Master <br className="hidden sm:inline" />
-            <span className="text-[#6FD9C1]">Landscape Design &amp; Construction</span>.
+            <span className="text-[#0A997D]">Landscape Design &amp; Construction</span>.
           </>
         ),
         heroSub: `Transforming outdoor spaces across Greater ${lead.city}. Turnkey landscape architecture, structural retaining walls, luxury paving, lush turf, and automated irrigation backed by structural guarantees.`,
@@ -1197,7 +1197,7 @@ function PrototypeContent() {
         heroHeadline: (
           <>
             {lead.city}&apos;s Certified <br className="hidden sm:inline" />
-            <span className="text-[#6FD9C1]">Tree Removal &amp; Arborist Services</span>.
+            <span className="text-[#0A997D]">Tree Removal &amp; Arborist Services</span>.
           </>
         ),
         heroSub: `Safe, fully insured tree removal, pruning, and emergency storm clearing across Greater ${lead.city}. AQF-qualified arborists, $20M public liability cover, high-reach crane access, and high-power stump grinding.`,
@@ -1348,25 +1348,25 @@ function PrototypeContent() {
       return {
         nicheKey: "cleaning",
         tradeTitle: "Commercial & Residential Cleaning Specialists",
-        badge: "100% Satisfaction & Bond-Back Guarantee",
+        badge: `Top-Rated Commercial & Home Cleaning · ${lead.city}`,
         heroHeadline: (
           <>
             {lead.city}&apos;s Top-Rated <br className="hidden sm:inline" />
-            <span className="text-[#6FD9C1]">Commercial &amp; Home Cleaning</span>.
+            <span className="text-[#0A997D]">Commercial &amp; Home Cleaning</span>.
           </>
         ),
         heroSub: `Hospital-grade commercial office cleaning, end-of-lease bond cleans, and deep steam extraction across Greater ${lead.city}. Eco-safe formulations, police-checked staff, and 100% bond-back guarantees.`,
-        navBadge: `${lead.city} Cleaning Dispatch`,
+        navBadge: `${lead.city} Cleaning Team`,
         navCta: "Book Cleaning",
-        navContactLabel: "Cleaning Quote",
-        heroCta: "Request Cleaning Quote",
+        navContactLabel: "Get Quote",
+        heroCta: "Request Free Cleaning Quote",
         heroTrustBadges: [
           "100% Bond-Back Written Guarantee",
           "Sub-Second 0.28s Load Speed",
           "Police-Checked & Insured Cleaners",
         ],
-        radarLabel: "CLEANING RADAR",
-        radarSub: `Cleaning Dispatch: ${lead.city}`,
+        radarLabel: "ACTIVE CLEANING TEAM",
+        radarSub: `Service Area: ${lead.city}`,
         partyA: { label: "Client", initials: "CL", bg: "#B5D4F4", text: "#0C447C" },
         partyB: { label: "Lead Cleaner", icon: Brush, bg: "#CECBF6", text: "#22184A" },
         agreementPill: { left: "Fixed Quote Agreed", right: "100% Guarantee" },
@@ -1507,7 +1507,7 @@ function PrototypeContent() {
         heroHeadline: (
           <>
             {lead.city}&apos;s High-Yield <br className="hidden sm:inline" />
-            <span className="text-[#6FD9C1]">Solar &amp; Battery Storage</span>.
+            <span className="text-[#0A997D]">Solar &amp; Battery Storage</span>.
           </>
         ),
         heroSub: `Cut electricity bills up to 80% with tier-1 solar panels and smart battery storage across Greater ${lead.city}. CEC-accredited engineering, 25-year performance warranties, and zero upfront finance options.`,
@@ -1658,25 +1658,25 @@ function PrototypeContent() {
       return {
         nicheKey: "pest",
         tradeTitle: "Eco-Safe Pest Control & Termite Barriers",
-        badge: "Same-Day Emergency Pest Eradication",
+        badge: `Targeted Pest & Termite Defence · ${lead.city}`,
         heroHeadline: (
           <>
             {lead.city}&apos;s Eco-Safe <br className="hidden sm:inline" />
-            <span className="text-[#6FD9C1]">Pest &amp; Termite Defence</span>.
+            <span className="text-[#0A997D]">Pest &amp; Termite Defence</span>.
           </>
         ),
         heroSub: `Rapid, child and pet-safe pest eradication across Greater ${lead.city}. Thermal termite inspections, guaranteed pest barriers, and certified treatments with zero toxic fumes.`,
-        navBadge: `${lead.city} Pest Dispatch`,
+        navBadge: `${lead.city} Pest Specialist`,
         navCta: "Book Treatment",
-        navContactLabel: "Pest Dispatch",
+        navContactLabel: "Get Quote",
         heroCta: "Request Same-Day Pest Treatment",
         heroTrustBadges: [
           "100% Child & Pet-Friendly Formulations",
           "Sub-Second 0.28s Load Speed",
           "12-Month Pest-Free Guarantee",
         ],
-        radarLabel: "PEST DISPATCH",
-        radarSub: `Priority Inspection: ${lead.city}`,
+        radarLabel: "ACTIVE PEST UNIT",
+        radarSub: `Priority Service: ${lead.city}`,
         partyA: { label: "Resident", initials: "RS", bg: "#B5D4F4", text: "#0C447C" },
         partyB: { label: "Licensed Tech", icon: Bug, bg: "#CECBF6", text: "#22184A" },
         agreementPill: { left: "Fixed Inspection Agreed", right: "Safe Barrier" },
@@ -1813,25 +1813,25 @@ function PrototypeContent() {
       return {
         nicheKey: "hvac",
         tradeTitle: "HVAC & Climate Control Specialists",
-        badge: "24/7 Rapid Cooling & Heating Dispatch",
+        badge: `Licensed Cooling & Heating Specialists · ${lead.city}`,
         heroHeadline: (
           <>
             {lead.city}&apos;s 24/7 Emergency <br className="hidden sm:inline" />
-            <span className="text-[#6FD9C1]">AC &amp; Heating Response</span>.
+            <span className="text-[#0A997D]">AC &amp; Heating Response</span>.
           </>
         ),
         heroSub: `Licensed master technicians on standby across Greater ${lead.city}. Upfront fixed quotes, guaranteed same-day arrival, and sub-second dispatch.`,
-        navBadge: `${lead.city} HVAC Dispatch`,
-        navCta: "Call Dispatch",
-        navContactLabel: "Dispatch",
-        heroCta: "Request HVAC Technician",
+        navBadge: `${lead.city} HVAC Specialists`,
+        navCta: "Call Specialist",
+        navContactLabel: "Get Quote",
+        heroCta: "Request Heating & Cooling Quote",
         heroTrustBadges: [
           "Zero Overtime or Heatwave Surcharges",
           "Sub-Second 0.28s Load Speed",
           "10-Year Workmanship Warranty",
         ],
-        radarLabel: "DISPATCH RADAR",
-        radarSub: `Priority HVAC: ${lead.city}`,
+        radarLabel: "ACTIVE HVAC UNIT",
+        radarSub: `Climate Control: ${lead.city}`,
         partyA: { label: "Homeowner", initials: "JH", bg: "#B5D4F4", text: "#0C447C" },
         partyB: { label: "Master Tech", icon: Flame, bg: "#CECBF6", text: "#22184A" },
         agreementPill: { left: "Fixed Quote Agreed", right: "No Overtime" },
@@ -1968,25 +1968,25 @@ function PrototypeContent() {
       return {
         nicheKey: "roofing",
         tradeTitle: "Roofing & Storm Repairs",
-        badge: "Immediate Storm Tarping & Emergency Repair",
+        badge: `Licensed Roof Repair & Restoration · ${lead.city}`,
         heroHeadline: (
           <>
             {lead.city}&apos;s Master <br className="hidden sm:inline" />
-            <span className="text-[#6FD9C1]">Roof Repair &amp; Restoration</span>.
+            <span className="text-[#0A997D]">Roof Repair &amp; Restoration</span>.
           </>
         ),
         heroSub: `Licensed, fully insured roofing contractors serving all suburbs across Greater ${lead.city}. Written quotes, zero overtime fees, and 25-year warranties.`,
-        navBadge: `${lead.city} Roofing Dispatch`,
-        navCta: "Call Dispatch",
-        navContactLabel: "Dispatch",
-        heroCta: "Request Roofer Dispatch",
+        navBadge: `${lead.city} Roofing Specialists`,
+        navCta: "Call Specialist",
+        navContactLabel: "Get Quote",
+        heroCta: "Request Free Roof Inspection",
         heroTrustBadges: [
           "24/7 Emergency Storm Tarping",
           "Sub-Second 0.28s Load Speed",
           "25-Year Workmanship Warranty",
         ],
-        radarLabel: "DISPATCH RADAR",
-        radarSub: `Priority Roofing: ${lead.city}`,
+        radarLabel: "ACTIVE ROOF UNIT",
+        radarSub: `Roof Assessment: ${lead.city}`,
         partyA: { label: "Homeowner", initials: "JH", bg: "#B5D4F4", text: "#0C447C" },
         partyB: { label: "Roof Specialist", icon: ShieldCheck, bg: "#CECBF6", text: "#22184A" },
         agreementPill: { left: "Fixed Quote Agreed", right: "Storm Certified" },
@@ -2123,25 +2123,25 @@ function PrototypeContent() {
       return {
         nicheKey: "electrical",
         tradeTitle: "Licensed Master Electricians",
-        badge: "24/7 Master Electrician Rapid Response",
+        badge: `Licensed Master Electricians · ${lead.city}`,
         heroHeadline: (
           <>
             {lead.city}&apos;s 24/7 Master <br className="hidden sm:inline" />
-            <span className="text-[#6FD9C1]">Electrical Emergency Response</span>.
+            <span className="text-[#0A997D]">Electrical Emergency Response</span>.
           </>
         ),
         heroSub: `Immediate safety dispatch across Greater ${lead.city}. Switchboard upgrades, outage restoration, upfront fixed pricing, and clean work.`,
-        navBadge: `${lead.city} Electrician Dispatch`,
-        navCta: "Call Dispatch",
-        navContactLabel: "Dispatch",
-        heroCta: "Request Electrician Dispatch",
+        navBadge: `${lead.city} Electrical Team`,
+        navCta: "Call Electrician",
+        navContactLabel: "Get Quote",
+        heroCta: "Request Upfront Quote & Service",
         heroTrustBadges: [
           "Zero Callout Fee With Work",
           "Sub-Second 0.28s Load Speed",
           "100% Written Workmanship Guarantee",
         ],
-        radarLabel: "DISPATCH RADAR",
-        radarSub: `Priority Electrical: ${lead.city}`,
+        radarLabel: "ACTIVE ELECTRICAL UNIT",
+        radarSub: `Live Service: ${lead.city}`,
         partyA: { label: "Homeowner", initials: "JH", bg: "#B5D4F4", text: "#0C447C" },
         partyB: { label: "Master Tech", icon: Zap, bg: "#CECBF6", text: "#22184A" },
         agreementPill: { left: "Fixed Quote Agreed", right: "Full Compliance" },
@@ -2278,25 +2278,25 @@ function PrototypeContent() {
       return {
         nicheKey: "plumbing",
         tradeTitle: "Emergency Plumbing & Drain Specialists",
-        badge: "24/7 Rapid Emergency Response Across City",
+        badge: `Licensed Master Plumber Response · ${lead.city}`,
         heroHeadline: (
           <>
             {lead.city}&apos;s 24/7 Emergency <br className="hidden sm:inline" />
-            <span className="text-[#6FD9C1]">Plumbing Response</span>.
+            <span className="text-[#0A997D]">Plumbing Response</span>.
           </>
         ),
         heroSub: `Immediate dispatch across Greater ${lead.city}. Upfront fixed pricing, zero callout fees with work, and licensed master plumbers arriving in under 45 minutes.`,
-        navBadge: `${lead.city} Dispatch`,
-        navCta: "Call Dispatch",
-        navContactLabel: "Dispatch",
-        heroCta: "Request Dispatcher",
+        navBadge: `${lead.city} Plumbing Team`,
+        navCta: "Call Plumber",
+        navContactLabel: "Get Quote",
+        heroCta: "Request Upfront Quote & Service",
         heroTrustBadges: [
           "Zero Callout Fee With Work",
           "Sub-Second 0.28s Load Speed",
           "100% Written Workmanship Guarantee",
         ],
-        radarLabel: "DISPATCH RADAR",
-        radarSub: `Priority Callout: ${lead.city}`,
+        radarLabel: "ACTIVE PLUMBING UNIT",
+        radarSub: `Live Service: ${lead.city}`,
         partyA: { label: "Homeowner", initials: "JH", bg: "#B5D4F4", text: "#0C447C" },
         partyB: { label: "Master Tech", icon: Droplets, bg: "#CECBF6", text: "#22184A" },
         agreementPill: { left: "Upfront Quote Agreed", right: "No Overtime" },
@@ -2434,24 +2434,24 @@ function PrototypeContent() {
     return {
       nicheKey: "custom",
       tradeTitle: `${cleanNicheTitle} Specialists`,
-      badge: `Premier ${cleanNicheTitle} in ${lead.city}`,
+      badge: `Premier ${cleanNicheTitle} · ${lead.city}`,
       heroHeadline: (
         <>
           {lead.city}&apos;s Trusted <br className="hidden sm:inline" />
-          <span className="text-[#6FD9C1]">{cleanNicheTitle} Specialists</span>.
+          <span className="text-[#0A997D]">{cleanNicheTitle} Specialists</span>.
         </>
       ),
       heroSub: `Delivering exceptional, reliable, and verified ${cleanNicheTitle.toLowerCase()} solutions across Greater ${lead.city}. Upfront transparent pricing, experienced professionals, and sub-second booking.`,
-      navBadge: `${lead.city} Office Active`,
+      navBadge: `${lead.city} Specialist Team`,
       navCta: "Contact Team",
-      navContactLabel: "Inquiry",
+      navContactLabel: "Get Quote",
       heroCta: `Request ${cleanNicheTitle} Consultation`,
       heroTrustBadges: [
         "100% Quality & Satisfaction Guarantee",
         "Sub-Second 0.28s Load Speed",
         "Direct Access to Senior Specialists",
       ],
-      radarLabel: "SERVICE RADAR",
+      radarLabel: "SERVICE INTAKE",
       radarSub: `Client Intake: ${lead.city}`,
       partyA: { label: "Client", initials: "CL", bg: "#B5D4F4", text: "#0C447C" },
       partyB: { label: "Lead Specialist", icon: Briefcase, bg: "#CECBF6", text: "#22184A" },
@@ -2630,11 +2630,11 @@ function PrototypeContent() {
             {/* Brand Logo & Live Status */}
             <div className="flex items-center gap-3">
               <Link href={`/preview/${slug}`} className="flex items-center gap-2.5 group">
-                <span className="w-9 h-9 rounded-[38%] bg-[#0C0730] text-[#6FD9C1] font-extrabold text-[15px] flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+                <span className="w-9 h-9 rounded-[38%] bg-[#0A0A0D] text-white font-extrabold text-[15px] flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform border border-black/10">
                   {lead.company.charAt(0)}
                 </span>
                 <div className="min-w-0">
-                  <span className="block text-[14px] sm:text-[15px] font-extrabold text-[#0C0730] tracking-tight truncate max-w-[150px] sm:max-w-[210px] leading-tight">
+                  <span className="block text-[14px] sm:text-[15px] font-extrabold text-[#0A0A0D] tracking-tight truncate max-w-[150px] sm:max-w-[210px] leading-tight">
                     {lead.company}
                   </span>
                   <span className="flex items-center gap-1.5 text-[10.5px] font-mono tracking-wider uppercase text-[#0A997D] font-semibold">
@@ -2679,7 +2679,7 @@ function PrototypeContent() {
               {/* Quick dial ghost pill */}
               <a
                 href={`tel:${cleanPhone}`}
-                className="hidden sm:inline-flex items-center gap-1.5 h-9 sm:h-10 px-3.5 rounded-full border border-black/15 text-[13px] font-bold text-[#0C0730] hover:border-black/35 hover:bg-white transition"
+                className="hidden sm:inline-flex items-center gap-1.5 h-9 sm:h-10 px-3.5 rounded-full border border-black/15 text-[13px] font-bold text-[#0A0A0D] hover:border-black/35 hover:bg-white transition"
               >
                 <Phone className="w-3.5 h-3.5 text-[#0A997D]" />
                 <span>{lead.phone}</span>
@@ -2688,10 +2688,10 @@ function PrototypeContent() {
               {/* Ink Black Solid Call Button (Tap Target: 44px+) */}
               <a
                 href={`tel:${cleanPhone}`}
-                className="flex items-center gap-2 h-10 sm:h-11 px-4 sm:px-5 rounded-full bg-[#0A0A0D] text-white hover:bg-[#22184A] text-[13px] font-extrabold shadow-sm active:scale-95 transition"
+                className="flex items-center gap-2 h-10 sm:h-11 px-4 sm:px-5 rounded-full bg-[#0A0A0D] text-white hover:bg-[#1E293B] text-[13px] font-extrabold shadow-sm active:scale-95 transition"
                 style={{ minHeight: 44 }}
               >
-                <Phone className="w-3.5 h-3.5 text-[#6FD9C1]" />
+                <Phone className="w-3.5 h-3.5 text-[#0A997D]" />
                 <span>{nicheConfig.navCta}</span>
                 <ArrowRight className="w-3.5 h-3.5 text-white/60 hidden sm:inline" />
               </a>
@@ -2700,22 +2700,23 @@ function PrototypeContent() {
         </header>
 
         {/* ═══════════════════════════════════════════════════════════════
-            HERO CONTAINER: QUICKFLEET OUTER FRAME + USE.LIVE TACTILE CORE
-            - Deep brand navy canvas (#0C0730)
-            - Ambient radial mesh glow
-            - Tactical Call Card Centerpiece with equalizer and live ticker
+            HERO CONTAINER: MODERN UNIVERSAL CONVERSION HUB
+            - Clean, elevated porcelain/alabaster canvas (#FAF9F5 / #FFFFFF)
+            - Ambient micro-radial glow & architectural micro-dot grid
+            - Universal quote & consultation conversion hub for ANY business
+            - Live status audio stage centerpiece with floating micro-badges
         ═══════════════════════════════════════════════════════════════ */}
         <div className="px-2 sm:px-4 md:px-6 pt-2 pb-8 max-w-[1360px] mx-auto">
-          <section className="relative rounded-[28px] sm:rounded-[36px] bg-[#0C0730] text-white overflow-hidden shadow-[0_24px_60px_-20px_rgba(12,7,48,0.45)] ring-1 ring-black/10">
+          <section className="relative rounded-[28px] sm:rounded-[36px] bg-gradient-to-b from-[#FAF9F5] via-[#FFFFFF] to-[#F5F2EA] text-[#0A0A0D] overflow-hidden border border-[#E5E0D5] shadow-[0_20px_50px_-20px_rgba(15,23,42,0.08)]">
             
             {/* Ambient Lighting & Blueprint Grid */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              <div className="absolute -top-32 -right-24 w-96 h-96 rounded-full bg-[#6FD9C1]/15 blur-3xl" />
-              <div className="absolute -bottom-36 -left-20 w-96 h-96 rounded-full bg-[#F5B301]/12 blur-3xl" />
+              <div className="absolute -top-32 -right-24 w-96 h-96 rounded-full bg-[#0A997D]/10 blur-3xl" />
+              <div className="absolute -bottom-36 -left-20 w-96 h-96 rounded-full bg-[#F5B301]/10 blur-3xl" />
               <div
-                className="absolute inset-0 opacity-[0.08]"
+                className="absolute inset-0 opacity-[0.035]"
                 style={{
-                  backgroundImage: "radial-gradient(circle, #6FD9C1 1px, transparent 1px)",
+                  backgroundImage: "radial-gradient(circle, #0F172A 1px, transparent 1px)",
                   backgroundSize: "28px 28px",
                 }}
               />
@@ -2724,94 +2725,150 @@ function PrototypeContent() {
             <div className="relative z-10 p-5 sm:p-8 md:p-14 lg:p-16">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
                 
-                {/* ─── Hero Left: Copy & Rapid Booking Form (7 Cols) ─── */}
+                {/* ─── Hero Left: Copy & Universal Priority Booking Hub (7 Cols) ─── */}
                 <div className="lg:col-span-7 space-y-5 sm:space-y-6">
                   
                   {/* Eyebrow Pill Tag */}
-                  <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 ring-1 ring-white/15 backdrop-blur-md">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 border border-black/10 shadow-xs backdrop-blur-md">
                     <span className="qf-status-dot" />
-                    <span className="text-[11.5px] font-mono tracking-wider uppercase font-semibold text-[#6FD9C1]">
+                    <span className="text-[11.5px] font-mono tracking-wider uppercase font-bold text-[#0A997D]">
                       {nicheConfig.badge}
                     </span>
                   </div>
 
                   {/* Main Punchy Headline */}
-                  <h1 className="text-[32px] sm:text-[46px] md:text-[54px] font-extrabold leading-[1.04] tracking-tight text-white">
+                  <h1 className="text-[32px] sm:text-[46px] md:text-[54px] font-extrabold leading-[1.04] tracking-tight text-[#0A0A0D]">
                     {nicheConfig.heroHeadline}
                   </h1>
 
-                  <p className="text-[15px] sm:text-[17px] text-white/75 font-medium leading-relaxed max-w-xl">
+                  <p className="text-[15px] sm:text-[17px] text-[#475569] font-medium leading-relaxed max-w-xl">
                     {nicheConfig.heroSub}
                   </p>
 
-                  {/* Rapid Instant Intake Box (use.live Form Card) */}
-                  <div className="rounded-[24px] bg-white/10 p-3 sm:p-4 backdrop-blur-md ring-1 ring-white/20 shadow-2xl max-w-xl">
-                    <form onSubmit={handleBookingSubmit} className="space-y-2.5">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {/* Suburb / Location input */}
-                        <div className="relative">
-                          <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px] text-white/50 font-bold">
-                            <MapPin className="w-4 h-4 text-[#6FD9C1]" />
-                          </span>
-                          <input
-                            type="text"
-                            placeholder={nicheConfig.formLocationPlaceholder}
-                            value={bookingData.suburb}
-                            onChange={(e) => setBookingData({ ...bookingData, suburb: e.target.value })}
-                            className="h-12 w-full rounded-2xl border border-white/15 bg-white/10 px-4 pl-9 text-[14px] text-white font-bold outline-none placeholder:text-white/40 focus:border-[#6FD9C1] focus:bg-white/15 transition"
-                            required
-                          />
-                        </div>
-
-                        {/* Phone input */}
-                        <div className="relative">
-                          <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px] text-white/50 font-bold">
-                            <Phone className="w-4 h-4 text-[#6FD9C1]" />
-                          </span>
-                          <input
-                            type="tel"
-                            placeholder="Your Phone Number"
-                            value={bookingData.phone}
-                            onChange={(e) => setBookingData({ ...bookingData, phone: e.target.value })}
-                            className="h-12 w-full rounded-2xl border border-white/15 bg-white/10 px-4 pl-9 text-[14px] text-white font-bold outline-none placeholder:text-white/40 focus:border-[#6FD9C1] focus:bg-white/15 transition"
-                            required
-                          />
-                        </div>
+                  {/* Universal Consultation & Instant Quote Hub */}
+                  <div className="rounded-[24px] bg-white p-4 sm:p-5 border border-black/[0.08] shadow-[0_14px_35px_-12px_rgba(0,0,0,0.08)] max-w-xl">
+                    {/* Header inside conversion hub */}
+                    <div className="flex items-center justify-between pb-3 mb-3 border-b border-black/[0.06]">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-[#0A997D]" />
+                        <span className="text-[13px] font-extrabold text-[#0A0A0D] tracking-tight">
+                          Priority Quote &amp; Consultation Request
+                        </span>
                       </div>
+                      <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-mono font-bold text-[#0A997D] bg-[#0A997D]/10 px-2.5 py-0.5 rounded-full">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#0A997D] animate-pulse" />
+                        0.28s Instant Connect
+                      </span>
+                    </div>
 
-                      {/* Submit / Call CTA Button (50px+ tap target) */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                    {formIntercepted ? (
+                      <div className="p-5 rounded-2xl bg-[#0A997D]/10 border border-[#0A997D]/30 text-center space-y-2.5">
+                        <div className="w-11 h-11 rounded-full bg-[#0A997D] text-white flex items-center justify-center mx-auto shadow-sm">
+                          <CheckCircle2 className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <h4 className="text-[16px] font-extrabold text-[#0A0A0D]">
+                            Request Received Successfully!
+                          </h4>
+                          <p className="text-[12.5px] text-[#475569] mt-0.5 max-w-md mx-auto">
+                            The team at <strong className="text-[#0A0A0D]">{lead.company}</strong> has received your inquiry. We will contact you at <strong className="text-[#0A0A0D]">{bookingData.phone || "your number"}</strong> within 15 minutes.
+                          </p>
+                        </div>
                         <button
-                          type="submit"
-                          disabled={formLoading}
-                          className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#6FD9C1] hover:bg-[#5bc4ad] text-[#0C0730] text-[14px] font-extrabold transition active:scale-[0.98] cursor-pointer shadow-lg"
+                          type="button"
+                          onClick={() => setFormIntercepted(false)}
+                          className="inline-flex items-center gap-1.5 text-[12px] font-mono font-bold text-[#0A997D] hover:underline pt-1 cursor-pointer"
                         >
-                          {formLoading ? (
-                            <RotateCcw className="w-4 h-4 animate-spin text-[#0C0730]" />
-                          ) : (
-                            <>
-                              <span>{nicheConfig.heroCta}</span>
-                              <ArrowRight className="w-4 h-4" />
-                            </>
-                          )}
+                          <RotateCcw className="w-3.5 h-3.5" />
+                          <span>Submit Another Inquiry</span>
                         </button>
-
-                        <a
-                          href={`tel:${cleanPhone}`}
-                          className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white text-[#0A0A0D] hover:bg-white/90 text-[14px] font-extrabold transition active:scale-[0.98] shadow-md"
-                        >
-                          <Phone className="w-4 h-4 text-[#0A997D]" />
-                          <span>Call {lead.phone}</span>
-                        </a>
                       </div>
-                    </form>
+                    ) : (
+                      <form onSubmit={handleBookingSubmit} className="space-y-2.5">
+                        {/* Service Selection Dropdown */}
+                        <div className="relative">
+                          <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-black/40">
+                            <Briefcase className="w-4 h-4 text-[#0A997D]" />
+                          </span>
+                          <select
+                            value={bookingData.service || (nicheConfig.services[0]?.title ?? "")}
+                            onChange={(e) => setBookingData({ ...bookingData, service: e.target.value })}
+                            className="h-11 sm:h-12 w-full appearance-none rounded-2xl border border-black/10 bg-[#FAF9F5] pl-10 pr-9 text-[13.5px] font-bold text-[#0A0A0D] outline-none focus:border-[#0A997D] focus:bg-white transition"
+                          >
+                            {nicheConfig.services.map((s, idx) => (
+                              <option key={idx} value={s.title}>{s.title}</option>
+                            ))}
+                            <option value="General Consultation & Quote">General Consultation &amp; Custom Scope</option>
+                          </select>
+                          <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-black/40" />
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {/* Suburb / Location input */}
+                          <div className="relative">
+                            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-black/40">
+                              <MapPin className="w-4 h-4 text-[#0A997D]" />
+                            </span>
+                            <input
+                              type="text"
+                              placeholder={nicheConfig.formLocationPlaceholder}
+                              value={bookingData.suburb}
+                              onChange={(e) => setBookingData({ ...bookingData, suburb: e.target.value })}
+                              className="h-11 sm:h-12 w-full rounded-2xl border border-black/10 bg-[#FAF9F5] pl-10 pr-4 text-[13.5px] font-bold text-[#0A0A0D] outline-none placeholder:text-black/40 focus:border-[#0A997D] focus:bg-white transition"
+                              required
+                            />
+                          </div>
+
+                          {/* Phone input */}
+                          <div className="relative">
+                            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-black/40">
+                              <Phone className="w-4 h-4 text-[#0A997D]" />
+                            </span>
+                            <input
+                              type="tel"
+                              placeholder="Your Phone Number"
+                              value={bookingData.phone}
+                              onChange={(e) => setBookingData({ ...bookingData, phone: e.target.value })}
+                              className="h-11 sm:h-12 w-full rounded-2xl border border-black/10 bg-[#FAF9F5] pl-10 pr-4 text-[13.5px] font-bold text-[#0A0A0D] outline-none placeholder:text-black/40 focus:border-[#0A997D] focus:bg-white transition"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        {/* Submit / Call CTA Button (50px+ tap target) */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                          <button
+                            type="submit"
+                            disabled={formLoading}
+                            className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#0A0A0D] hover:bg-[#1E293B] text-white text-[14px] font-extrabold transition active:scale-[0.98] cursor-pointer shadow-md"
+                          >
+                            {formLoading ? (
+                              <RotateCcw className="w-4 h-4 animate-spin text-white" />
+                            ) : (
+                              <>
+                                <span>{nicheConfig.heroCta}</span>
+                                <ArrowRight className="w-4 h-4 text-[#0A997D]" />
+                              </>
+                            )}
+                          </button>
+
+                          <a
+                            href={`tel:${cleanPhone}`}
+                            className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-black/12 bg-white hover:bg-black/[0.03] text-[#0A0A0D] text-[14px] font-extrabold transition active:scale-[0.98] shadow-xs"
+                          >
+                            <Phone className="w-4 h-4 text-[#0A997D]" />
+                            <span>Call {lead.phone}</span>
+                          </a>
+                        </div>
+                      </form>
+                    )}
                   </div>
 
                   {/* Trust Highlights */}
-                  <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-1 text-[12.5px] font-semibold text-white/80">
+                  <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-1 text-[12.5px] font-semibold text-[#475569]">
                     {nicheConfig.heroTrustBadges.map((badge, idx) => (
                       <span key={idx} className="flex items-center gap-1.5">
-                        <Check className="w-4 h-4 text-[#6FD9C1]" />
+                        <Check className="w-4 h-4 text-[#0A997D]" />
                         <span>{badge}</span>
                       </span>
                     ))}
@@ -2823,28 +2880,28 @@ function PrototypeContent() {
                   
                   {/* Floating Micro-Badges (Use.Live signature) */}
                   <div className="live-float-1 absolute -top-4 -left-2 sm:-left-6 z-20">
-                    <span className="flex items-center gap-2 rounded-full bg-white px-3.5 py-2 text-[12px] font-extrabold text-[#0C0730] shadow-[0_12px_30px_rgba(0,0,0,0.3)] ring-1 ring-black/10">
+                    <span className="flex items-center gap-2 rounded-full bg-white px-3.5 py-2 text-[12px] font-extrabold text-[#0A0A0D] shadow-[0_10px_25px_-5px_rgba(0,0,0,0.12)] border border-black/10">
                       <Zap className="w-4 h-4 text-[#0A997D] fill-[#0A997D]" />
                       <span>0.28s Mobile Load</span>
                     </span>
                   </div>
 
                   <div className="live-float-2 absolute -bottom-4 -left-4 sm:left-0 z-20">
-                    <span className="flex items-center gap-2 rounded-full bg-white px-3.5 py-2 text-[12px] font-extrabold text-[#0C0730] shadow-[0_12px_30px_rgba(0,0,0,0.3)] ring-1 ring-black/10">
+                    <span className="flex items-center gap-2 rounded-full bg-white px-3.5 py-2 text-[12px] font-extrabold text-[#0A0A0D] shadow-[0_10px_25px_-5px_rgba(0,0,0,0.12)] border border-black/10">
                       <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
                       <span>Direct Local Contact</span>
                     </span>
                   </div>
 
                   <div className="live-float-3 absolute -top-3 -right-2 sm:-right-4 z-20">
-                    <span className="flex items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-[12px] font-extrabold text-[#0C0730] shadow-[0_12px_30px_rgba(0,0,0,0.3)] ring-1 ring-black/10">
+                    <span className="flex items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-[12px] font-extrabold text-[#0A0A0D] shadow-[0_10px_25px_-5px_rgba(0,0,0,0.12)] border border-black/10">
                       <Star className="w-4 h-4 text-[#F5B301] fill-[#F5B301]" />
                       <span>4.9 ★ Verified</span>
                     </span>
                   </div>
 
                   {/* Centered Main Live Widget Card */}
-                  <div className="relative w-full max-w-[340px] rounded-[30px] bg-white text-[#0A0A0D] p-5 shadow-[0_30px_70px_-20px_rgba(0,0,0,0.6)] ring-1 ring-black/10">
+                  <div className="relative w-full max-w-[340px] rounded-[30px] bg-white text-[#0A0A0D] p-5 shadow-[0_24px_50px_-15px_rgba(0,0,0,0.12)] border border-black/[0.08]">
                     
                     {/* Header: Live Badge + Ticker */}
                     <div className="flex items-center justify-between text-[12px] font-extrabold pb-3 border-b border-black/[0.06]">
@@ -2859,7 +2916,7 @@ function PrototypeContent() {
                     </div>
 
                     <div className="mt-3">
-                      <p className="text-[15px] font-extrabold leading-tight text-[#0C0730]">
+                      <p className="text-[15px] font-extrabold leading-tight text-[#0A0A0D]">
                         {nicheConfig.radarSub}
                       </p>
                       <p className="text-[12px] text-black/55 font-medium mt-0.5">
@@ -2914,7 +2971,7 @@ function PrototypeContent() {
                     </div>
 
                     {/* Upfront Agreement Pill */}
-                    <div className="mt-5 flex items-center justify-between rounded-2xl bg-[#6FD9C1]/15 px-3.5 py-2.5 border border-[#6FD9C1]/30">
+                    <div className="mt-5 flex items-center justify-between rounded-2xl bg-[#0A997D]/[0.08] px-3.5 py-2.5 border border-[#0A997D]/20">
                       <span className="flex items-center gap-1.5 text-[12.5px] font-extrabold text-[#0A997D]">
                         <CheckCircle className="w-4 h-4 text-[#0A997D]" />
                         <span>{nicheConfig.agreementPill.left}</span>
@@ -2927,9 +2984,9 @@ function PrototypeContent() {
                     {/* Instant Call Button inside widget */}
                     <a
                       href={`tel:${cleanPhone}`}
-                      className="mt-3 flex items-center justify-center gap-2 h-11 w-full rounded-2xl bg-[#0A0A0D] hover:bg-[#22184A] text-white text-[13px] font-extrabold transition shadow-md"
+                      className="mt-3 flex items-center justify-center gap-2 h-11 w-full rounded-2xl bg-[#0A0A0D] hover:bg-[#1E293B] text-white text-[13px] font-extrabold transition shadow-md"
                     >
-                      <Phone className="w-3.5 h-3.5 text-[#6FD9C1]" />
+                      <Phone className="w-3.5 h-3.5 text-[#0A997D]" />
                       <span>Connect Directly: {lead.phone}</span>
                     </a>
                   </div>
