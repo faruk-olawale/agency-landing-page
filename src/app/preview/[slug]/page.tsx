@@ -1389,40 +1389,13 @@ function PrototypeContent() {
         </footer>
 
         {/* ═══════════════════════════════════════════════════════════════
-            QUICKFLEET MOBILE FLOATING BOTTOM DOCK (.mcta)
-            - Fixed at bottom of mobile viewports
-            - Thumb-reachable 50px high-conversion call pill
-        ═══════════════════════════════════════════════════════════════ */}
-        <div className="sm:hidden fixed bottom-0 inset-x-0 z-40 p-2 bg-white/90 backdrop-blur-md border-t border-black/[0.08] shadow-[0_-8px_20px_rgba(0,0,0,0.12)]">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setBannerExpanded(!bannerExpanded)}
-              className="flex items-center justify-center gap-1.5 h-11 px-3 rounded-full bg-[#0C0730] text-[#6FD9C1] font-mono text-[11px] font-bold shrink-0 border border-[#6FD9C1]/30"
-              title="Speedcraft Audit & Settings"
-            >
-              <Zap className="w-3.5 h-3.5 fill-[#6FD9C1]" />
-              <span>{measuredSpeed}</span>
-            </button>
-            <a
-              href={`tel:${cleanPhone}`}
-              className="flex-1 flex items-center justify-center gap-2 h-11 rounded-full bg-[#0A0A0D] text-white font-extrabold text-[13px] shadow-md active:scale-95 transition"
-            >
-              <span className="qf-status-dot" />
-              <Phone className="w-3.5 h-3.5 text-[#6FD9C1]" />
-              <span className="truncate">Call Now · {lead.phone}</span>
-            </a>
-          </div>
-        </div>
-
-        {/* ═══════════════════════════════════════════════════════════════
             SPEEDCRAFT STUDIO AGENCY CONTROLLER (COLLAPSIBLE RIBBON)
-            - Desktop: pinned at bottom with live latency & claim action
-            - Mobile: expanded on demand from the 0.24s meter button
+            - Desktop & Mobile: pinned at bottom with live latency & claim action
             - Live Lead & Niche Switcher for testing across businesses
         ═══════════════════════════════════════════════════════════════ */}
         <aside
           aria-label="Speedcraft Studio Performance Ribbon"
-          className="fixed bottom-12 sm:bottom-0 inset-x-0 z-50 transition-all pointer-events-none"
+          className="fixed bottom-0 inset-x-0 z-50 transition-all pointer-events-none"
         >
           {bannerExpanded && (
             <div className="toast-pop bg-[#0C0730] border-t border-[#6FD9C1]/30 p-4 sm:p-5 text-white text-[13px] shadow-2xl pointer-events-auto">
@@ -1516,22 +1489,22 @@ function PrototypeContent() {
             </div>
           )}
 
-          {/* Collapsed Control Strip (Desktop) */}
-          <div className="hidden sm:block pointer-events-auto bg-[#0A0A0D]/90 backdrop-blur-md border-t border-white/15 text-white px-4 sm:px-6 py-2.5 shadow-[0_-4px_30px_rgba(0,0,0,0.35)]">
+          {/* Collapsed Control Strip (Desktop & Mobile) */}
+          <div className="pointer-events-auto bg-[#0A0A0D]/90 backdrop-blur-md border-t border-white/15 text-white px-3 sm:px-6 py-2 sm:py-2.5 shadow-[0_-4px_30px_rgba(0,0,0,0.35)]">
             <div className="max-w-[1200px] mx-auto flex items-center justify-between gap-3">
               <button
                 onClick={() => setBannerExpanded(!bannerExpanded)}
-                className="flex items-center gap-2.5 text-left group cursor-pointer"
-                style={{ minHeight: 40 }}
+                className="flex items-center gap-2 text-left group cursor-pointer"
+                style={{ minHeight: 38 }}
               >
-                <span className="w-7 h-7 rounded-lg bg-[#6FD9C1]/20 flex items-center justify-center text-[#6FD9C1]">
-                  <Zap className="w-4 h-4 fill-[#6FD9C1]" />
+                <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-[#6FD9C1]/20 flex items-center justify-center text-[#6FD9C1]">
+                  <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-[#6FD9C1]" />
                 </span>
-                <div className="flex items-center gap-2 text-[12.5px] font-bold text-white">
-                  <span className="font-mono text-[#6FD9C1] bg-black/50 px-2 py-0.5 rounded border border-[#6FD9C1]/40">
+                <div className="flex items-center gap-1.5 sm:gap-2 text-[11.5px] sm:text-[12.5px] font-bold text-white">
+                  <span className="font-mono text-[#6FD9C1] bg-black/50 px-1.5 sm:px-2 py-0.5 rounded border border-[#6FD9C1]/40">
                     {measuredSpeed}
                   </span>
-                  <span className="text-white/80 hidden sm:inline">PageSpeed: 100/100</span>
+                  <span className="text-white/80">PageSpeed: 100/100</span>
                   <span className="text-white/40 hidden sm:inline">|</span>
                   <span className="text-white/70 hidden md:inline truncate">{lead.company}</span>
                 </div>
@@ -1541,7 +1514,7 @@ function PrototypeContent() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setBannerExpanded(!bannerExpanded)}
-                  className="px-3.5 py-1.5 rounded-full bg-white text-[#0A0A0D] hover:bg-white/90 text-[12px] font-extrabold shadow-sm transition"
+                  className="px-3 sm:px-3.5 py-1.5 rounded-full bg-white text-[#0A0A0D] hover:bg-white/90 text-[11px] sm:text-[12px] font-extrabold shadow-sm transition cursor-pointer"
                 >
                   {bannerExpanded ? "Close Panel" : "Claim Code"}
                 </button>

@@ -6,8 +6,8 @@
     "method": "gmail",
     "status": "sent",
     "previewUrl": "http://localhost:3001/preview/quay-dental-cbd",
-    "viewedAt": "2026-10-06T15:45:46.209Z",
-    "viewCount": 2
+    "viewedAt": "2026-10-06T16:23:53.963Z",
+    "viewCount": 6
   },
   {
     "company": "LinkPaddy Tech",
@@ -16,8 +16,8 @@
     "method": "gmail",
     "status": "sent",
     "previewUrl": "http://localhost:3001/preview/linkpaddy-tech",
-    "viewedAt": "2026-10-06T15:45:46.209Z",
-    "viewCount": 10
+    "viewedAt": "2026-10-06T16:23:53.963Z",
+    "viewCount": 14
   },
   {
     "company": "Dallas Plumbing Co",
@@ -26,8 +26,8 @@
     "method": "gmail",
     "status": "sent",
     "previewUrl": "http://localhost:3001/preview/dallas-plumbing-co",
-    "viewedAt": "2026-10-06T15:45:46.209Z",
-    "viewCount": 13
+    "viewedAt": "2026-10-06T16:23:53.963Z",
+    "viewCount": 17
   },
   {
     "company": "Powerhub Electrical",
@@ -36,8 +36,8 @@
     "previewUrl": "https://speedcraft.dev/preview/powerhub-electrical",
     "id": "01a0fa84-33eb-772a-a553-0b43df6b95c0",
     "status": "sent",
-    "viewedAt": "2026-10-06T15:45:46.209Z",
-    "viewCount": 12
+    "viewedAt": "2026-10-06T16:23:53.963Z",
+    "viewCount": 16
   },
   {
     "company": "Powerhub Electrical",
@@ -45,7 +45,7 @@
     "sentAt": "2026-10-02T02:58:40.128Z",
     "previewUrl": "https://agency-landing-page-smoky-psi.vercel.app/preview/powerhub-electrical",
     "status": "sent",
-    "viewedAt": "2026-10-06T15:45:46.209Z",
-    "viewCount": 12
+    "viewedAt": "2026-10-06T16:23:53.963Z",
+    "viewCount": 16
   }
 ]
