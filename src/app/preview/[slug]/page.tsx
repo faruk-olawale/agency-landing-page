@@ -25,6 +25,12 @@ import {
   Droplets,
   Sliders,
   CheckCircle,
+  Scale,
+  Briefcase,
+  FileText,
+  Sun,
+  Bug,
+  HeartPulse,
 } from "lucide-react";
 import leadsData from "../../../../leads/global_leads_audit.json";
 
@@ -175,11 +181,14 @@ interface LeadRecord {
 }
 
 const PRESET_LEADS = [
+  { slug: "jameson-law", name: "Jameson Law", city: "Sydney", niche: "Legal", phone: "02 8806 0866" },
   { slug: "sydney-emergency-plumbing", name: "Sydney Emergency Plumbing", city: "Sydney", niche: "Plumbing", phone: "1300 882 190" },
-  { slug: "dallas-plumbing-co", name: "Dallas Plumbing Co", city: "Dallas", niche: "Plumbing", phone: "(214) 736-9201" },
-  { slug: "austin-air-heating", name: "Austin Air & Heating Experts", city: "Austin", niche: "HVAC", phone: "(512) 694-8119" },
+  { slug: "skygate-dental", name: "Skygate Dental", city: "Brisbane", niche: "Dental", phone: "(07) 3130 0088" },
+  { slug: "total-solar-solutions", name: "Total Solar Solutions", city: "Brisbane", niche: "Solar", phone: "1300 868 257" },
   { slug: "powerhub-electrical", name: "PowerHub Electrical Services", city: "Melbourne", niche: "Electrical", phone: "1300 914 202" },
+  { slug: "austin-air-heating", name: "Austin Air & Heating Experts", city: "Austin", niche: "HVAC", phone: "(512) 694-8119" },
   { slug: "apex-roofing-contractors", name: "Apex Roofing Contractors", city: "Brisbane", niche: "Roofing", phone: "1300 452 881" },
+  { slug: "pest-control-sydney", name: "Pest Control Sydney", city: "Sydney", niche: "Pest Control", phone: "1300 760 050" },
 ];
 
 function PrototypeContent() {
@@ -196,6 +205,7 @@ function PrototypeContent() {
       const leadSlug = l.company.toLowerCase().replace(/[^a-z0-9]/g, "");
       const domainSlug = l.website.toLowerCase().replace(/[^a-z0-9]/g, "");
       return (
+        leadSlug === normalizedSlug ||
         leadSlug.includes(normalizedSlug) ||
         domainSlug.includes(normalizedSlug) ||
         normalizedSlug.includes(leadSlug)
@@ -215,20 +225,36 @@ function PrototypeContent() {
     const currencySymbol = searchParams.get("symbol") || found?.currencySymbol || "$";
     const website = searchParams.get("domain") || found?.website || (slug ? `https://${slug}.com.au` : "https://sydneyemergencyplumbing.com.au");
     const city = searchParams.get("city") || found?.city || (countryCode === "AU" ? "Sydney" : "Dallas");
-    const niche = searchParams.get("niche") || found?.niche || "Plumbing";
+
+    // Intelligently infer niche if not strictly defined in query or database
+    let inferredNiche = searchParams.get("niche") || found?.niche || "";
+    if (!inferredNiche) {
+      const s = slug.toLowerCase();
+      if (s.includes("law") || s.includes("legal") || s.includes("solicitor") || s.includes("attorney")) inferredNiche = "Legal";
+      else if (s.includes("dent") || s.includes("smile")) inferredNiche = "Dental";
+      else if (s.includes("solar") || s.includes("energy")) inferredNiche = "Solar";
+      else if (s.includes("pest") || s.includes("termite")) inferredNiche = "Pest Control";
+      else if (s.includes("lock")) inferredNiche = "Locksmith";
+      else if (s.includes("roof")) inferredNiche = "Roofing";
+      else if (s.includes("electr") || s.includes("power")) inferredNiche = "Electrician";
+      else if (s.includes("air") || s.includes("hvac") || s.includes("cool") || s.includes("heat")) inferredNiche = "HVAC";
+      else if (s.includes("restor") || s.includes("mold") || s.includes("flood")) inferredNiche = "Restoration";
+      else if (s.includes("plumb") || s.includes("drain") || s.includes("pipe")) inferredNiche = "Plumbing";
+      else inferredNiche = "General";
+    }
 
     // Standardized dialable phone
     let rawPhone = searchParams.get("phone") || found?.phone || "";
     if (!rawPhone || rawPhone.toLowerCase().includes("direct") || rawPhone.toLowerCase().includes("website")) {
-      if (countryCode === "AU") rawPhone = "1300 882 190";
+      if (countryCode === "AU") rawPhone = inferredNiche === "Legal" ? "02 8806 0866" : "1300 882 190";
       else if (countryCode === "GB" || countryCode === "UK") rawPhone = "020 7946 0192";
       else rawPhone = "(214) 736-9201";
     }
 
-    const email = searchParams.get("email") || found?.email || "dispatch@" + website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
-    const mobilePageSpeed = Number(searchParams.get("speed")) || found?.mobilePageSpeed || 19;
-    const mobileLoadTimeSec = Number(searchParams.get("load")) || found?.mobileLoadTimeSec || 4.6;
-    const estLostMonthlySpend = Number(searchParams.get("waste")) || found?.estLostMonthlySpend || found?.estLostMonthlySpendAud || 1280;
+    const email = searchParams.get("email") || found?.email || "contact@" + website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
+    const mobilePageSpeed = Number(searchParams.get("speed")) || found?.mobilePageSpeed || 16;
+    const mobileLoadTimeSec = Number(searchParams.get("load")) || found?.mobileLoadTimeSec || 2.92;
+    const estLostMonthlySpend = Number(searchParams.get("waste")) || found?.estLostMonthlySpend || found?.estLostMonthlySpendAud || 882;
     const cms = found?.cms || "WordPress / Elementor Pro";
     const detectedPlugins = found?.detectedPlugins || "Elementor, Revolution Slider, Contact Form 7";
 
@@ -240,7 +266,7 @@ function PrototypeContent() {
       currency,
       currencySymbol,
       city,
-      niche,
+      niche: inferredNiche,
       phone: rawPhone,
       email,
       mobilePageSpeed,
@@ -266,7 +292,7 @@ function PrototypeContent() {
     service: "",
     name: "",
     phone: "",
-    urgency: "Immediate Emergency (Under 45 Mins)",
+    urgency: "Immediate Priority",
   });
 
   // Telemetry Ping
@@ -321,18 +347,709 @@ function PrototypeContent() {
 
   const cleanPhone = lead.phone.replace(/[^0-9+]/g, "");
 
-  // ─── Niche Content Configuration (1-to-1 Parity) ──────────────────────
+  // ─── Niche Content Configuration (1-to-1 Real-Time Industry Adaptation) ──
   const nicheConfig = useMemo(() => {
     const n = lead.niche.toLowerCase();
 
+    // 1. LEGAL / LAW FIRMS / SOLICITORS
+    if (n.includes("leg") || n.includes("law") || n.includes("solicitor") || n.includes("attorney") || n.includes("barrister")) {
+      return {
+        nicheKey: "legal",
+        tradeTitle: "Commercial, Criminal & Family Law",
+        badge: "Direct Solicitor Access · Urgent Legal Counsel",
+        heroHeadline: (
+          <>
+            {lead.city}&apos;s Trusted <br className="hidden sm:inline" />
+            <span className="text-[#6FD9C1]">Legal Defence &amp; Counsel</span>.
+          </>
+        ),
+        heroSub: `Experienced legal practitioners fighting for your rights across Greater ${lead.city}. Transparent fixed fees, urgent court representation, and strategic counsel with zero jargon.`,
+        navBadge: `${lead.city} Law Chambers`,
+        navCta: "Speak with Lawyer",
+        navContactLabel: "Consultation",
+        heroCta: "Request Confidential Consultation",
+        heroTrustBadges: [
+          "Strict Legal Professional Privilege",
+          "Sub-Second 0.28s Load Speed",
+          "Direct Senior Solicitor Access",
+        ],
+        radarLabel: "CASE ADVISORY",
+        radarSub: `Confidential Intake: ${lead.city}`,
+        partyA: { label: "Client", initials: "CL", bg: "#B5D4F4", text: "#0C447C" },
+        partyB: { label: "Senior Counsel", icon: Scale, bg: "#CECBF6", text: "#22184A" },
+        agreementPill: { left: "Fixed Fee Scope Agreed", right: "Privileged" },
+        blueprintFrames: [
+          {
+            title: "▸ CONFIDENTIAL CASE ASSESSMENT",
+            desc: `Immediate case triage by senior practitioners across Greater ${lead.city}. Rapid merit review, urgent bail/injunction advice, and dispute strategy.`,
+          },
+          {
+            title: "▸ TRANSPARENT COST DISCLOSURE",
+            desc: "Zero hidden disbursements. Clear written cost agreements and fixed milestone quotes before any billable work commences.",
+          },
+          {
+            title: "▸ SUB-SECOND EDGE STACK",
+            desc: `Built on Next.js Edge CDN. Renders in 0.28s compared to slow WordPress (${lead.mobileLoadTimeSec}s), capturing high-intent legal inquiries.`,
+          },
+        ],
+        stepsBadge: "How It Works",
+        stepsHeading: "Three Steps to Clear Legal Resolution",
+        stepsSub: "We eliminated legal ambiguity, bill shock, and impersonal junior gatekeepers.",
+        steps: [
+          {
+            num: "01",
+            cardBadge: "1-Tap Intake",
+            cardNote: "Direct Solicitor Line",
+            title: "Direct Confidential Inquiry",
+            desc: `Connect immediately with an experienced practitioner in ${lead.city}. Initial direction with complete discretion.`,
+            icon: Phone,
+            color: "#0A997D",
+            bgColor: "#6FD9C1",
+          },
+          {
+            num: "02",
+            cardBadge: "Case Review",
+            cardNote: "Merit & Evidence Analysis",
+            title: "Strategic Case Assessment",
+            desc: "We analyze your documentation, identify legal exposures, and formulate your strongest strategic legal positioning.",
+            icon: FileText,
+            color: "#633806",
+            bgColor: "#F5B301",
+          },
+          {
+            num: "03",
+            cardBadge: "Fixed Scope",
+            cardNote: "100% Cost Transparency",
+            title: "Decisive Legal Representation",
+            desc: "Agreed written scope and fee structure. Dedicated advocacy across pre-court negotiations, formal mediation, and litigation.",
+            icon: ShieldCheck,
+            color: "#0A997D",
+            bgColor: "#CECBF6",
+          },
+        ],
+        capabilitiesBadge: "Practice Areas",
+        capabilitiesHeading: `Specialized Practice Areas Across ${lead.city}`,
+        capabilitiesSub: "Proven legal advocacy delivered by admitted senior solicitors and barristers.",
+        services: [
+          {
+            title: "Criminal Defence & Traffic Offences",
+            desc: `Immediate representation for urgent police interviews, bail hearings, licensing appeals, and court appearances in ${lead.city}.`,
+            tag: "Urgent Bail & Court",
+            price: "Fixed Quote",
+            icon: Scale,
+          },
+          {
+            title: "Commercial Litigation & Contract Disputes",
+            desc: "Strategic resolution for partnership conflicts, shareholder oppression, debt recovery, and commercial lease breaches.",
+            tag: "Corporate Advisory",
+            price: "Clear Retainer",
+            icon: Briefcase,
+          },
+          {
+            title: "Family Law & Property Settlements",
+            desc: "Compassionate guidance for divorce, binding financial agreements, child custody arrangements, and complex asset division.",
+            tag: "Sensitive Matters",
+            price: "Agreed Milestone",
+            icon: Award,
+          },
+          {
+            title: "Employment Law & Workplace Rights",
+            desc: "Representation for unfair dismissal claims, redundancy reviews, restraint of trade enforcement, and executive contracts.",
+            tag: "Workplace Rights",
+            price: "Fixed Review",
+            icon: ShieldCheck,
+          },
+        ],
+        standardBadge: "PRACTICE STANDARD",
+        standardHeading: `Why ${lead.city} Clients Retain ${lead.company}`,
+        standardItems: [
+          { title: "Strict Confidentiality", desc: "Every communication is protected by legal professional privilege from your initial inquiry." },
+          { title: "Senior Practitioners", desc: "Direct access to senior admitted practitioners with proven courtroom and negotiation track records." },
+          { title: "Fixed Cost Agreements", desc: "Transparent, agreed fee structures with zero surprise hourly add-ons or bill shock." },
+          { title: "Trial-Ready Advocates", desc: "Strategic negotiation first, relentless trial representation when litigation is necessary." },
+        ],
+        auditHeadline: "Every 1-Second Mobile Delay Leaks 20% of High-Value Retainers",
+        auditSub: `When an individual or business owner faces an urgent legal dispute, they search on their phone. If your website takes over 2.5 seconds to load, they click the next law firm. High-value legal retainers are won or lost in milliseconds.`,
+        auditBenefits: [
+          "Next.js App Router renders on Edge CDN in 0.28 seconds for instant mobile access.",
+          "Zero slow WordPress / Elementor plugin scripts blocking the consultation dialer.",
+          `Saves an estimated ~${lead.currencySymbol}${lead.estLostMonthlySpend}/mo in wasted Google ad clicks.`,
+        ],
+        socialProofHeading: `Clients in ${lead.city} Trust ${lead.company}`,
+        testimonials: [
+          {
+            name: "David M.",
+            neighborhood: `${lead.city} CBD`,
+            quote: `${lead.company} provided sharp, clear guidance during a complex commercial dispute. Secured a full settlement within weeks without costly court delays.`,
+          },
+          {
+            name: "Rebecca S.",
+            neighborhood: `${lead.city} North`,
+            quote: "Approachable, empathetic, and exceptionally thorough. They explained every legal option without confusing legal jargon and kept costs completely transparent.",
+          },
+        ],
+        formBadge: "CONFIDENTIAL LEGAL INTAKE",
+        formTitle: `Schedule Confidential Consultation in ${lead.city}`,
+        formSub: "Speak directly with our senior legal team. All inquiries are protected under client-lawyer confidentiality.",
+        formLocationPlaceholder: `Your Suburb / Business in ${lead.city}`,
+        formUrgencyOptions: [
+          "Urgent (Court Date / Police Interview within 24h)",
+          "This Week (Active Dispute or Transaction)",
+          "Scheduled Advice & Document Review",
+          "Fixed-Fee Cost Inquiry Only",
+        ],
+        formSubmitLabel: "Request Confidential Consultation",
+        formSuccessHeading: "Consultation Request Received",
+        formSuccessDesc: "Your test request was processed in 0.04s. In production, this immediately alerts the on-duty practice manager.",
+        footerDesc: `Premier legal practice serving individuals, families, and corporations across Greater ${lead.city}.`,
+        footerPhoneLabel: "Consultation Line:",
+      };
+    }
+
+    // 2. DENTAL PRACTICES
+    if (n.includes("dent") || n.includes("smile") || n.includes("ortho") || n.includes("implant")) {
+      return {
+        nicheKey: "dental",
+        tradeTitle: "General, Cosmetic & Emergency Dentistry",
+        badge: "Same-Day Emergency Dental Appointments",
+        heroHeadline: (
+          <>
+            {lead.city}&apos;s Premier <br className="hidden sm:inline" />
+            <span className="text-[#6FD9C1]">Dental Care &amp; Pain Relief</span>.
+          </>
+        ),
+        heroSub: `Gentle, state-of-the-art family and cosmetic dentistry across Greater ${lead.city}. Instant health fund claiming (HICAPS), modern pain-free techniques, and same-day emergency relief.`,
+        navBadge: `${lead.city} Dental Clinic Open`,
+        navCta: "Book Appointment",
+        navContactLabel: "Appointments",
+        heroCta: "Reserve Appointment Slot",
+        heroTrustBadges: [
+          "Same-Day Pain Relief Guaranteed",
+          "Sub-Second 0.28s Load Speed",
+          "On-the-Spot Health Fund Claiming",
+        ],
+        radarLabel: "PATIENT TRIAGE",
+        radarSub: `Emergency Dental: ${lead.city}`,
+        partyA: { label: "Patient", initials: "PT", bg: "#B5D4F4", text: "#0C447C" },
+        partyB: { label: "Lead Dentist", icon: HeartPulse, bg: "#CECBF6", text: "#22184A" },
+        agreementPill: { left: "Treatment Plan Confirmed", right: "Gentle Care" },
+        blueprintFrames: [
+          {
+            title: "▸ SAME-DAY DENTAL TRIAGE",
+            desc: `Emergency appointments held open daily for acute toothaches, chipped teeth, and trauma in ${lead.city}.`,
+          },
+          {
+            title: "▸ ITEMISED FEE TRANSPARENCY",
+            desc: "Zero surprise fees. Full treatment cost estimate provided before any procedure, with instant HICAPS claiming.",
+          },
+          {
+            title: "▸ SUB-SECOND EDGE STACK",
+            desc: `Loads in 0.28s on mobile so patients in pain can book immediately without leaving your site.`,
+          },
+        ],
+        stepsBadge: "How It Works",
+        stepsHeading: "Three Steps to Gentle & Pain-Free Dental Care",
+        stepsSub: "We eliminated dental anxiety, confusing treatment jargon, and long waiting times.",
+        steps: [
+          {
+            num: "01",
+            cardBadge: "1-Tap Booking",
+            cardNote: "Same-Day Slot",
+            title: "Book Priority Appointment",
+            desc: `Select your preferred time slot online or call our ${lead.city} clinic directly for immediate priority.`,
+            icon: Phone,
+            color: "#0A997D",
+            bgColor: "#6FD9C1",
+          },
+          {
+            num: "02",
+            cardBadge: "Gentle Exam",
+            cardNote: "Low-Dose Digital X-Ray",
+            title: "Comprehensive Examination",
+            desc: "Low-dose digital imaging and gentle diagnostics to identify pain sources and present all care choices.",
+            icon: HeartPulse,
+            color: "#633806",
+            bgColor: "#F5B301",
+          },
+          {
+            num: "03",
+            cardBadge: "Clear Plan",
+            cardNote: "All Health Funds",
+            title: "Relief & Lasting Health",
+            desc: "Immediate comfort administered with modern gentle techniques, followed by transparent preventative advice.",
+            icon: ShieldCheck,
+            color: "#0A997D",
+            bgColor: "#CECBF6",
+          },
+        ],
+        capabilitiesBadge: "Treatments",
+        capabilitiesHeading: `Comprehensive Dental Care in ${lead.city}`,
+        capabilitiesSub: "Modern treatments performed by registered Australian dental practitioners.",
+        services: [
+          {
+            title: "Emergency Dental & Acute Pain Relief",
+            desc: `Same-day diagnosis, gentle root canal therapy, and prompt repair of broken or knocked-out teeth across ${lead.city}.`,
+            tag: "Same-Day Relief",
+            price: "Itemised Quote",
+            icon: HeartPulse,
+          },
+          {
+            title: "Dental Implants & Permanent Restorations",
+            desc: "High-precision titanium implants, porcelain crowns, and bridges restoring full chewing comfort and natural aesthetics.",
+            tag: "Permanent Fix",
+            price: "Free Consult",
+            icon: Award,
+          },
+          {
+            title: "Cosmetic Dentistry & Clear Aligners",
+            desc: "Professional in-chair Philips Zoom whitening, porcelain veneers, and discreet clear aligner smile alignment.",
+            tag: "Smile Design",
+            price: "Package Options",
+            icon: Sparkles,
+          },
+          {
+            title: "Preventive Checkups, Scale & Clean",
+            desc: "Gentle ultrasonic tartar removal, remineralizing fluoride therapies, and proactive periodontal disease prevention.",
+            tag: "Routine Care",
+            price: "No-Gap Eligible",
+            icon: ShieldCheck,
+          },
+        ],
+        standardBadge: "CLINICAL STANDARD",
+        standardHeading: `Why ${lead.city} Families Choose ${lead.company}`,
+        standardItems: [
+          { title: "Gentle Anesthetic Care", desc: "Designed specifically for anxious patients with comfort-first pain management." },
+          { title: "Modern Digital Suite", desc: "Ultra-low-dose digital 3D imaging, intraoral cameras, and modern sterilization protocols." },
+          { title: "No-Gap Checkups", desc: "Maximized private health insurance rebates with on-the-spot HICAPS instant claiming." },
+          { title: "Flexible Payment Plans", desc: "Interest-free payment options available so essential dental care is never delayed." },
+        ],
+        auditHeadline: "Every 1-Second Mobile Delay Leaks 20% of New Patient Bookings",
+        auditSub: `When a patient experiences toothache or wants cosmetic veneers, they compare clinics on their phone. If your site takes 3 seconds to load, they book with the next practice. Instant speed captures high-value new patients.`,
+        auditBenefits: [
+          "Next.js App Router renders on Edge CDN in 0.28 seconds for instant mobile booking.",
+          "Zero heavy CMS plugins or WordPress bloat slowing down patient scheduling.",
+          `Saves an estimated ~${lead.currencySymbol}${lead.estLostMonthlySpend}/mo in wasted Google ad clicks.`,
+        ],
+        socialProofHeading: `Patients in ${lead.city} Trust ${lead.company}`,
+        testimonials: [
+          {
+            name: "Sarah K.",
+            neighborhood: `${lead.city} Suburbs`,
+            quote: `Severe toothache on a Friday afternoon. ${lead.company} fit me in within 45 minutes, completely relieved the pain, and explained everything gently.`,
+          },
+          {
+            name: "Mark T.",
+            neighborhood: `${lead.city} Central`,
+            quote: "State-of-the-art dental clinic. Immaculate implant and crown work with zero discomfort. Upfront cost breakdown before starting.",
+          },
+        ],
+        formBadge: "DENTAL APPOINTMENT INTAKE",
+        formTitle: `Book Your Dental Visit in ${lead.city}`,
+        formSub: "Emergency pain relief appointments and general dental bookings.",
+        formLocationPlaceholder: `Your Suburb in ${lead.city}`,
+        formUrgencyOptions: [
+          "Severe Tooth Pain / Dental Emergency (Today)",
+          "This Week (Morning / Afternoon Preference)",
+          "Weekend / Saturday Appointment",
+          "Cosmetic Smile Consultation",
+        ],
+        formSubmitLabel: "Confirm Appointment Request",
+        formSuccessHeading: "Appointment Request Received",
+        formSuccessDesc: "Your test request was processed in 0.04s. In production, this immediately reserves your clinical slot.",
+        footerDesc: `Accredited dental practice providing gentle, comprehensive care for patients across Greater ${lead.city}.`,
+        footerPhoneLabel: "Clinic Line:",
+      };
+    }
+
+    // 3. SOLAR & RENEWABLE ENERGY
+    if (n.includes("solar") || n.includes("energy") || n.includes("renew")) {
+      return {
+        nicheKey: "solar",
+        tradeTitle: "Residential & Commercial Solar Systems",
+        badge: "CEC-Accredited Clean Energy Specialists",
+        heroHeadline: (
+          <>
+            {lead.city}&apos;s High-Yield <br className="hidden sm:inline" />
+            <span className="text-[#6FD9C1]">Solar &amp; Battery Storage</span>.
+          </>
+        ),
+        heroSub: `Cut electricity bills up to 80% with tier-1 solar panels and smart battery storage across Greater ${lead.city}. CEC-accredited engineering, 25-year performance warranties, and zero upfront finance options.`,
+        navBadge: `${lead.city} Solar Operations`,
+        navCta: "Get Solar Quote",
+        navContactLabel: "Solar Quote",
+        heroCta: "Request Free Solar Assessment",
+        heroTrustBadges: [
+          "CEC-Accredited Designers & Installers",
+          "Sub-Second 0.28s Load Speed",
+          "25-Year Performance Guarantee",
+        ],
+        radarLabel: "SOLAR AUDIT",
+        radarSub: `Solar System Design: ${lead.city}`,
+        partyA: { label: "Property Owner", initials: "PO", bg: "#B5D4F4", text: "#0C447C" },
+        partyB: { label: "Solar Engineer", icon: Sun, bg: "#CECBF6", text: "#22184A" },
+        agreementPill: { left: "Fixed Yield Guaranteed", right: "25-Yr Warranty" },
+        blueprintFrames: [
+          {
+            title: "▸ ROOF SHADOW & YIELD ANALYSIS",
+            desc: `Detailed satellite solar modeling and production calculation tailored to your roof pitch and orientation in ${lead.city}.`,
+          },
+          {
+            title: "▸ REBATE & INCENTIVE HANDLING",
+            desc: "All government STC rebates and feed-in tariff documentation managed end-to-end for zero administrative stress.",
+          },
+          {
+            title: "▸ SUB-SECOND EDGE STACK",
+            desc: "Instant loading mobile assessment tool that captures homeowners seeking immediate electricity bill relief.",
+          },
+        ],
+        stepsBadge: "How It Works",
+        stepsHeading: "Three Steps to Permanent Energy Independence",
+        stepsSub: "We eliminated pushy door-to-door salesmen and overpriced foreign hardware.",
+        steps: [
+          {
+            num: "01",
+            cardBadge: "1-Tap Audit",
+            cardNote: "Satellite Modeling",
+            title: "Free Rooftop Assessment",
+            desc: `We review your recent power bill and model your roof yield for maximum generation in ${lead.city}.`,
+            icon: Sun,
+            color: "#0A997D",
+            bgColor: "#6FD9C1",
+          },
+          {
+            num: "02",
+            cardBadge: "CEC Engineered",
+            cardNote: "Tier-1 Microinverters",
+            title: "Precision System Design",
+            desc: "Custom component matching with premium tier-1 panels, smart inverters, and scalable battery storage.",
+            icon: Zap,
+            color: "#633806",
+            bgColor: "#F5B301",
+          },
+          {
+            num: "03",
+            cardBadge: "Turnkey Power",
+            cardNote: "Grid Connection Included",
+            title: "Certified Installation & Activation",
+            desc: "Accredited master electricians install your system, complete safety testing, and connect you to the grid.",
+            icon: ShieldCheck,
+            color: "#0A997D",
+            bgColor: "#CECBF6",
+          },
+        ],
+        capabilitiesBadge: "Solar Solutions",
+        capabilitiesHeading: `Clean Energy Capabilities in ${lead.city}`,
+        capabilitiesSub: "High-efficiency installations backed by comprehensive performance warranties.",
+        services: [
+          {
+            title: "Residential Tier-1 Solar Installations",
+            desc: `High-efficiency 6.6kW to 13.2kW rooftop solar systems designed for maximum self-consumption in ${lead.city}.`,
+            tag: "Bill Slasher",
+            price: "Rebates Included",
+            icon: Sun,
+          },
+          {
+            title: "Home Battery Storage (Tesla / BYD)",
+            desc: "Store daytime solar generation for evening use and protect your household against blackout power outages.",
+            tag: "Blackout Backup",
+            price: "Turnkey Package",
+            icon: Zap,
+          },
+          {
+            title: "Commercial Solar & Peak Shaving",
+            desc: "30kW to 100kW+ commercial rooftop arrays dramatically reducing operational overhead for local enterprises.",
+            tag: "Commercial ROI",
+            price: "Feasibility Study",
+            icon: Briefcase,
+          },
+          {
+            title: "Inverter Replacement & Fault Repairs",
+            desc: "Same-day troubleshooting for red-light inverter errors, isolator burnouts, and declining solar generation.",
+            tag: "System Rescue",
+            price: "Diagnostic Fixed",
+            icon: Award,
+          },
+        ],
+        standardBadge: "ENGINEERING STANDARD",
+        standardHeading: `Why ${lead.city} Chooses ${lead.company}`,
+        standardItems: [
+          { title: "CEC Certified Installers", desc: "Installed solely by Clean Energy Council accredited master electricians." },
+          { title: "Tier-1 Bloomberg Hardware", desc: "Only high-purity monocrystalline modules with proven 25-year linear output warranties." },
+          { title: "Government Rebate Handling", desc: "Immediate point-of-sale discounts applied directly to your quote." },
+          { title: "Real-Time Mobile Monitoring", desc: "Live smartphone app tracking generation, consumption, and export credits." },
+        ],
+        auditHeadline: "Every 1-Second Mobile Delay Leaks 20% of High-Intent Solar Leads",
+        auditSub: `When a property owner gets hit with a quarterly electricity bill, they search for solar quotes immediately. If your site lags, they switch to competing installers. Speedcraft Studio ensures zero lost leads.`,
+        auditBenefits: [
+          "Edge CDN delivers 0.28s load times for instant mobile quote forms.",
+          "Zero bloated WordPress plugins dragging down Core Web Vitals.",
+          `Recovers an estimated ~${lead.currencySymbol}${lead.estLostMonthlySpend}/mo in leaked PPC traffic.`,
+        ],
+        socialProofHeading: `Property Owners in ${lead.city} Trust ${lead.company}`,
+        testimonials: [
+          {
+            name: "Greg P.",
+            neighborhood: `${lead.city} South`,
+            quote: `Quarterly electricity bill dropped from $1,100 to under $180. The installation crew from ${lead.company} was exceptionally fast, clean, and professional.`,
+          },
+          {
+            name: "Lisa N.",
+            neighborhood: `${lead.city} Hills`,
+            quote: "Great honest advice on battery sizing and roof orientation. Handled all government rebate paperwork seamlessly.",
+          },
+        ],
+        formBadge: "FREE SOLAR YIELD AUDIT",
+        formTitle: `Calculate Your Solar Savings in ${lead.city}`,
+        formSub: "Get an accurate quote and rooftop feasibility report within 60 minutes.",
+        formLocationPlaceholder: `Your Suburb in ${lead.city}`,
+        formUrgencyOptions: [
+          "Ready to Install This Month (Rebate Claim)",
+          "Planning Within 60 Days",
+          "Battery Storage Add-On Only",
+          "Free Roof Feasibility Quote",
+        ],
+        formSubmitLabel: "Calculate My Solar Savings",
+        formSuccessHeading: "Solar Assessment Received",
+        formSuccessDesc: "Your test request was processed in 0.04s. In production, this immediately schedules your solar engineering report.",
+        footerDesc: `Clean Energy Council accredited solar and battery storage installations across Greater ${lead.city}.`,
+        footerPhoneLabel: "Solar Hotline:",
+      };
+    }
+
+    // 4. PEST CONTROL
+    if (n.includes("pest") || n.includes("termite") || n.includes("rodent")) {
+      return {
+        nicheKey: "pest",
+        tradeTitle: "Eco-Safe Pest Control & Termite Barriers",
+        badge: "Same-Day Emergency Pest Eradication",
+        heroHeadline: (
+          <>
+            {lead.city}&apos;s Eco-Safe <br className="hidden sm:inline" />
+            <span className="text-[#6FD9C1]">Pest &amp; Termite Defence</span>.
+          </>
+        ),
+        heroSub: `Rapid, child and pet-safe pest eradication across Greater ${lead.city}. Thermal termite inspections, guaranteed pest barriers, and certified treatments with zero toxic fumes.`,
+        navBadge: `${lead.city} Pest Dispatch`,
+        navCta: "Book Treatment",
+        navContactLabel: "Pest Dispatch",
+        heroCta: "Request Same-Day Pest Treatment",
+        heroTrustBadges: [
+          "100% Child & Pet-Friendly Formulations",
+          "Sub-Second 0.28s Load Speed",
+          "12-Month Pest-Free Guarantee",
+        ],
+        radarLabel: "PEST DISPATCH",
+        radarSub: `Priority Inspection: ${lead.city}`,
+        partyA: { label: "Resident", initials: "RS", bg: "#B5D4F4", text: "#0C447C" },
+        partyB: { label: "Licensed Tech", icon: Bug, bg: "#CECBF6", text: "#22184A" },
+        agreementPill: { left: "Fixed Inspection Agreed", right: "Safe Barrier" },
+        blueprintFrames: [
+          {
+            title: "▸ THERMAL TERMITE IMAGING",
+            desc: `Non-invasive infrared scanning detecting hidden termite nests behind walls without damaging plaster in ${lead.city}.`,
+          },
+          {
+            title: "▸ WRITTEN 12-MONTH WARRANTY",
+            desc: "If pests return within the warranty period, our technicians re-treat your property completely free of charge.",
+          },
+          {
+            title: "▸ SUB-SECOND EDGE STACK",
+            desc: "Loads instantly on mobile phones so distressed homeowners can call for immediate eradication.",
+          },
+        ],
+        stepsBadge: "How It Works",
+        stepsHeading: "Three Steps to a Guaranteed Pest-Free Property",
+        stepsSub: "We eliminated ineffective supermarket sprays and dangerous chemical residues.",
+        steps: [
+          {
+            num: "01",
+            cardBadge: "1-Tap Dispatch",
+            cardNote: "Rapid Arrival",
+            title: "Schedule Rapid Inspection",
+            desc: `Call or book online for guaranteed same-day technician dispatch across ${lead.city}.`,
+            icon: Phone,
+            color: "#0A997D",
+            bgColor: "#6FD9C1",
+          },
+          {
+            num: "02",
+            cardBadge: "Thermal Scan",
+            cardNote: "Nest Location",
+            title: "Targeted Inspection & Eradication",
+            desc: "We locate nesting zones and apply micro-encapsulated treatments safe for pets and children.",
+            icon: Bug,
+            color: "#633806",
+            bgColor: "#F5B301",
+          },
+          {
+            num: "03",
+            cardBadge: "Active Barrier",
+            cardNote: "12-Month Coverage",
+            title: "Long-Term Perimeter Shield",
+            desc: "Perimeter chemical barrier installed to prevent future infestations, backed by our written warranty.",
+            icon: ShieldCheck,
+            color: "#0A997D",
+            bgColor: "#CECBF6",
+          },
+        ],
+        capabilitiesBadge: "Capabilities",
+        capabilitiesHeading: `Certified Pest Solutions in ${lead.city}`,
+        capabilitiesSub: "Licensed chemical handlers adhering strictly to Australian Pest Management standards.",
+        services: [
+          {
+            title: "Termite Thermal Inspection & Chemical Barriers",
+            desc: `Complete AS 3660.2 certified thermal radar termite scans and Termidor chemical soil barriers in ${lead.city}.`,
+            tag: "Termite Shield",
+            price: "Written Report",
+            icon: Bug,
+          },
+          {
+            title: "Residential General Pest Eradication",
+            desc: "Single-treatment eradication for German cockroaches, black house spiders, ants, and silverfish.",
+            tag: "Family Safe",
+            price: "12-Mo Warranty",
+            icon: ShieldCheck,
+          },
+          {
+            title: "Rodent Baiting & Roof Cavity Proofing",
+            desc: "Tamper-proof lockable external bait stations and entry point sealing to stop rats and mice permanently.",
+            tag: "Fast Elimination",
+            price: "Fixed Quote",
+            icon: Award,
+          },
+          {
+            title: "Commercial & Restaurant HACCP Compliance",
+            desc: "Scheduled pest management plans with digital audit logbooks for hospitality and food manufacturing venues.",
+            tag: "Health Certified",
+            price: "Commercial SLA",
+            icon: Briefcase,
+          },
+        ],
+        standardBadge: "SAFETY STANDARD",
+        standardHeading: `Why ${lead.city} Calls ${lead.company}`,
+        standardItems: [
+          { title: "Zero Odour Formulations", desc: "No need to evacuate your property for hours; safe immediately after application." },
+          { title: "Licensed Technicians", desc: "All team members hold certified Australian EPA licenses and police checks." },
+          { title: "12-Month Re-Treatment", desc: "Unconditional free re-service if covered pests reappear during your warranty." },
+          { title: "Same-Day Emergency Service", desc: "Dedicated emergency vans ready for immediate wasp, rodent, or spider outbreaks." },
+        ],
+        auditHeadline: "Every 1-Second Mobile Delay Leaks 20% of Urgent Pest Calls",
+        auditSub: `When a customer discovers termites or a rodent infestation, they want a technician fast. A sluggish site makes them tap the back button. Speedcraft Studio locks in the lead in under 0.3 seconds.`,
+        auditBenefits: [
+          "Next.js App Router renders on Edge CDN in 0.28 seconds for instant mobile booking.",
+          "Zero heavy CMS plugins or WordPress bloat slowing down emergency pest triage.",
+          `Saves an estimated ~${lead.currencySymbol}${lead.estLostMonthlySpend}/mo in wasted Google ad clicks.`,
+        ],
+        socialProofHeading: `Homeowners in ${lead.city} Trust ${lead.company}`,
+        testimonials: [
+          {
+            name: "Amanda L.",
+            neighborhood: `${lead.city} West`,
+            quote: `Found active termites in our doorframe. ${lead.company} arrived in 40 minutes with thermal cameras, treated the colony, and installed a full barrier. Absolute lifesavers.`,
+          },
+          {
+            name: "Brian W.",
+            neighborhood: `${lead.city} North`,
+            quote: "Completely eliminated a terrible cockroach problem in one afternoon. Odourless, totally safe for our dogs, and zero bugs ever since.",
+          },
+        ],
+        formBadge: "PRIORITY PEST INTAKE",
+        formTitle: `Schedule Pest Treatment in ${lead.city}`,
+        formSub: "Book same-day emergency eradication or request a written quote.",
+        formLocationPlaceholder: `Your Suburb in ${lead.city}`,
+        formUrgencyOptions: [
+          "Immediate Emergency (Active Termites / Rodents)",
+          "This Week (General Pest Treatment)",
+          "Pre-Purchase Timber Pest Inspection",
+          "Commercial Venue Maintenance",
+        ],
+        formSubmitLabel: "Request Pest Treatment",
+        formSuccessHeading: "Pest Treatment Request Logged",
+        formSuccessDesc: "Your test request was processed in 0.04s. In production, this immediately notifies on-call pest technicians.",
+        footerDesc: `Licensed pest management and termite barrier installations across Greater ${lead.city}.`,
+        footerPhoneLabel: "Pest Dispatch:",
+      };
+    }
+
+    // 5. HVAC / AIR CONDITIONING & HEATING
     if (n.includes("hvac") || n.includes("air") || n.includes("cool") || n.includes("heat")) {
       return {
-        tradeTitle: "HVAC & Climate Control",
+        nicheKey: "hvac",
+        tradeTitle: "HVAC & Climate Control Specialists",
         badge: "24/7 Rapid Cooling & Heating Dispatch",
-        heroHeadline: `24/7 Emergency AC & Heating in ${lead.city}`,
+        heroHeadline: (
+          <>
+            {lead.city}&apos;s 24/7 Emergency <br className="hidden sm:inline" />
+            <span className="text-[#6FD9C1]">AC &amp; Heating Response</span>.
+          </>
+        ),
         heroSub: `Licensed master technicians on standby across Greater ${lead.city}. Upfront fixed quotes, guaranteed same-day arrival, and sub-second dispatch.`,
-        accentColor: "#0A997D", // QuickFleet Teal
-        accentMint: "#6FD9C1",
+        navBadge: `${lead.city} HVAC Dispatch`,
+        navCta: "Call Dispatch",
+        navContactLabel: "Dispatch",
+        heroCta: "Request HVAC Technician",
+        heroTrustBadges: [
+          "Zero Overtime or Heatwave Surcharges",
+          "Sub-Second 0.28s Load Speed",
+          "10-Year Workmanship Warranty",
+        ],
+        radarLabel: "DISPATCH RADAR",
+        radarSub: `Priority HVAC: ${lead.city}`,
+        partyA: { label: "Homeowner", initials: "JH", bg: "#B5D4F4", text: "#0C447C" },
+        partyB: { label: "Master Tech", icon: Flame, bg: "#CECBF6", text: "#22184A" },
+        agreementPill: { left: "Fixed Quote Agreed", right: "No Overtime" },
+        blueprintFrames: [
+          {
+            title: "▸ DISPATCH TIMELINE",
+            desc: `Average arrival time is under 45 minutes across Greater ${lead.city}. Live vehicle tracking sent to mobile.`,
+          },
+          {
+            title: "▸ UPFRONT PRICING SLA",
+            desc: "Zero surprise invoices. Written fixed quote agreed before any work starts. Zero weekend or overtime markups.",
+          },
+          {
+            title: "▸ SUB-SECOND EDGE STACK",
+            desc: `Loads in 0.28s compared to legacy WordPress (${lead.mobileLoadTimeSec}s), capturing emergency cooling and heating calls.`,
+          },
+        ],
+        stepsBadge: "How It Works",
+        stepsHeading: "Three Steps to Guaranteed Resolution",
+        stepsSub: "We eliminated phone trees, waiting queues, and surprise quotes.",
+        steps: [
+          {
+            num: "01",
+            cardBadge: "1-Tap Dispatch",
+            cardNote: "No Hold Music",
+            title: "Tap to Call or Request Dispatch",
+            desc: `Connect immediately with a licensed dispatcher in ${lead.city}. No automated bots or call centers.`,
+            icon: Phone,
+            color: "#0A997D",
+            bgColor: "#6FD9C1",
+          },
+          {
+            num: "02",
+            cardBadge: "Van En Route",
+            cardNote: "ETA: 22 Mins",
+            title: "Live Technician Tracking",
+            desc: "We assign the closest technician in your suburb. You get an exact ETA and vehicle tracking pin.",
+            icon: Navigation,
+            color: "#633806",
+            bgColor: "#F5B301",
+          },
+          {
+            num: "03",
+            cardBadge: "Fixed Invoice",
+            cardNote: "100% Backed",
+            title: "Fixed Quote & Lifetime Guarantee",
+            desc: "Your technician inspects the site, presents a written fixed quote, and executes the repair with certified parts.",
+            icon: ShieldCheck,
+            color: "#0A997D",
+            bgColor: "#CECBF6",
+          },
+        ],
+        capabilitiesBadge: "Our Capabilities",
+        capabilitiesHeading: `Specialized Services Across ${lead.city}`,
+        capabilitiesSub: "Exact solutions handled by master-certified trade technicians.",
         services: [
           {
             title: "Emergency AC Repair & Leak Stop",
@@ -342,7 +1059,7 @@ function PrototypeContent() {
             icon: Flame,
           },
           {
-            title: "Heat Pump & Furnace Restoration",
+            title: "Heat Pump & Ducted Restoration",
             desc: "Expert heat pump diagnostics, faulty ignition repairs, and electrical safety interlock testing.",
             tag: "Licensed Tech",
             price: "Upfront Pricing",
@@ -363,21 +1080,131 @@ function PrototypeContent() {
             icon: Activity,
           },
         ],
-        testimonials: [
-          { name: "Marcus Vance", neighborhood: `${lead.city} Inner West`, quote: "AC failed during a 39-degree heatwave. Technician was at our door in 32 minutes, replaced the capacitor, and had freezing air blasting before dinner." },
-          { name: "Sarah Jenkins", neighborhood: `${lead.city} Hills`, quote: "Zero guesswork or surprise fees. They gave me a fixed price before opening a single panel. Outstanding speed." },
+        standardBadge: "RESPONSE STANDARD",
+        standardHeading: `Why ${lead.city} Residents Call ${lead.company} First`,
+        standardItems: [
+          { title: "Zero Callout Fee", desc: "No fee to travel to your property when repairs are performed." },
+          { title: "Direct Master Techs", desc: "Every van is operated by a fully licensed, background-checked tradesperson." },
+          { title: "Fully Stocked Vans", desc: "94% of emergency repairs completed in a single visit with onboard inventory." },
+          { title: "Lifetime Workmanship", desc: "All labor backed by written warranty for total customer peace of mind." },
         ],
+        auditHeadline: "Every 1-Second Mobile Delay Leaks 20% of Callers",
+        auditSub: `When a homeowner experiences AC failure in a heatwave, they click the top Google ad on their phone. If your site doesn't load under 1 second, they tap back and call the next contractor.`,
+        auditBenefits: [
+          "Next.js App Router renders on Edge CDN in 0.28 seconds.",
+          "Zero heavy Elementor/WordPress plugin overhead blocking the phone dialer.",
+          `Saves an estimated ~${lead.currencySymbol}${lead.estLostMonthlySpend}/mo in wasted Google ad clicks.`,
+        ],
+        socialProofHeading: `Homeowners in ${lead.city} Trust Us`,
+        testimonials: [
+          {
+            name: "Marcus Vance",
+            neighborhood: `${lead.city} Inner West`,
+            quote: "AC failed during a 39-degree heatwave. Technician was at our door in 32 minutes, replaced the capacitor, and had freezing air blasting before dinner.",
+          },
+          {
+            name: "Sarah Jenkins",
+            neighborhood: `${lead.city} Hills`,
+            quote: "Zero guesswork or surprise fees. They gave me a fixed price before opening a single panel. Outstanding speed.",
+          },
+        ],
+        formBadge: "PRIORITY DISPATCH FORM",
+        formTitle: `Request Priority Dispatch in ${lead.city}`,
+        formSub: "Fill in your details for immediate 45-minute arrival or an upfront quote.",
+        formLocationPlaceholder: `Your Suburb in ${lead.city}`,
+        formUrgencyOptions: [
+          "Immediate Emergency (Under 45 Mins)",
+          "Today (Standard Business Hours)",
+          "Scheduled Next 48 Hours",
+          "Upfront Price Quote Only",
+        ],
+        formSubmitLabel: "Submit Emergency Request",
+        formSuccessHeading: "Simulated Dispatch Sent",
+        formSuccessDesc: "Your test request was processed in 0.04s. In production, this instantly notifies the on-call dispatcher.",
+        footerDesc: `Licensed trade contracting serving all suburbs of Greater ${lead.city}.`,
+        footerPhoneLabel: "Direct Dispatch:",
       };
     }
 
+    // 6. ROOFING
     if (n.includes("roof")) {
       return {
+        nicheKey: "roofing",
         tradeTitle: "Roofing & Storm Repairs",
         badge: "Immediate Storm Tarping & Emergency Repair",
-        heroHeadline: `Master Roof Repairs & Restoration in ${lead.city}`,
+        heroHeadline: (
+          <>
+            {lead.city}&apos;s Master <br className="hidden sm:inline" />
+            <span className="text-[#6FD9C1]">Roof Repair &amp; Restoration</span>.
+          </>
+        ),
         heroSub: `Licensed, fully insured roofing contractors serving all suburbs across Greater ${lead.city}. Written quotes, zero overtime fees, and 25-year warranties.`,
-        accentColor: "#0A997D",
-        accentMint: "#6FD9C1",
+        navBadge: `${lead.city} Roofing Dispatch`,
+        navCta: "Call Dispatch",
+        navContactLabel: "Dispatch",
+        heroCta: "Request Roofer Dispatch",
+        heroTrustBadges: [
+          "24/7 Emergency Storm Tarping",
+          "Sub-Second 0.28s Load Speed",
+          "25-Year Workmanship Warranty",
+        ],
+        radarLabel: "DISPATCH RADAR",
+        radarSub: `Priority Roofing: ${lead.city}`,
+        partyA: { label: "Homeowner", initials: "JH", bg: "#B5D4F4", text: "#0C447C" },
+        partyB: { label: "Roof Specialist", icon: ShieldCheck, bg: "#CECBF6", text: "#22184A" },
+        agreementPill: { left: "Fixed Quote Agreed", right: "Storm Certified" },
+        blueprintFrames: [
+          {
+            title: "▸ DISPATCH TIMELINE",
+            desc: `Average emergency storm response under 45 minutes across Greater ${lead.city}. Full tarping and leak isolation.`,
+          },
+          {
+            title: "▸ UPFRONT PRICING SLA",
+            desc: "Zero surprise invoices. Written fixed quote agreed before any repairs start.",
+          },
+          {
+            title: "▸ SUB-SECOND EDGE STACK",
+            desc: `Loads in 0.28s so homeowners with storm damage get through to your crew immediately.`,
+          },
+        ],
+        stepsBadge: "How It Works",
+        stepsHeading: "Three Steps to Guaranteed Roof Integrity",
+        stepsSub: "We eliminated phone trees, waiting queues, and surprise quotes.",
+        steps: [
+          {
+            num: "01",
+            cardBadge: "1-Tap Dispatch",
+            cardNote: "Rapid Response",
+            title: "Immediate Roof Assessment",
+            desc: `Connect directly with our licensed roofing team in ${lead.city}.`,
+            icon: Phone,
+            color: "#0A997D",
+            bgColor: "#6FD9C1",
+          },
+          {
+            num: "02",
+            cardBadge: "Drone Survey",
+            cardNote: "Thermal Leak Trace",
+            title: "Site Inspection & Tarping",
+            desc: "We secure active leaks with emergency tarping and pinpoint broken tiles or flashing issues.",
+            icon: Navigation,
+            color: "#633806",
+            bgColor: "#F5B301",
+          },
+          {
+            num: "03",
+            cardBadge: "Certified Fix",
+            cardNote: "25-Yr Warranty",
+            title: "Permanent Restoration",
+            desc: "Full repairs completed with certified tiles, Colorbond steel, and watertight flashing.",
+            icon: ShieldCheck,
+            color: "#0A997D",
+            bgColor: "#CECBF6",
+          },
+        ],
+        capabilitiesBadge: "Capabilities",
+        capabilitiesHeading: `Master Roofing Capabilities in ${lead.city}`,
+        capabilitiesSub: "Licensed, fully insured roofing contractors serving all suburbs across Greater Sydney.",
         services: [
           {
             title: "Emergency Storm & Leak Isolation",
@@ -408,25 +1235,135 @@ function PrototypeContent() {
             icon: Sparkles,
           },
         ],
-        testimonials: [
-          { name: "Robert Henderson", neighborhood: `${lead.city} North`, quote: "Severe hail cracked 18 tiles causing water to pour through our ceiling. They arrived with tarps in 40 minutes and fixed it completely the next morning." },
-          { name: "Elena Morales", neighborhood: `${lead.city} Bay`, quote: "Immaculate cleanup—not a single roofing nail left in our driveway. Very honest team with upfront quotes." },
+        standardBadge: "RESPONSE STANDARD",
+        standardHeading: `Why ${lead.city} Homeowners Choose ${lead.company}`,
+        standardItems: [
+          { title: "Zero Callout Fee", desc: "No fee to travel to your property when repairs are performed." },
+          { title: "Master Roofers", desc: "Every project handled by fully licensed, insured roofing specialists." },
+          { title: "Insurance Claim Reports", desc: "Detailed photographic and drone reports formatted for insurance assessors." },
+          { title: "Lifetime Workmanship", desc: "All labor backed by written warranty for total customer peace of mind." },
         ],
+        auditHeadline: "Every 1-Second Mobile Delay Leaks 20% of Roofing Calls",
+        auditSub: `When a storm hits, homeowners search frantically on their phones. If your page takes 3 seconds to load, they tap the next contractor.`,
+        auditBenefits: [
+          "Next.js App Router renders on Edge CDN in 0.28 seconds.",
+          "Zero heavy Elementor plugins blocking the call button.",
+          `Saves an estimated ~${lead.currencySymbol}${lead.estLostMonthlySpend}/mo in wasted Google ad clicks.`,
+        ],
+        socialProofHeading: `Homeowners in ${lead.city} Trust Us`,
+        testimonials: [
+          {
+            name: "Robert Henderson",
+            neighborhood: `${lead.city} North`,
+            quote: "Severe hail cracked 18 tiles causing water to pour through our ceiling. They arrived with tarps in 40 minutes and fixed it completely the next morning.",
+          },
+          {
+            name: "Elena Morales",
+            neighborhood: `${lead.city} Bay`,
+            quote: "Immaculate cleanup—not a single roofing nail left in our driveway. Very honest team with upfront quotes.",
+          },
+        ],
+        formBadge: "PRIORITY DISPATCH FORM",
+        formTitle: `Request Roofing Dispatch in ${lead.city}`,
+        formSub: "Fill in your details for immediate emergency tarping or an upfront quote.",
+        formLocationPlaceholder: `Your Suburb in ${lead.city}`,
+        formUrgencyOptions: [
+          "Emergency Active Leak (Tarping Needed)",
+          "Storm Damage Assessment",
+          "Full Roof Restoration Quote",
+          "Gutter & Downpipe Repair",
+        ],
+        formSubmitLabel: "Submit Roofing Request",
+        formSuccessHeading: "Simulated Dispatch Sent",
+        formSuccessDesc: "Your test request was processed in 0.04s. In production, this instantly notifies the on-call roofer.",
+        footerDesc: `Licensed trade contracting serving all suburbs of Greater ${lead.city}.`,
+        footerPhoneLabel: "Direct Dispatch:",
       };
     }
 
+    // 7. ELECTRICAL
     if (n.includes("electr") || n.includes("power")) {
       return {
-        tradeTitle: "Electrical Specialists",
-        badge: "24/7 Master Electrician Emergency Dispatch",
-        heroHeadline: `24/7 Master Electricians in ${lead.city}`,
+        nicheKey: "electrical",
+        tradeTitle: "Licensed Master Electricians",
+        badge: "24/7 Master Electrician Rapid Response",
+        heroHeadline: (
+          <>
+            {lead.city}&apos;s 24/7 Master <br className="hidden sm:inline" />
+            <span className="text-[#6FD9C1]">Electrical Emergency Response</span>.
+          </>
+        ),
         heroSub: `Immediate safety dispatch across Greater ${lead.city}. Switchboard upgrades, outage restoration, upfront fixed pricing, and clean work.`,
-        accentColor: "#0A997D",
-        accentMint: "#6FD9C1",
+        navBadge: `${lead.city} Electrician Dispatch`,
+        navCta: "Call Dispatch",
+        navContactLabel: "Dispatch",
+        heroCta: "Request Electrician Dispatch",
+        heroTrustBadges: [
+          "Zero Callout Fee With Work",
+          "Sub-Second 0.28s Load Speed",
+          "100% Written Workmanship Guarantee",
+        ],
+        radarLabel: "DISPATCH RADAR",
+        radarSub: `Priority Electrical: ${lead.city}`,
+        partyA: { label: "Homeowner", initials: "JH", bg: "#B5D4F4", text: "#0C447C" },
+        partyB: { label: "Master Tech", icon: Zap, bg: "#CECBF6", text: "#22184A" },
+        agreementPill: { left: "Fixed Quote Agreed", right: "Full Compliance" },
+        blueprintFrames: [
+          {
+            title: "▸ DISPATCH TIMELINE",
+            desc: `Average arrival time is under 45 minutes across Greater ${lead.city}. Live vehicle tracking sent to mobile.`,
+          },
+          {
+            title: "▸ UPFRONT PRICING SLA",
+            desc: "Zero surprise invoices. Written fixed quote agreed before any work starts. Zero weekend or overtime markups.",
+          },
+          {
+            title: "▸ SUB-SECOND EDGE STACK",
+            desc: `Loads in 0.28s compared to slow WordPress (${lead.mobileLoadTimeSec}s), capturing emergency electrical calls.`,
+          },
+        ],
+        stepsBadge: "How It Works",
+        stepsHeading: "Three Steps to Guaranteed Resolution",
+        stepsSub: "We eliminated phone trees, waiting queues, and surprise quotes.",
+        steps: [
+          {
+            num: "01",
+            cardBadge: "1-Tap Dispatch",
+            cardNote: "Direct Line",
+            title: "Tap to Call or Request Dispatch",
+            desc: `Connect immediately with a licensed dispatcher in ${lead.city}.`,
+            icon: Phone,
+            color: "#0A997D",
+            bgColor: "#6FD9C1",
+          },
+          {
+            num: "02",
+            cardBadge: "Van En Route",
+            cardNote: "ETA: 22 Mins",
+            title: "Live Electrician Tracking",
+            desc: "We assign the closest licensed electrician in your suburb with live ETA tracking.",
+            icon: Navigation,
+            color: "#633806",
+            bgColor: "#F5B301",
+          },
+          {
+            num: "03",
+            cardBadge: "Fixed Invoice",
+            cardNote: "Safety Certified",
+            title: "Fixed Quote & Compliance Certificate",
+            desc: "Site inspection, transparent quote, and safety certificate issued on completion.",
+            icon: ShieldCheck,
+            color: "#0A997D",
+            bgColor: "#CECBF6",
+          },
+        ],
+        capabilitiesBadge: "Our Capabilities",
+        capabilitiesHeading: `Electrical Capabilities in ${lead.city}`,
+        capabilitiesSub: "Exact solutions handled by master-certified trade technicians.",
         services: [
           {
             title: "Power Outage & Circuit Fault Finding",
-            desc: `Acoustic and thermal detection to locate short circuits and trip switches safely across ${lead.city}.`,
+            desc: `Thermal detection to locate short circuits and trip switches safely across ${lead.city}.`,
             tag: "Immediate Priority",
             price: "Fixed Quote",
             icon: Zap,
@@ -453,21 +1390,130 @@ function PrototypeContent() {
             icon: Award,
           },
         ],
-        testimonials: [
-          { name: "Daniel Craig", neighborhood: `${lead.city} East`, quote: "Our main switchboard started humming and sparking on a Sunday evening. The electrician was here in 35 minutes, safely replaced the breaker, and explained everything." },
-          { name: "Jessica Taylor", neighborhood: `${lead.city} Central`, quote: "Installed a dedicated Tesla charger and overhauled our old fuses. Clean, punctual, and zero hidden costs." },
+        standardBadge: "RESPONSE STANDARD",
+        standardHeading: `Why ${lead.city} Residents Call ${lead.company}`,
+        standardItems: [
+          { title: "Zero Callout Fee", desc: "No fee to travel to your property when repairs are performed." },
+          { title: "Direct Master Techs", desc: "Every van is operated by a fully licensed, background-checked tradesperson." },
+          { title: "Fully Stocked Vans", desc: "94% of emergency repairs completed in a single visit with onboard inventory." },
+          { title: "Lifetime Workmanship", desc: "All labor backed by written warranty for total customer peace of mind." },
         ],
+        auditHeadline: "Every 1-Second Mobile Delay Leaks 20% of Electrical Emergency Calls",
+        auditSub: `When a main switchboard sparks or power trips, homeowners dial the first result. If your site stutters, they call someone else.`,
+        auditBenefits: [
+          "Next.js App Router renders on Edge CDN in 0.28 seconds.",
+          "Zero heavy Elementor plugin overhead blocking the phone dialer.",
+          `Saves an estimated ~${lead.currencySymbol}${lead.estLostMonthlySpend}/mo in wasted Google ad clicks.`,
+        ],
+        socialProofHeading: `Homeowners in ${lead.city} Trust Us`,
+        testimonials: [
+          {
+            name: "Daniel Craig",
+            neighborhood: `${lead.city} East`,
+            quote: "Our main switchboard started humming and sparking on a Sunday evening. The electrician was here in 35 minutes, safely replaced the breaker, and explained everything.",
+          },
+          {
+            name: "Jessica Taylor",
+            neighborhood: `${lead.city} Central`,
+            quote: "Installed a dedicated Tesla charger and overhauled our old fuses. Clean, punctual, and zero hidden costs.",
+          },
+        ],
+        formBadge: "PRIORITY DISPATCH FORM",
+        formTitle: `Request Electrical Dispatch in ${lead.city}`,
+        formSub: "Fill in your details for immediate 45-minute arrival or an upfront quote.",
+        formLocationPlaceholder: `Your Suburb in ${lead.city}`,
+        formUrgencyOptions: [
+          "Immediate Emergency (Under 45 Mins)",
+          "Today (Standard Business Hours)",
+          "Switchboard Upgrade Quote",
+          "EV Charger Installation",
+        ],
+        formSubmitLabel: "Submit Electrical Request",
+        formSuccessHeading: "Simulated Dispatch Sent",
+        formSuccessDesc: "Your test request was processed in 0.04s. In production, this instantly notifies the on-call electrician.",
+        footerDesc: `Licensed trade contracting serving all suburbs of Greater ${lead.city}.`,
+        footerPhoneLabel: "Direct Dispatch:",
       };
     }
 
-    // Default: Plumbing
+    // 8. PLUMBING (DEFAULT TRADE FALLBACK)
     return {
-      tradeTitle: "Emergency Plumbing & Drains",
+      nicheKey: "plumbing",
+      tradeTitle: "Emergency Plumbing & Drain Specialists",
       badge: "24/7 Rapid Emergency Response Across City",
-      heroHeadline: `24/7 Emergency Plumbers in ${lead.city}`,
+      heroHeadline: (
+        <>
+          {lead.city}&apos;s 24/7 Emergency <br className="hidden sm:inline" />
+          <span className="text-[#6FD9C1]">Plumbing Response</span>.
+        </>
+      ),
       heroSub: `Immediate dispatch across Greater ${lead.city}. Upfront fixed pricing, zero callout fees with work, and licensed master plumbers arriving in under 45 minutes.`,
-      accentColor: "#0A997D",
-      accentMint: "#6FD9C1",
+      navBadge: `${lead.city} Dispatch`,
+      navCta: "Call Dispatch",
+      navContactLabel: "Dispatch",
+      heroCta: "Request Dispatcher",
+      heroTrustBadges: [
+        "Zero Callout Fee With Work",
+        "Sub-Second 0.28s Load Speed",
+        "100% Written Workmanship Guarantee",
+      ],
+      radarLabel: "DISPATCH RADAR",
+      radarSub: `Priority Callout: ${lead.city}`,
+      partyA: { label: "Homeowner", initials: "JH", bg: "#B5D4F4", text: "#0C447C" },
+      partyB: { label: "Master Tech", icon: Droplets, bg: "#CECBF6", text: "#22184A" },
+      agreementPill: { left: "Upfront Quote Agreed", right: "No Overtime" },
+      blueprintFrames: [
+        {
+          title: "▸ DISPATCH TIMELINE",
+          desc: `Average arrival time is under 45 minutes across Greater ${lead.city}. Live vehicle tracking sent to mobile.`,
+        },
+        {
+          title: "▸ UPFRONT PRICING SLA",
+          desc: "Zero surprise invoices. Written fixed quote agreed before any work starts. Zero weekend or overtime markups.",
+        },
+        {
+          title: "▸ SUB-SECOND EDGE STACK",
+          desc: `Built on Next.js Edge CDN. Loads in 0.28s compared to legacy WordPress (${lead.mobileLoadTimeSec}s), capturing every phone call.`,
+        },
+      ],
+      stepsBadge: "How It Works",
+      stepsHeading: "Three Steps to Guaranteed Resolution",
+      stepsSub: "We eliminated phone trees, waiting queues, and surprise quotes.",
+      steps: [
+        {
+          num: "01",
+          cardBadge: "1-Tap Dispatch",
+          cardNote: "No Hold Music",
+          title: "Tap to Call or Request Dispatch",
+          desc: `Connect immediately with a licensed dispatcher in ${lead.city}. No automated bots or outsourced call centers.`,
+          icon: Phone,
+          color: "#0A997D",
+          bgColor: "#6FD9C1",
+        },
+        {
+          num: "02",
+          cardBadge: "Van #12 En Route",
+          cardNote: "ETA: 22 Mins",
+          title: "Live Technician Tracking",
+          desc: "We assign the closest technician in your suburb. You get an exact ETA and vehicle tracking pin to your phone.",
+          icon: Navigation,
+          color: "#633806",
+          bgColor: "#F5B301",
+        },
+        {
+          num: "03",
+          cardBadge: "Fixed Invoice",
+          cardNote: "100% Backed",
+          title: "Fixed Quote & Lifetime Guarantee",
+          desc: "Your technician inspects the site, presents a written fixed quote, and executes the repair with certified parts.",
+          icon: ShieldCheck,
+          color: "#0A997D",
+          bgColor: "#CECBF6",
+        },
+      ],
+      capabilitiesBadge: "Our Capabilities",
+      capabilitiesHeading: `Specialized Services Across ${lead.city}`,
+      capabilitiesSub: "Exact solutions handled by master-certified trade technicians.",
       services: [
         {
           title: "Burst Pipes & Acoustic Leak Detection",
@@ -498,18 +1544,57 @@ function PrototypeContent() {
           icon: ShieldCheck,
         },
       ],
-      testimonials: [
-        { name: "James Wilson", neighborhood: `${lead.city} Suburbs`, quote: "Burst pipe under our bathroom floor at 11:30 PM. Their plumber arrived in 30 minutes, isolated the mains, and repaired the copper pipe cleanly." },
-        { name: "Claire Bennett", neighborhood: `${lead.city} North`, quote: "Upfront quote before any tool touched our house. They cleared a massive tree root obstruction with high-pressure jetting in under an hour." },
+      standardBadge: "RESPONSE STANDARD",
+      standardHeading: `Why ${lead.city} Residents Call ${lead.company} First`,
+      standardItems: [
+        { title: "Zero Callout Fee", desc: "No fee to travel to your property when repairs are performed." },
+        { title: "Direct Master Techs", desc: "Every van is operated by a fully licensed, background-checked tradesperson." },
+        { title: "Fully Stocked Vans", desc: "94% of emergency repairs completed in a single visit with onboard inventory." },
+        { title: "Lifetime Workmanship", desc: "All labor backed by written warranty for total customer peace of mind." },
       ],
+      auditHeadline: "Every 1-Second Mobile Delay Leaks 20% of Callers",
+      auditSub: `When a homeowner has an emergency, they click the top Google ad on their phone. If your site doesn't load under 1 second, they tap back and call the next contractor.`,
+      auditBenefits: [
+        "Next.js App Router renders on Edge CDN in 0.28 seconds.",
+        "Zero heavy Elementor/WordPress plugin overhead blocking the phone dialer.",
+        `Saves an estimated ~${lead.currencySymbol}${lead.estLostMonthlySpend}/mo in wasted Google ad clicks.`,
+      ],
+      socialProofHeading: `Homeowners in ${lead.city} Trust Us`,
+      testimonials: [
+        {
+          name: "James Wilson",
+          neighborhood: `${lead.city} Suburbs`,
+          quote: "Burst pipe under our bathroom floor at 11:30 PM. Their plumber arrived in 30 minutes, isolated the mains, and repaired the copper pipe cleanly.",
+        },
+        {
+          name: "Claire Bennett",
+          neighborhood: `${lead.city} North`,
+          quote: "Upfront quote before any tool touched our house. They cleared a massive tree root obstruction with high-pressure jetting in under an hour.",
+        },
+      ],
+      formBadge: "PRIORITY DISPATCH FORM",
+      formTitle: `Request Priority Dispatch in ${lead.city}`,
+      formSub: "Fill in your details for immediate 45-minute arrival or an upfront quote.",
+      formLocationPlaceholder: `Your Suburb in ${lead.city}`,
+      formUrgencyOptions: [
+        "Immediate Emergency (Under 45 Mins)",
+        "Today (Standard Business Hours)",
+        "Scheduled Next 48 Hours",
+        "Upfront Price Quote Only",
+      ],
+      formSubmitLabel: "Submit Emergency Request",
+      formSuccessHeading: "Simulated Dispatch Sent",
+      formSuccessDesc: "Your test request was processed in 0.04s. In production, this instantly notifies the on-call dispatcher.",
+      footerDesc: `Licensed trade contracting serving all suburbs of Greater ${lead.city}.`,
+      footerPhoneLabel: "Direct Dispatch:",
     };
-  }, [lead.niche, lead.city]);
+  }, [lead.niche, lead.city, lead.company, lead.mobileLoadTimeSec, lead.currencySymbol, lead.estLostMonthlySpend]);
 
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: customVisualStyles }} />
 
-      <div className="min-h-screen bg-[#FFFFFF] text-[#0A0A0D] antialiased selection:bg-[#6FD9C1] selection:text-[#0C0730]" style={{ paddingBottom: "92px" }}>
+      <div className="min-h-screen bg-[#FFFFFF] text-[#0A0A0D] antialiased selection:bg-[#6FD9C1] selection:text-[#0C0730] pb-24 sm:pb-16">
         
         {/* ═══════════════════════════════════════════════════════════════
             SANDBOX POPUP TOAST (use.live / quickfleet tactile feedback)
@@ -525,7 +1610,7 @@ function PrototypeContent() {
                   {sandboxAlert.linkName || "Link"} Clicked in Speed Prototype
                 </p>
                 <p className="text-[12px] text-white/70 mt-1 leading-snug">
-                  Navigation is sandboxed to keep this benchmark focused strictly on mobile conversion and instant load speeds.
+                  Navigation is sandboxed to keep this benchmark focused strictly on conversion and instant load speeds.
                 </p>
               </div>
               <button
@@ -542,8 +1627,8 @@ function PrototypeContent() {
         {/* ═══════════════════════════════════════════════════════════════
             HEADER: QUICKFLEET FROSTED PILL NAVIGATION BAR
             - Centered segmented menu pill (#F3F1EC)
-            - Pulsing live dispatch beacon
-            - Ghost + solid ink action buttons
+            - Pulsing live status beacon
+            - Dialable phone call button
         ═══════════════════════════════════════════════════════════════ */}
         <header className="sticky top-0 z-40 px-3 sm:px-6 pt-3 pb-2 transition-all">
           <nav className="max-w-[1200px] mx-auto flex items-center justify-between gap-2 rounded-full bg-white/85 p-1.5 pl-4 sm:pl-6 shadow-[0_8px_24px_-12px_rgba(12,7,48,0.18)] ring-1 ring-black/[0.07] backdrop-blur-md">
@@ -560,7 +1645,7 @@ function PrototypeContent() {
                   </span>
                   <span className="flex items-center gap-1.5 text-[10.5px] font-mono tracking-wider uppercase text-[#0A997D] font-semibold">
                     <span className="qf-status-dot" />
-                    <span>{lead.city} Dispatch</span>
+                    <span>{nicheConfig.navBadge}</span>
                   </span>
                 </div>
               </Link>
@@ -580,7 +1665,7 @@ function PrototypeContent() {
               </li>
               <li>
                 <a href="#process" className="px-3.5 py-1.5 rounded-full hover:bg-white hover:shadow-xs transition">
-                  Response SLA
+                  Standard
                 </a>
               </li>
               <li>
@@ -590,7 +1675,7 @@ function PrototypeContent() {
               </li>
               <li>
                 <a href="#quote-form" className="px-3.5 py-1.5 rounded-full hover:bg-white hover:shadow-xs transition">
-                  Dispatch
+                  {nicheConfig.navContactLabel}
                 </a>
               </li>
             </ul>
@@ -613,7 +1698,7 @@ function PrototypeContent() {
                 style={{ minHeight: 44 }}
               >
                 <Phone className="w-3.5 h-3.5 text-[#6FD9C1]" />
-                <span>Call Dispatch</span>
+                <span>{nicheConfig.navCta}</span>
                 <ArrowRight className="w-3.5 h-3.5 text-white/60 hidden sm:inline" />
               </a>
             </div>
@@ -623,7 +1708,7 @@ function PrototypeContent() {
         {/* ═══════════════════════════════════════════════════════════════
             HERO CONTAINER: QUICKFLEET OUTER FRAME + USE.LIVE TACTILE CORE
             - Deep brand navy canvas (#0C0730)
-            - Ambient radial mint & gold mesh glow
+            - Ambient radial mesh glow
             - Tactical Call Card Centerpiece with equalizer and live ticker
         ═══════════════════════════════════════════════════════════════ */}
         <div className="px-2 sm:px-4 md:px-6 pt-2 pb-8 max-w-[1360px] mx-auto">
@@ -656,10 +1741,9 @@ function PrototypeContent() {
                     </span>
                   </div>
 
-                  {/* Main Punchy Headline (use.live font weight & line-height) */}
+                  {/* Main Punchy Headline */}
                   <h1 className="text-[32px] sm:text-[46px] md:text-[54px] font-extrabold leading-[1.04] tracking-tight text-white">
-                    {lead.city}&apos;s Emergency <br className="hidden sm:inline" />
-                    <span className="text-[#6FD9C1]">{lead.niche} Response</span>.
+                    {nicheConfig.heroHeadline}
                   </h1>
 
                   <p className="text-[15px] sm:text-[17px] text-white/75 font-medium leading-relaxed max-w-xl">
@@ -670,14 +1754,14 @@ function PrototypeContent() {
                   <div className="rounded-[24px] bg-white/10 p-3 sm:p-4 backdrop-blur-md ring-1 ring-white/20 shadow-2xl max-w-xl">
                     <form onSubmit={handleBookingSubmit} className="space-y-2.5">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {/* Suburb input */}
+                        {/* Suburb / Location input */}
                         <div className="relative">
                           <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px] text-white/50 font-bold">
                             <MapPin className="w-4 h-4 text-[#6FD9C1]" />
                           </span>
                           <input
                             type="text"
-                            placeholder={`Your Suburb in ${lead.city}`}
+                            placeholder={nicheConfig.formLocationPlaceholder}
                             value={bookingData.suburb}
                             onChange={(e) => setBookingData({ ...bookingData, suburb: e.target.value })}
                             className="h-12 w-full rounded-2xl border border-white/15 bg-white/10 px-4 pl-9 text-[14px] text-white font-bold outline-none placeholder:text-white/40 focus:border-[#6FD9C1] focus:bg-white/15 transition"
@@ -712,7 +1796,7 @@ function PrototypeContent() {
                             <RotateCcw className="w-4 h-4 animate-spin text-[#0C0730]" />
                           ) : (
                             <>
-                              <span>Request Dispatcher</span>
+                              <span>{nicheConfig.heroCta}</span>
                               <ArrowRight className="w-4 h-4" />
                             </>
                           )}
@@ -731,22 +1815,16 @@ function PrototypeContent() {
 
                   {/* Trust Highlights */}
                   <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-1 text-[12.5px] font-semibold text-white/80">
-                    <span className="flex items-center gap-1.5">
-                      <Check className="w-4 h-4 text-[#6FD9C1]" />
-                      <span>Zero Callout Fee With Work</span>
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <Check className="w-4 h-4 text-[#6FD9C1]" />
-                      <span>Sub-Second 0.28s Load Speed</span>
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <Check className="w-4 h-4 text-[#6FD9C1]" />
-                      <span>100% Written Workmanship Guarantee</span>
-                    </span>
+                    {nicheConfig.heroTrustBadges.map((badge, idx) => (
+                      <span key={idx} className="flex items-center gap-1.5">
+                        <Check className="w-4 h-4 text-[#6FD9C1]" />
+                        <span>{badge}</span>
+                      </span>
+                    ))}
                   </div>
                 </div>
 
-                {/* ─── Hero Right: The Iconic use.live Call/Dispatch Card (5 Cols) ─── */}
+                {/* ─── Hero Right: The Iconic use.live Call/Stage Card (5 Cols) ─── */}
                 <div className="lg:col-span-5 relative flex justify-center items-center">
                   
                   {/* Floating Micro-Badges (Use.Live signature) */}
@@ -760,7 +1838,7 @@ function PrototypeContent() {
                   <div className="live-float-2 absolute -bottom-4 -left-4 sm:left-0 z-20">
                     <span className="flex items-center gap-2 rounded-full bg-white px-3.5 py-2 text-[12px] font-extrabold text-[#0C0730] shadow-[0_12px_30px_rgba(0,0,0,0.3)] ring-1 ring-black/10">
                       <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
-                      <span>Tech En Route · 14m ETA</span>
+                      <span>Direct Local Contact</span>
                     </span>
                   </div>
 
@@ -771,7 +1849,7 @@ function PrototypeContent() {
                     </span>
                   </div>
 
-                  {/* Centered Main Live Dispatch Card */}
+                  {/* Centered Main Live Widget Card */}
                   <div className="relative w-full max-w-[340px] rounded-[30px] bg-white text-[#0A0A0D] p-5 shadow-[0_30px_70px_-20px_rgba(0,0,0,0.6)] ring-1 ring-black/10">
                     
                     {/* Header: Live Badge + Ticker */}
@@ -781,14 +1859,14 @@ function PrototypeContent() {
                           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#10B981] opacity-60" />
                           <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#10B981]" />
                         </span>
-                        <span>DISPATCH RADAR</span>
+                        <span>{nicheConfig.radarLabel}</span>
                       </span>
                       <span className="font-mono text-black/50 tabular-nums">00:42 LIVE</span>
                     </div>
 
                     <div className="mt-3">
                       <p className="text-[15px] font-extrabold leading-tight text-[#0C0730]">
-                        Priority Callout: {lead.city}
+                        {nicheConfig.radarSub}
                       </p>
                       <p className="text-[12px] text-black/55 font-medium mt-0.5">
                         {nicheConfig.tradeTitle}
@@ -797,12 +1875,17 @@ function PrototypeContent() {
 
                     {/* Tactile Audio Connection Stage (use.live signature) */}
                     <div className="relative mt-5 flex items-center justify-between px-2">
-                      {/* Customer Squircle */}
+                      {/* Customer / Client Squircle */}
                       <div className="flex flex-col items-center gap-1.5">
-                        <span className="w-13 h-13 rounded-[38%] bg-[#B5D4F4] text-[#0C447C] font-extrabold text-[18px] flex items-center justify-center shadow-md ring-2 ring-white">
-                          JH
+                        <span
+                          className="w-13 h-13 rounded-[38%] font-extrabold text-[18px] flex items-center justify-center shadow-md ring-2 ring-white"
+                          style={{ backgroundColor: nicheConfig.partyA.bg, color: nicheConfig.partyA.text }}
+                        >
+                          {nicheConfig.partyA.initials}
                         </span>
-                        <span className="text-[11px] font-extrabold text-black/70">Homeowner</span>
+                        <span className="text-[11px] font-extrabold text-black/70">
+                          {nicheConfig.partyA.label}
+                        </span>
                       </div>
 
                       {/* Equalizer Sound Waves */}
@@ -814,12 +1897,17 @@ function PrototypeContent() {
                         <span />
                       </div>
 
-                      {/* Master Tech Squircle */}
+                      {/* Professional Squircle */}
                       <div className="flex flex-col items-center gap-1.5">
-                        <span className="w-13 h-13 rounded-[38%] bg-[#CECBF6] text-[#22184A] font-extrabold text-[18px] flex items-center justify-center shadow-md ring-2 ring-white">
-                          <ShieldCheck className="w-6 h-6 text-[#0A997D]" />
+                        <span
+                          className="w-13 h-13 rounded-[38%] font-extrabold text-[18px] flex items-center justify-center shadow-md ring-2 ring-white"
+                          style={{ backgroundColor: nicheConfig.partyB.bg, color: nicheConfig.partyB.text }}
+                        >
+                          {React.createElement(nicheConfig.partyB.icon, { className: "w-6 h-6 text-[#0A997D]" })}
                         </span>
-                        <span className="text-[11px] font-extrabold text-black/70">Master Tech</span>
+                        <span className="text-[11px] font-extrabold text-black/70">
+                          {nicheConfig.partyB.label}
+                        </span>
                       </div>
 
                       {/* Gliding Status Token */}
@@ -831,13 +1919,15 @@ function PrototypeContent() {
                       </span>
                     </div>
 
-                    {/* Upfront Price Receipt Pill */}
+                    {/* Upfront Agreement Pill */}
                     <div className="mt-5 flex items-center justify-between rounded-2xl bg-[#6FD9C1]/15 px-3.5 py-2.5 border border-[#6FD9C1]/30">
                       <span className="flex items-center gap-1.5 text-[12.5px] font-extrabold text-[#0A997D]">
                         <CheckCircle className="w-4 h-4 text-[#0A997D]" />
-                        <span>Upfront Quote Agreed</span>
+                        <span>{nicheConfig.agreementPill.left}</span>
                       </span>
-                      <span className="text-[12px] font-bold text-black/55 font-mono">No Overtime</span>
+                      <span className="text-[12px] font-bold text-black/55 font-mono">
+                        {nicheConfig.agreementPill.right}
+                      </span>
                     </div>
 
                     {/* Instant Call Button inside widget */}
@@ -862,146 +1952,91 @@ function PrototypeContent() {
         ═══════════════════════════════════════════════════════════════ */}
         <section className="px-4 sm:px-6 py-6 max-w-[1240px] mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="qf-frame text-[#0C0730]">
-              <span className="block font-mono text-[11px] font-bold tracking-wider text-[#0A997D] uppercase mb-1">
-                ▸ DISPATCH TIMELINE
-              </span>
-              <p className="text-[13.5px] text-[#0A0A0D]/80 leading-snug">
-                Average arrival time is <strong className="text-[#0C0730]">under 45 minutes</strong> across Greater {lead.city}. Live vehicle tracking sent to mobile.
-              </p>
-            </div>
-
-            <div className="qf-frame text-[#0C0730]">
-              <span className="block font-mono text-[11px] font-bold tracking-wider text-[#0A997D] uppercase mb-1">
-                ▸ UPFRONT PRICING SLA
-              </span>
-              <p className="text-[13.5px] text-[#0A0A0D]/80 leading-snug">
-                Zero surprise invoices. Written fixed quote agreed <strong className="text-[#0C0730]">before any work starts</strong>. Zero weekend or overtime markups.
-              </p>
-            </div>
-
-            <div className="qf-frame text-[#0C0730]">
-              <span className="block font-mono text-[11px] font-bold tracking-wider text-[#0A997D] uppercase mb-1">
-                ▸ SUB-SECOND EDGE STACK
-              </span>
-              <p className="text-[13.5px] text-[#0A0A0D]/80 leading-snug">
-                Built on Next.js Edge CDN. Loads in <strong className="text-[#0A997D]">0.28s</strong> compared to legacy WordPress ({lead.mobileLoadTimeSec}s), capturing every phone call.
-              </p>
-            </div>
+            {nicheConfig.blueprintFrames.map((frame, idx) => (
+              <div key={idx} className="qf-frame text-[#0C0730]">
+                <span className="block font-mono text-[11px] font-bold tracking-wider text-[#0A997D] uppercase mb-1">
+                  {frame.title}
+                </span>
+                <p className="text-[13.5px] text-[#0A0A0D]/80 leading-snug">
+                  {frame.desc}
+                </p>
+              </div>
+            ))}
           </div>
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
-            "THREE STEPS TO SERVICE" BENTO GRID (use.live 01/02/03)
+            "THREE STEPS" BENTO GRID (use.live 01/02/03)
         ═══════════════════════════════════════════════════════════════ */}
         <section id="how-it-works" className="px-4 sm:px-6 py-12 md:py-18 max-w-[1200px] mx-auto">
           <div className="text-center max-w-xl mx-auto mb-10 sm:mb-12">
             <span className="inline-flex rounded-full bg-[#0A997D]/10 px-3.5 py-1 text-[12px] font-extrabold text-[#0A997D]">
-              How It Works
+              {nicheConfig.stepsBadge}
             </span>
             <h2 className="mt-3 text-[28px] sm:text-[38px] font-extrabold tracking-tight text-[#0C0730] leading-tight">
-              Three Steps to Guaranteed Resolution
+              {nicheConfig.stepsHeading}
             </h2>
             <p className="mt-2 text-[15px] text-[#0A0A0D]/60 font-medium">
-              We eliminated phone trees, waiting queues, and surprise quotes.
+              {nicheConfig.stepsSub}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {/* Step 01 */}
-            <div className="tactile-lift rounded-[28px] bg-white ring-1 ring-black/[0.07] shadow-[0_16px_40px_-28px_rgba(12,7,48,0.2)] p-2.5 flex flex-col justify-between">
-              <div className="h-[185px] rounded-[22px] bg-[#6FD9C1]/15 p-4 flex flex-col justify-center items-center gap-3">
-                <div className="rounded-2xl bg-white p-3 shadow-md ring-1 ring-black/5 flex items-center gap-3 w-full max-w-[210px]">
-                  <span className="w-8 h-8 rounded-full bg-[#0A997D] text-white flex items-center justify-center font-bold text-xs">
-                    <Phone className="w-4 h-4" />
-                  </span>
-                  <div className="min-w-0">
-                    <div className="text-[12px] font-extrabold text-[#0C0730]">1-Tap Dispatch</div>
-                    <div className="text-[11px] font-mono text-[#0A997D]">No Hold Music</div>
+            {nicheConfig.steps.map((step, idx) => {
+              const StepIcon = step.icon;
+              return (
+                <div
+                  key={idx}
+                  className="tactile-lift rounded-[28px] bg-white ring-1 ring-black/[0.07] shadow-[0_16px_40px_-28px_rgba(12,7,48,0.2)] p-2.5 flex flex-col justify-between"
+                >
+                  <div
+                    className="h-[185px] rounded-[22px] p-4 flex flex-col justify-center items-center gap-3"
+                    style={{ backgroundColor: `${step.bgColor}22` }}
+                  >
+                    <div className="rounded-2xl bg-white p-3 shadow-md ring-1 ring-black/5 flex items-center gap-3 w-full max-w-[215px]">
+                      <span
+                        className="w-8 h-8 rounded-full text-white flex items-center justify-center font-bold text-xs"
+                        style={{ backgroundColor: step.color }}
+                      >
+                        <StepIcon className="w-4 h-4" />
+                      </span>
+                      <div className="min-w-0">
+                        <div className="text-[12px] font-extrabold text-[#0C0730]">{step.cardBadge}</div>
+                        <div className="text-[11px] font-mono text-[#0A997D] truncate">{step.cardNote}</div>
+                      </div>
+                    </div>
+                    <span className="text-[11px] font-mono font-semibold text-[#0C0730] bg-white/70 px-3 py-1 rounded-full">
+                      Step {step.num}
+                    </span>
+                  </div>
+                  <div className="px-3 pb-3 pt-4">
+                    <span className="text-[13px] font-extrabold text-black/35 font-mono">{step.num}</span>
+                    <h3 className="mt-0.5 text-[18px] font-extrabold text-[#0C0730] tracking-tight">
+                      {step.title}
+                    </h3>
+                    <p className="mt-1.5 text-[13.5px] font-medium leading-snug text-black/60">
+                      {step.desc}
+                    </p>
                   </div>
                 </div>
-                <span className="text-[11px] font-mono font-semibold text-[#0A997D] bg-white/70 px-3 py-1 rounded-full">
-                  Average pickup: 12 seconds
-                </span>
-              </div>
-              <div className="px-3 pb-3 pt-4">
-                <span className="text-[13px] font-extrabold text-black/35 font-mono">01</span>
-                <h3 className="mt-0.5 text-[18px] font-extrabold text-[#0C0730] tracking-tight">
-                  Tap to Call or Request Dispatch
-                </h3>
-                <p className="mt-1.5 text-[13.5px] font-medium leading-snug text-black/60">
-                  Connect immediately with a licensed dispatcher in {lead.city}. No automated bots or outsourced call centers.
-                </p>
-              </div>
-            </div>
-
-            {/* Step 02 */}
-            <div className="tactile-lift rounded-[28px] bg-white ring-1 ring-black/[0.07] shadow-[0_16px_40px_-28px_rgba(12,7,48,0.2)] p-2.5 flex flex-col justify-between">
-              <div className="h-[185px] rounded-[22px] bg-[#F5B301]/15 p-4 flex flex-col justify-center items-center gap-3">
-                <div className="rounded-2xl bg-white p-3 shadow-md ring-1 ring-black/5 flex items-center gap-3 w-full max-w-[220px]">
-                  <span className="w-8 h-8 rounded-full bg-[#F5B301] text-[#633806] flex items-center justify-center font-bold text-xs">
-                    <Navigation className="w-4 h-4" />
-                  </span>
-                  <div className="min-w-0">
-                    <div className="text-[12px] font-extrabold text-[#0C0730]">Van #12 En Route</div>
-                    <div className="text-[11px] font-mono text-black/55">ETA: 22 Mins</div>
-                  </div>
-                </div>
-                <span className="text-[11px] font-mono font-semibold text-[#633806] bg-white/70 px-3 py-1 rounded-full">
-                  Live GPS Route Updates
-                </span>
-              </div>
-              <div className="px-3 pb-3 pt-4">
-                <span className="text-[13px] font-extrabold text-black/35 font-mono">02</span>
-                <h3 className="mt-0.5 text-[18px] font-extrabold text-[#0C0730] tracking-tight">
-                  Live Technician Tracking
-                </h3>
-                <p className="mt-1.5 text-[13.5px] font-medium leading-snug text-black/60">
-                  We assign the closest technician in your suburb. You get an exact ETA and vehicle tracking pin to your phone.
-                </p>
-              </div>
-            </div>
-
-            {/* Step 03 */}
-            <div className="tactile-lift rounded-[28px] bg-white ring-1 ring-black/[0.07] shadow-[0_16px_40px_-28px_rgba(12,7,48,0.2)] p-2.5 flex flex-col justify-between">
-              <div className="h-[185px] rounded-[22px] bg-[#CECBF6]/25 p-4 flex flex-col justify-center items-center gap-3">
-                <div className="rounded-2xl bg-white p-3 shadow-md ring-1 ring-black/5 flex items-center justify-between w-full max-w-[210px]">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-5 h-5 text-[#0A997D]" />
-                    <span className="text-[12px] font-extrabold text-[#0C0730]">Fixed Invoice</span>
-                  </div>
-                  <span className="text-[12px] font-extrabold text-[#0A997D] font-mono">100% Backed</span>
-                </div>
-                <span className="text-[11px] font-mono font-semibold text-[#22184A] bg-white/70 px-3 py-1 rounded-full">
-                  Zero Overtime Charges
-                </span>
-              </div>
-              <div className="px-3 pb-3 pt-4">
-                <span className="text-[13px] font-extrabold text-black/35 font-mono">03</span>
-                <h3 className="mt-0.5 text-[18px] font-extrabold text-[#0C0730] tracking-tight">
-                  Fixed Quote & Lifetime Guarantee
-                </h3>
-                <p className="mt-1.5 text-[13.5px] font-medium leading-snug text-black/60">
-                  Your technician inspects the site, presents a written fixed quote, and executes the repair with certified parts.
-                </p>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
-            SERVICES SECTION (use.live "MADE FOR" TACTILE CARDS)
+            SERVICES / CAPABILITIES SECTION (use.live "MADE FOR" CARDS)
         ═══════════════════════════════════════════════════════════════ */}
         <section id="services" className="px-4 sm:px-6 py-12 md:py-16 max-w-[1200px] mx-auto">
           <div className="text-center max-w-xl mx-auto mb-10">
             <span className="inline-flex rounded-full bg-[#0A997D]/10 px-3.5 py-1 text-[12px] font-extrabold text-[#0A997D]">
-              Our Capabilities
+              {nicheConfig.capabilitiesBadge}
             </span>
             <h2 className="mt-3 text-[28px] sm:text-[36px] font-extrabold tracking-tight text-[#0C0730] leading-tight">
-              Specialized Services Across {lead.city}
+              {nicheConfig.capabilitiesHeading}
             </h2>
             <p className="mt-2 text-[15px] text-[#0A0A0D]/60 font-medium">
-              Exact solutions handled by master-certified trade technicians.
+              {nicheConfig.capabilitiesSub}
             </p>
           </div>
 
@@ -1037,7 +2072,7 @@ function PrototypeContent() {
                         onClick={() => setBookingData((prev) => ({ ...prev, service: svc.title }))}
                         className="text-[13px] font-extrabold text-[#0A997D] hover:underline flex items-center gap-1"
                       >
-                        <span>Book Priority Dispatch</span>
+                        <span>{nicheConfig.heroCta}</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </a>
                       <a
@@ -1063,20 +2098,15 @@ function PrototypeContent() {
           <div className="rounded-[32px] bg-[#F4F2ED] p-6 sm:p-10 md:p-12 border border-black/5">
             <div className="max-w-2xl mb-8">
               <span className="font-mono text-[11px] font-bold text-[#0A997D] uppercase tracking-wider">
-                ▸ RESPONSE STANDARD
+                ▸ {nicheConfig.standardBadge}
               </span>
               <h2 className="text-[26px] sm:text-[34px] font-extrabold text-[#0C0730] mt-2 leading-tight">
-                Why {lead.city} Residents Call {lead.company} First
+                {nicheConfig.standardHeading}
               </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {[
-                { title: "Zero Callout Fee", desc: "No fee to travel to your property when repairs are performed." },
-                { title: "Direct Master Techs", desc: "Every van is operated by a fully licensed, background-checked tradesperson." },
-                { title: "Fully Stocked Vans", desc: "94% of emergency repairs completed in a single visit with onboard inventory." },
-                { title: "Lifetime Workmanship", desc: "All labor backed by written warranty for total customer peace of mind." },
-              ].map((item, idx) => (
+              {nicheConfig.standardItems.map((item, idx) => (
                 <div
                   key={idx}
                   onClick={() => setActiveProcessTab(idx)}
@@ -1096,7 +2126,7 @@ function PrototypeContent() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
-            HIGH-CONTRAST DARK AUDIT SECTION (use.live PAYOUT EQUIVALENT)
+            HIGH-CONTRAST AUDIT SECTION
             - Deep navy (#0C0730) high-contrast card
             - Proven speed difference between slow WordPress & Next.js
         ═══════════════════════════════════════════════════════════════ */}
@@ -1110,31 +2140,21 @@ function PrototypeContent() {
                   Speedcraft Studio Performance Audit
                 </span>
                 <h2 className="mt-3 text-[28px] sm:text-[42px] font-extrabold leading-[1.05] tracking-tight">
-                  Every 1-Second Mobile Delay Leaks 20% of Callers
+                  {nicheConfig.auditHeadline}
                 </h2>
                 <p className="mt-3 text-[15px] text-white/70 font-medium leading-relaxed">
-                  When a homeowner has an emergency, they click the top Google ad on their phone. If your site doesn&apos;t load under 1 second, they tap back and call the next contractor.
+                  {nicheConfig.auditSub}
                 </p>
 
                 <ul className="mt-6 space-y-3 text-[14px] font-medium text-white/80">
-                  <li className="flex items-center gap-3">
-                    <span className="w-5 h-5 rounded-full bg-[#6FD9C1]/20 flex items-center justify-center text-[#6FD9C1] shrink-0 font-bold">
-                      ✓
-                    </span>
-                    <span>Next.js App Router renders on Edge CDN in <strong className="text-[#6FD9C1]">0.28 seconds</strong>.</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <span className="w-5 h-5 rounded-full bg-[#6FD9C1]/20 flex items-center justify-center text-[#6FD9C1] shrink-0 font-bold">
-                      ✓
-                    </span>
-                    <span>Zero heavy Elementor/WordPress plugin overhead blocking the phone dialer.</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <span className="w-5 h-5 rounded-full bg-[#6FD9C1]/20 flex items-center justify-center text-[#6FD9C1] shrink-0 font-bold">
-                      ✓
-                    </span>
-                    <span>Saves an estimated <strong className="text-[#F5B301]">~{lead.currencySymbol}{lead.estLostMonthlySpend}/mo</strong> in wasted Google ad clicks.</span>
-                  </li>
+                  {nicheConfig.auditBenefits.map((benefit, bIdx) => (
+                    <li key={bIdx} className="flex items-center gap-3">
+                      <span className="w-5 h-5 rounded-full bg-[#6FD9C1]/20 flex items-center justify-center text-[#6FD9C1] shrink-0 font-bold">
+                        ✓
+                      </span>
+                      <span>{benefit}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
 
@@ -1191,7 +2211,7 @@ function PrototypeContent() {
               Verified Proof
             </span>
             <h2 className="mt-3 text-[28px] sm:text-[36px] font-extrabold tracking-tight text-[#0C0730]">
-              Homeowners in {lead.city} Trust Us
+              {nicheConfig.socialProofHeading}
             </h2>
           </div>
 
@@ -1221,7 +2241,7 @@ function PrototypeContent() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
-            BOOKING / QUOTE FORM (use.live HIGH CONVERSION CARD)
+            INTAKE / CONTACT FORM (use.live HIGH CONVERSION CARD)
         ═══════════════════════════════════════════════════════════════ */}
         <section id="quote-form" className="px-4 sm:px-6 py-12 md:py-16 bg-[#F4F2ED]">
           <div className="max-w-xl mx-auto">
@@ -1229,13 +2249,13 @@ function PrototypeContent() {
               
               <div className="text-center pb-5 mb-5 border-b border-black/[0.06]">
                 <span className="inline-block px-3 py-1 rounded-full bg-[#6FD9C1]/20 text-[#0A997D] text-[11px] font-extrabold font-mono mb-2">
-                  PRIORITY DISPATCH FORM
+                  {nicheConfig.formBadge}
                 </span>
                 <h3 className="text-[24px] font-extrabold text-[#0C0730] tracking-tight">
-                  Request Priority Dispatch in {lead.city}
+                  {nicheConfig.formTitle}
                 </h3>
                 <p className="text-[13px] text-black/60 mt-1">
-                  Fill in your details for immediate 45-minute arrival or an upfront quote.
+                  {nicheConfig.formSub}
                 </p>
               </div>
 
@@ -1246,10 +2266,10 @@ function PrototypeContent() {
                   </div>
                   <div>
                     <h4 className="text-[18px] font-extrabold text-[#0C0730]">
-                      Simulated Dispatch Sent
+                      {nicheConfig.formSuccessHeading}
                     </h4>
                     <p className="text-[13px] text-black/75 mt-1 leading-snug">
-                      Your test request was processed in <strong className="font-mono font-bold text-[#0A997D]">0.04s</strong>. In production, this instantly notifies the on-call dispatcher.
+                      {nicheConfig.formSuccessDesc}
                     </p>
                   </div>
                   <button
@@ -1264,7 +2284,7 @@ function PrototypeContent() {
                 <form onSubmit={handleBookingSubmit} className="space-y-4">
                   <div>
                     <label className="block text-[13px] font-extrabold text-[#0C0730] mb-1">
-                      Required Service
+                      Required Service / Inquiry
                     </label>
                     <select
                       value={bookingData.service || nicheConfig.services[0].title}
@@ -1309,11 +2329,11 @@ function PrototypeContent() {
 
                   <div>
                     <label className="block text-[13px] font-extrabold text-[#0C0730] mb-1">
-                      Property Suburb
+                      Location / Suburb
                     </label>
                     <input
                       type="text"
-                      placeholder={`Suburb in ${lead.city}`}
+                      placeholder={nicheConfig.formLocationPlaceholder}
                       value={bookingData.suburb}
                       onChange={(e) => setBookingData({ ...bookingData, suburb: e.target.value })}
                       className="w-full h-12 rounded-2xl bg-[#F3F1EC] px-4 text-[14px] font-bold text-[#0A0A0D] outline-none border border-transparent focus:border-[#0A997D] focus:bg-white transition"
@@ -1322,17 +2342,16 @@ function PrototypeContent() {
 
                   <div>
                     <label className="block text-[13px] font-extrabold text-[#0C0730] mb-1">
-                      Urgency
+                      Timeline / Urgency
                     </label>
                     <select
                       value={bookingData.urgency}
                       onChange={(e) => setBookingData({ ...bookingData, urgency: e.target.value })}
                       className="w-full h-12 rounded-2xl bg-[#F3F1EC] px-4 text-[14px] font-bold text-[#0A0A0D] outline-none border border-transparent focus:border-[#0A997D] focus:bg-white transition"
                     >
-                      <option>Immediate Emergency (Under 45 Mins)</option>
-                      <option>Today (Standard Business Hours)</option>
-                      <option>Scheduled Next 48 Hours</option>
-                      <option>Upfront Price Quote Only</option>
+                      {nicheConfig.formUrgencyOptions.map((opt, oIdx) => (
+                        <option key={oIdx}>{opt}</option>
+                      ))}
                     </select>
                   </div>
 
@@ -1345,7 +2364,7 @@ function PrototypeContent() {
                       <RotateCcw className="w-5 h-5 animate-spin" />
                     ) : (
                       <>
-                        <span>Submit Emergency Request</span>
+                        <span>{nicheConfig.formSubmitLabel}</span>
                         <ArrowRight className="w-4 h-4 text-[#6FD9C1]" />
                       </>
                     )}
@@ -1367,9 +2386,12 @@ function PrototypeContent() {
           <div className="max-w-[1200px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-left">
               <div className="font-extrabold text-[16px] text-[#0C0730]">{lead.company}</div>
-              <p className="mt-0.5">Licensed trade contracting serving all suburbs of Greater {lead.city}.</p>
+              <p className="mt-0.5">{nicheConfig.footerDesc}</p>
               <p className="mt-1 font-mono text-[#0A997D] font-bold">
-                Direct Dispatch: <a href={`tel:${cleanPhone}`} className="underline hover:text-[#0C0730]">{lead.phone}</a>
+                {nicheConfig.footerPhoneLabel}{" "}
+                <a href={`tel:${cleanPhone}`} className="underline hover:text-[#0C0730]">
+                  {lead.phone}
+                </a>
               </p>
             </div>
 
@@ -1528,7 +2550,7 @@ export default function ClientPrototypePreviewPage() {
         <div className="min-h-screen bg-[#0C0730] flex flex-col items-center justify-center text-white space-y-3 font-sans">
           <div className="w-8 h-8 border-2 border-[#6FD9C1] border-t-transparent rounded-full animate-spin" />
           <div className="tracking-widest uppercase text-white/60 text-[11px] font-mono">
-            Loading Sub-Second Prototype...
+            Loading Speedcraft Edge Prototype...
           </div>
         </div>
       }
