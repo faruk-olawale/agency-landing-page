@@ -2653,7 +2653,7 @@ function PrototypeContent() {
     <>
       <style dangerouslySetInnerHTML={{ __html: customVisualStyles }} />
 
-      <div className="min-h-screen bg-[#FFFFFF] text-[#0A0A0D] antialiased selection:bg-[#6FD9C1] selection:text-[#0C0730] pb-24 sm:pb-16">
+      <div className="min-h-screen bg-[#FFFFFF] text-[#0A0A0D] antialiased selection:bg-[#6FD9C1] selection:text-[#0C0730]">
         
         {/* ═══════════════════════════════════════════════════════════════
             SANDBOX POPUP TOAST (use.live / quickfleet tactile feedback)
@@ -3507,7 +3507,7 @@ function PrototypeContent() {
         {/* ═══════════════════════════════════════════════════════════════
             FOOTER: CLEAN ARCHITECTURAL QUICKFLEET LAYOUT
         ═══════════════════════════════════════════════════════════════ */}
-        <footer className="bg-white border-t border-black/[0.08] py-12 px-4 sm:px-6 text-[13px] text-black/60">
+        <footer className="bg-white border-t border-black/[0.08] py-6 sm:py-8 px-4 sm:px-6 text-[13px] text-black/60">
           <div className="max-w-[1200px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-left">
               <div className="font-extrabold text-[16px] text-[#0C0730]">{lead.company}</div>
@@ -3520,7 +3520,7 @@ function PrototypeContent() {
               </p>
             </div>
 
-            <div className="flex items-center gap-6 font-medium">
+            <div className="flex flex-wrap items-center justify-center md:justify-end gap-x-6 gap-y-2 font-medium">
               {["Terms of Service", "Licensing & Insurance", "Privacy Policy", "Sitemap"].map((link) => (
                 <a
                   key={link}
