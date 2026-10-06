@@ -28,7 +28,11 @@ import {
   MapPin,
   Sparkles,
   RefreshCw,
-  Compass
+  Compass,
+  Plus,
+  UploadCloud,
+  X,
+  FileSpreadsheet
 } from "lucide-react";
 import leadsData from "../../../leads/global_leads_audit.json";
 
@@ -127,31 +131,42 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
     return s;
   }, [sentRecords]);
 
-  const allVaultLeads = leadsData as Lead[];
+  const [vaultLeads, setVaultLeads] = useState<Lead[]>(leadsData as Lead[]);
+
+  // Instant URL Auditor & Importer States
+  const [showImportDrawer, setShowImportDrawer] = useState(false);
+  const [importTab, setImportTab] = useState<"single" | "bulk">("single");
+  const [auditUrl, setAuditUrl] = useState("");
+  const [auditCompany, setAuditCompany] = useState("");
+  const [auditCity, setAuditCity] = useState("");
+  const [auditNiche, setAuditNiche] = useState("Plumbing");
+  const [isAuditing, setIsAuditing] = useState(false);
+  const [bulkText, setBulkText] = useState("");
+  const [isBulkImporting, setIsBulkImporting] = useState(false);
 
   // Dynamic Country list from vault
   const countries = useMemo(() => {
     const counts: Record<string, number> = {};
-    allVaultLeads.forEach((l) => {
+    vaultLeads.forEach((l) => {
       counts[l.country] = (counts[l.country] || 0) + 1;
     });
     return ["all", ...Object.keys(counts).sort()];
-  }, [allVaultLeads]);
+  }, [vaultLeads]);
 
   // Dynamic City list (scoped to selected country)
   const cities = useMemo(() => {
-    const scoped = selectedCountry === "all" ? allVaultLeads : allVaultLeads.filter((l) => l.country === selectedCountry);
+    const scoped = selectedCountry === "all" ? vaultLeads : vaultLeads.filter((l) => l.country === selectedCountry);
     return ["all", ...new Set(scoped.map((l) => l.city))].sort();
-  }, [allVaultLeads, selectedCountry]);
+  }, [vaultLeads, selectedCountry]);
 
   // Dynamic Niche list
   const niches = useMemo(() => {
-    const scoped = selectedCountry === "all" ? allVaultLeads : allVaultLeads.filter((l) => l.country === selectedCountry);
+    const scoped = selectedCountry === "all" ? vaultLeads : vaultLeads.filter((l) => l.country === selectedCountry);
     return ["all", ...new Set(scoped.map((l) => l.niche))].sort();
-  }, [allVaultLeads, selectedCountry]);
+  }, [vaultLeads, selectedCountry]);
 
   // Active dataset depending on mode
-  const currentLeadsPool = sourceMode === "google_maps" ? mapsResults : allVaultLeads;
+  const currentLeadsPool = sourceMode === "google_maps" ? mapsResults : vaultLeads;
 
   // Filtered Leads
   const filteredAll = useMemo(() => {
@@ -214,6 +229,89 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
     } finally {
       setIsSearchingMaps(false);
     }
+  };
+
+  const handleSingleAudit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!auditUrl.trim()) return;
+
+    setIsAuditing(true);
+    try {
+      const res = await fetch("/api/outreach/audit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          website: auditUrl.trim(),
+          company: auditCompany.trim() || undefined,
+          city: auditCity.trim() || undefined,
+          niche: auditNiche.trim() || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.lead) {
+        setVaultLeads((prev) => [data.lead, ...prev]);
+        setAuditUrl("");
+        setAuditCompany("");
+        setAuditCity("");
+        showToast(`Audited ${data.lead.company} (${data.lead.mobilePageSpeed}/100 Speed) — added to queue!`);
+        setShowImportDrawer(false);
+        setSourceMode("vault");
+      } else {
+        throw new Error(data.error || "Failed to audit website");
+      }
+    } catch (err: any) {
+      showToast(`Audit error: ${err.message}`);
+    } finally {
+      setIsAuditing(false);
+    }
+  };
+
+  const handleBulkAudit = async () => {
+    if (!bulkText.trim()) return;
+    setIsBulkImporting(true);
+    const lines = bulkText.split("\n").map((l) => l.trim()).filter(Boolean);
+    let successCount = 0;
+
+    for (const line of lines) {
+      const parts = line.split(",").map((p) => p.trim());
+      let url = parts[0];
+      let company = "";
+      let city = "";
+      let niche = "";
+
+      if (parts.length > 1) {
+        if (parts[1].startsWith("http") || parts[1].includes(".")) {
+          company = parts[0];
+          url = parts[1];
+          city = parts[2] || "";
+          niche = parts[3] || "";
+        } else {
+          url = parts[0];
+          company = parts[1] || "";
+          city = parts[2] || "";
+          niche = parts[3] || "";
+        }
+      }
+
+      try {
+        const res = await fetch("/api/outreach/audit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ website: url, company, city, niche }),
+        });
+        const data = await res.json();
+        if (data.success && data.lead) {
+          setVaultLeads((prev) => [data.lead, ...prev]);
+          successCount++;
+        }
+      } catch {}
+    }
+
+    setIsBulkImporting(false);
+    setBulkText("");
+    showToast(`Successfully audited & imported ${successCount} leads into queue!`);
+    setShowImportDrawer(false);
+    setSourceMode("vault");
   };
 
   // Register a lead as sent in real time
@@ -577,7 +675,7 @@ Direct Inquiries: farukolawale509@gmail.com`;
 
           {/* ─── TABS & SOURCE SELECTOR ─── */}
           <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-zinc-100">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => setActiveTab("active")}
                 className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
@@ -601,6 +699,18 @@ Direct Inquiries: farukolawale509@gmail.com`;
                 <CheckCheck className="w-3.5 h-3.5" />
                 <span>Contacted Archive ({sentRecords.length})</span>
               </button>
+
+              <button
+                onClick={() => setShowImportDrawer(!showImportDrawer)}
+                className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  showImportDrawer
+                    ? "bg-[#5B4BD6] text-white shadow-sm"
+                    : "bg-purple-50 text-[#5B4BD6] hover:bg-purple-100 border border-purple-200"
+                }`}
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Audit Any Website / Import</span>
+              </button>
             </div>
 
             {/* SOURCE SWITCHER: GOOGLE MAPS vs VAULT */}
@@ -620,11 +730,167 @@ Direct Inquiries: farukolawale509@gmail.com`;
                     sourceMode === "vault" ? "bg-white text-[#160F29] font-bold shadow-2xs" : "text-zinc-600"
                   }`}
                 >
-                  Audited Lead Vault ({allVaultLeads.length})
+                  Audited Lead Vault ({vaultLeads.length})
                 </button>
               </div>
             )}
           </div>
+
+          {/* ─── LIVE AUDITOR & LEAD IMPORTER DRAWER ─── */}
+          {showImportDrawer && (
+            <div className="bg-purple-50/60 border border-purple-200/90 rounded-2xl p-5 space-y-4 shadow-xs">
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-purple-100">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-[#5B4BD6] text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                    <Sparkles className="w-3.5 h-3.5 fill-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-sm text-[#160F29]">Live Website Speed Auditor & Lead Importer</h3>
+                    <p className="text-[11px] text-zinc-500">
+                      Audit any live website on the internet: calculates real PageSpeed, detects CMS bloat, and creates an instant sub-second Next.js prototype.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="inline-flex rounded-lg bg-white border border-purple-200 p-0.5 text-xs font-medium">
+                    <button
+                      onClick={() => setImportTab("single")}
+                      className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
+                        importTab === "single" ? "bg-[#5B4BD6] text-white font-semibold shadow-2xs" : "text-zinc-600 hover:text-zinc-900"
+                      }`}
+                    >
+                      Single URL Audit
+                    </button>
+                    <button
+                      onClick={() => setImportTab("bulk")}
+                      className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
+                        importTab === "bulk" ? "bg-[#5B4BD6] text-white font-semibold shadow-2xs" : "text-zinc-600 hover:text-zinc-900"
+                      }`}
+                    >
+                      Batch CSV / Paste
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => setShowImportDrawer(false)}
+                    className="p-1 rounded-md hover:bg-purple-100 text-zinc-400 hover:text-zinc-700 transition-colors cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* TAB 1: SINGLE URL AUDIT */}
+              {importTab === "single" && (
+                <form onSubmit={handleSingleAudit} className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                    <div className="sm:col-span-4">
+                      <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                        Business Website URL <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={auditUrl}
+                        onChange={(e) => setAuditUrl(e.target.value)}
+                        placeholder="https://exampleplumber.com"
+                        className="w-full px-3 py-2 text-xs bg-white border border-zinc-300 rounded-lg focus:outline-none focus:border-[#5B4BD6]"
+                      />
+                    </div>
+                    <div className="sm:col-span-3">
+                      <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                        Company Name (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={auditCompany}
+                        onChange={(e) => setAuditCompany(e.target.value)}
+                        placeholder="Auto-detected if blank"
+                        className="w-full px-3 py-2 text-xs bg-white border border-zinc-300 rounded-lg focus:outline-none focus:border-[#5B4BD6]"
+                      />
+                    </div>
+                    <div className="sm:col-span-3">
+                      <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                        City / Metro (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={auditCity}
+                        onChange={(e) => setAuditCity(e.target.value)}
+                        placeholder="e.g. Austin, TX or London"
+                        className="w-full px-3 py-2 text-xs bg-white border border-zinc-300 rounded-lg focus:outline-none focus:border-[#5B4BD6]"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="block text-[11px] font-semibold text-zinc-700 mb-1">Trade Niche</label>
+                      <select
+                        value={auditNiche}
+                        onChange={(e) => setAuditNiche(e.target.value)}
+                        className="w-full px-2.5 py-2 text-xs bg-white border border-zinc-300 rounded-lg focus:outline-none focus:border-[#5B4BD6]"
+                      >
+                        <option value="Plumbing">Plumbing</option>
+                        <option value="Electrician">Electrician</option>
+                        <option value="Roofing">Roofing</option>
+                        <option value="HVAC">HVAC</option>
+                        <option value="Solar">Solar</option>
+                        <option value="Locksmith">Locksmith</option>
+                        <option value="Restoration">Restoration</option>
+                        <option value="Landscaping">Landscaping</option>
+                        <option value="Pest Control">Pest Control</option>
+                        <option value="Dental">Dental</option>
+                        <option value="Legal">Legal</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                    <p className="text-[11px] text-zinc-500">
+                      Calculates live mobile load speed, detects CMS bloat (WordPress, Elementor, Divi), computes lost ad spend, and prepares cold outreach email.
+                    </p>
+                    <button
+                      type="submit"
+                      disabled={isAuditing || !auditUrl.trim()}
+                      className="px-5 py-2 rounded-lg bg-[#5B4BD6] hover:bg-[#4939C7] text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer disabled:opacity-60 shrink-0 shadow-xs"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isAuditing ? "animate-spin" : ""}`} />
+                      <span>{isAuditing ? "Auditing Website..." : "Audit & Add to Active Queue"}</span>
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* TAB 2: BATCH CSV / URL PASTE */}
+              {importTab === "bulk" && (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                      Paste List of URLs or CSV Rows (One per line)
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={bulkText}
+                      onChange={(e) => setBulkText(e.target.value)}
+                      placeholder={`https://austinemergencyplumbing.com\nhttps://dfwmasterelectric.com\n"Summit Roofing", https://summitroofing.com, "Denver", "Roofing"`}
+                      className="w-full p-3 font-mono text-xs bg-white border border-zinc-300 rounded-lg focus:outline-none focus:border-[#5B4BD6]"
+                    />
+                  </div>
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <p className="text-[11px] text-zinc-500">
+                      Accepts direct URLs or CSV rows: <code className="bg-white px-1.5 py-0.5 rounded border border-purple-100 font-mono text-[10px]">Company, Website, City, Niche</code>.
+                    </p>
+                    <button
+                      onClick={handleBulkAudit}
+                      disabled={isBulkImporting || !bulkText.trim()}
+                      className="px-5 py-2 rounded-lg bg-[#5B4BD6] hover:bg-[#4939C7] text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer disabled:opacity-60 shrink-0 shadow-xs"
+                    >
+                      <UploadCloud className={`w-3.5 h-3.5 ${isBulkImporting ? "animate-spin" : ""}`} />
+                      <span>{isBulkImporting ? "Batch Auditing..." : "Batch Audit & Add to Queue"}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* ─── FILTERS (When viewing Vault) ─── */}
           {activeTab === "active" && sourceMode === "vault" && (
@@ -646,7 +912,7 @@ Direct Inquiries: farukolawale509@gmail.com`;
                   onChange={(e) => setSelectedCountry(e.target.value)}
                   className="w-full px-3 py-2 text-xs bg-zinc-50 border border-zinc-200 rounded-lg focus:outline-none focus:border-[#5B4BD6] font-medium"
                 >
-                  <option value="all">All Countries ({allVaultLeads.length})</option>
+                  <option value="all">All Countries ({vaultLeads.length})</option>
                   <option value="Australia">Australia</option>
                   <option value="United States">United States</option>
                   <option value="United Kingdom">United Kingdom</option>
@@ -712,7 +978,7 @@ Direct Inquiries: farukolawale509@gmail.com`;
                     onClick={() => setSourceMode("vault")}
                     className="px-5 py-2.5 bg-[#160F29] hover:bg-zinc-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
                   >
-                    View Audited Lead Vault ({allVaultLeads.length} Verified Leads)
+                    View Audited Lead Vault ({vaultLeads.length} Verified Leads)
                   </button>
                   <button
                     onClick={() => handleGoogleMapsSearch(mapsQuery, mapsLocation)}
