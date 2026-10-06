@@ -1,5 +1,29 @@
 [
   {
+    "id": "view_1791301546209_hf703",
+    "slug": "",
+    "company": "Dallas Plumbing Co",
+    "website": "https://dallasplumbing.com",
+    "loadTimeMs": 165,
+    "speedSec": "0.17s",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "timestamp": "2026-10-06T15:45:46.209Z",
+    "ip": "::1"
+  },
+  {
+    "id": "view_1791301545717_s3gqs",
+    "slug": "",
+    "company": "Dallas Plumbing Co",
+    "website": "https://dallasplumbing.com",
+    "loadTimeMs": 1,
+    "speedSec": "0.11s",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "timestamp": "2026-10-06T15:45:45.716Z",
+    "ip": "::1"
+  },
+  {
     "id": "view_1791280090236_mh08s",
     "slug": "linkpaddy-tech",
     "company": "LinkPaddy Tech",
