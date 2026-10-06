@@ -72,6 +72,9 @@ export interface SentRecord {
   method?: string;
   status: string;
   previewUrl?: string;
+  id?: string;
+  viewedAt?: string;
+  viewCount?: number;
 }
 
 function slugify(name: string): string {
@@ -1384,18 +1387,32 @@ Direct: farukolawale509@gmail.com`;
                     return (
                       <div key={idx} className="py-3.5 flex flex-wrap items-center justify-between gap-3 text-xs">
                         <div className="space-y-0.5">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-bold text-zinc-900">{record.company}</span>
                             <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 uppercase">
                               {record.method || "manual"}
                             </span>
+                            {record.viewedAt && (
+                              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold border border-emerald-300 flex items-center gap-1">
+                                <Zap className="w-2.5 h-2.5 text-emerald-600 fill-emerald-600" />
+                                <span>Opened Prototype ({record.viewCount || 1}x)</span>
+                              </span>
+                            )}
                           </div>
-                          <div className="text-[11px] text-zinc-500 flex items-center gap-2">
+                          <div className="text-[11px] text-zinc-500 flex items-center gap-2 flex-wrap">
                             <span>{record.email || "No email listed"}</span>
                             <span>•</span>
                             <span className="font-mono">
                               Dispatched: {new Date(record.sentAt).toLocaleString()}
                             </span>
+                            {record.viewedAt && (
+                              <>
+                                <span>•</span>
+                                <span className="font-mono text-emerald-700 font-medium">
+                                  Last viewed: {new Date(record.viewedAt).toLocaleTimeString()}
+                                </span>
+                              </>
+                            )}
                           </div>
                         </div>
 

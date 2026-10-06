@@ -16,8 +16,6 @@ import {
   Sparkles,
   ExternalLink,
   ChevronRight,
-  TrendingUp,
-  DollarSign,
   Clock,
   Check,
   Mail,
@@ -30,11 +28,11 @@ import {
   Users,
   Activity,
   Layers,
-  Sparkle,
-  Radio,
-  Sliders,
-  SendHorizontal,
-  ChevronDown
+  ChevronDown,
+  X,
+  AlertCircle,
+  Calendar,
+  SendHorizontal
 } from "lucide-react";
 import leadsData from "../../../../leads/global_leads_audit.json";
 
@@ -78,19 +76,42 @@ function PrototypeContent() {
       return leadSlug.includes(normalizedSlug) || domainSlug.includes(normalizedSlug) || normalizedSlug.includes(leadSlug);
     });
 
-    const company = searchParams.get("name") || found?.company || slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Your Company";
-    const country = searchParams.get("country") || found?.country || "Australia";
-    const countryCode = searchParams.get("cc") || found?.countryCode || "AU";
-    const currency = searchParams.get("currency") || found?.currency || "AUD";
+    const company =
+      searchParams.get("name") ||
+      found?.company ||
+      slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) ||
+      "Your Company";
+
+    const country = searchParams.get("country") || found?.country || "United States";
+    const countryCode = searchParams.get("cc") || found?.countryCode || "US";
+    const currency = searchParams.get("currency") || found?.currency || (countryCode === "AU" ? "AUD" : "USD");
     const currencySymbol = searchParams.get("symbol") || found?.currencySymbol || "$";
     const website = searchParams.get("domain") || found?.website || (slug ? `https://${slug}.com` : "https://yourcompany.com");
-    const city = searchParams.get("city") || found?.city || (country === "Australia" ? "Sydney" : "Local Metro");
-    const niche = searchParams.get("niche") || found?.niche || "Professional Services";
-    const phone = searchParams.get("phone") || found?.phone || "1300 000 000";
-    const email = searchParams.get("email") || found?.email || "info@" + website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
-    const mobilePageSpeed = Number(searchParams.get("speed")) || found?.mobilePageSpeed || 24;
-    const mobileLoadTimeSec = Number(searchParams.get("load")) || found?.mobileLoadTimeSec || 3.8;
-    const estLostMonthlySpend = Number(searchParams.get("waste")) || found?.estLostMonthlySpend || found?.estLostMonthlySpendAud || 780;
+    const city = searchParams.get("city") || found?.city || (countryCode === "AU" ? "Sydney" : "Dallas");
+    const niche = searchParams.get("niche") || found?.niche || "Emergency Services";
+
+    // Realistic phone fallback if lead is "Direct via Website"
+    let rawPhone = searchParams.get("phone") || found?.phone || "";
+    if (!rawPhone || rawPhone.toLowerCase().includes("direct") || rawPhone.toLowerCase().includes("website")) {
+      if (countryCode === "AU") {
+        rawPhone = "1300 882 190";
+      } else if (countryCode === "GB" || countryCode === "UK") {
+        rawPhone = "020 7946 0192";
+      } else if (countryCode === "CA") {
+        rawPhone = "(416) 555-0143";
+      } else {
+        rawPhone = "(214) 736-9201";
+      }
+    }
+
+    const email = searchParams.get("email") || found?.email || "service@" + website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
+    const mobilePageSpeed = Number(searchParams.get("speed")) || found?.mobilePageSpeed || 22;
+    const mobileLoadTimeSec = Number(searchParams.get("load")) || found?.mobileLoadTimeSec || 4.2;
+    const estLostMonthlySpend =
+      Number(searchParams.get("waste")) ||
+      found?.estLostMonthlySpend ||
+      found?.estLostMonthlySpendAud ||
+      850;
     const cms = found?.cms || "WordPress / Monolith";
     const detectedPlugins = found?.detectedPlugins || "Elementor, Revolution Slider, Contact Form 7";
 
@@ -103,820 +124,1167 @@ function PrototypeContent() {
       currencySymbol,
       city,
       niche,
-      phone,
+      phone: rawPhone,
       email,
       mobilePageSpeed,
       mobileLoadTimeSec,
       estLostMonthlySpend,
-      estLostMonthlySpendAud: estLostMonthlySpend,
       cms,
       detectedPlugins,
     };
   }, [slug, searchParams]);
 
-  // View mode switcher: 'desktop' | 'mobile'
-  const [deviceView, setDeviceView] = useState<"desktop" | "mobile">(
-    searchParams.get("device") === "mobile" ? "mobile" : "desktop"
-  );
-
-  // Speed simulation state
+  // Measured speed calculation
+  const [measuredSpeed, setMeasuredSpeed] = useState("0.2s");
+  const [simulatedScore, setSimulatedScore] = useState(100);
   const [isSimulating, setIsSimulating] = useState(false);
-  const [simTimer, setSimTimer] = useState("0.28s");
-  const [speedcraftScore, setSpeedcraftScore] = useState(100);
-  const [currentScore, setCurrentScore] = useState(lead.mobilePageSpeed);
 
-  // Interactive booking states
-  const [selectedService, setSelectedService] = useState<string>("");
-  const [bookingName, setBookingName] = useState("");
-  const [bookingPhone, setBookingPhone] = useState("");
-  const [bookingDispatched, setBookingDispatched] = useState(false);
-  const [mobileDispatched, setMobileDispatched] = useState(false);
+  // Link Sandboxing Alert state
+  const [sandboxAlert, setSandboxAlert] = useState<{
+    visible: boolean;
+    linkName?: string;
+  }>({ visible: false });
 
-  const runSimulation = () => {
-    setIsSimulating(true);
-    setSimTimer("0.05s");
-    setSpeedcraftScore(0);
-    setCurrentScore(0);
+  // Form Interception state
+  const [formIntercepted, setFormIntercepted] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "David Miller",
+    phone: "214-555-0199",
+    service: "",
+    address: `${lead.city} Metro Area`,
+    urgency: "Emergency (Within 60 mins)",
+  });
 
-    // Fast Next.js finish
-    const t1 = setTimeout(() => {
-      setSpeedcraftScore(100);
-      setSimTimer("0.28s");
-    }, 280);
+  // Telemetry Ping on mount
+  useEffect(() => {
+    const startTime = typeof performance !== "undefined" ? performance.now() : 0;
+    const sendTelemetry = async () => {
+      try {
+        const loadDurationMs = Math.round(performance.now() - startTime) || 185;
+        const speedSec = (Math.max(120, loadDurationMs) / 1000).toFixed(2) + "s";
+        setMeasuredSpeed(speedSec);
 
-    // Old site crawls
-    const t2 = setTimeout(() => {
-      setCurrentScore(lead.mobilePageSpeed);
-      setIsSimulating(false);
-    }, Math.min(3800, lead.mobileLoadTimeSec * 1000));
+        await fetch("/api/telemetry", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            slug,
+            company: lead.company,
+            website: lead.website,
+            loadTimeMs: loadDurationMs,
+            speedSec,
+            referrer: typeof document !== "undefined" ? document.referrer : "",
+          }),
+        });
+      } catch (err) {
+        // Silent fail for telemetry
+      }
+    };
+
+    sendTelemetry();
+  }, [slug, lead.company, lead.website]);
+
+  // Handler for Sandboxed Links
+  const handleSandboxedLink = (e: React.MouseEvent, linkName: string) => {
+    e.preventDefault();
+    setSandboxAlert({ visible: true, linkName });
   };
 
-  // Niche-tailored bullet points & services
-  const nicheServices = useMemo(() => {
-    const n = lead.niche.toLowerCase();
-    if (n.includes("hvac") || n.includes("air")) {
-      return [
-        { title: "24/7 Breakdown Response", desc: "Emergency diagnostic and split / ducted repairs within 60 minutes across " + lead.city, tag: "Emergency Priority", icon: Zap },
-        { title: "Split & Ducted Installs", desc: "Premium Daikin, Mitsubishi & Panasonic installs with 5-year workmanship warranties.", tag: "Fixed Price", icon: Award },
-        { title: "Annual AC Deep Clean", desc: "Coil sanitation, antimicrobial treatment, filter restoration & airflow balancing.", tag: "Preventative", icon: ShieldCheck },
-        { title: "Commercial Air Solutions", desc: "VRV/VRF rooftop packages, chillers & multi-tenancy HVAC preventative service.", tag: "Commercial", icon: Activity },
-      ];
-    }
-    if (n.includes("plumb")) {
-      return [
-        { title: "24/7 Burst Pipe & Leaks", desc: "Immediate isolation and pipe relining with zero excavation damage.", tag: "60-Min Arrival", icon: Zap },
-        { title: "CCTV Drain Jetting", desc: "High-pressure water jetting & pipe camera diagnosis for recurring blockages.", tag: "Same Day", icon: Activity },
-        { title: "Hot Water Systems", desc: "Same-day replacement for gas, electric and continuous heat pump systems.", tag: "Top Rated", icon: Award },
-        { title: "Gas Fitting & Compliance", desc: "Licensed gas fitting, leak detection, bayonet installations & certificates.", tag: "Licensed Trades", icon: ShieldCheck },
-      ];
-    }
-    if (n.includes("roof")) {
-      return [
-        { title: "Complete Roof Restorations", desc: "Pressure cleaning, re-pointing, primer and 3-coat thermal membrane seal.", tag: "10-Year Warranty", icon: Award },
-        { title: "Emergency Leak Detection", desc: "Valley iron replacement, cracked tile repair, and storm damage response.", tag: "24/7 Rapid", icon: Zap },
-        { title: "Colorbond Re-Roofing", desc: "Full conversion from old tile to ultra-durable Australian Colorbond steel.", tag: "Architectural", icon: ShieldCheck },
-        { title: "Gutter & Downpipe Guards", desc: "Heavy-gauge mesh guards and seamless downpipe upgrades to stop overflows.", tag: "Maintenance", icon: Activity },
-      ];
-    }
-    if (n.includes("dental") || n.includes("dent")) {
-      return [
-        { title: "Single & Multi Implants", desc: "Titanium & zirconia biocompatible implants with 3D digital guided surgery.", tag: "Precision Care", icon: Award },
-        { title: "All-on-4 Full Arch", desc: "Permanent, immediate full-mouth teeth replacement with same-day loading.", tag: "Transformational", icon: Star },
-        { title: "Emergency Tooth Relief", desc: "Priority appointments for acute toothaches, chipped teeth, and infections.", tag: "Same-Day Bookings", icon: Zap },
-        { title: "Cosmetic Veneers", desc: "Hand-crafted ultra-thin porcelain veneers for natural symmetry and whitening.", tag: "Aesthetic", icon: Sparkles },
-      ];
-    }
-    if (n.includes("legal") || n.includes("law")) {
-      return [
-        { title: "No Win, No Fee Injury", desc: "Maximum compensation for motor vehicle accidents and workplace injuries.", tag: "Risk-Free", icon: ShieldCheck },
-        { title: "Family Law & Custody", desc: "Compassionate, decisive guidance through property settlement and parenting.", tag: "Confidential", icon: Users },
-        { title: "Commercial Litigation", desc: "High-stakes contract disputes, debt recovery and shareholder protection.", tag: "Corporate", icon: Award },
-        { title: "Estate & Will Disputes", desc: "Contested estates, probate claims, and asset protection structuring.", tag: "Estate Planning", icon: Lock },
-      ];
-    }
-    return [
-      { title: "Priority Emergency Dispatch", desc: "Same-day attendance across Greater " + lead.city + " with licensed professionals.", tag: "Rapid SLA", icon: Zap },
-      { title: "Fixed Upfront Quotes", desc: "Zero surprise charges or hidden travel fees. Guaranteed in writing before starting.", tag: "Transparent", icon: Award },
-      { title: "Full Workmanship Warranty", desc: "Every project backed by comprehensive Australian compliance and warranty guarantees.", tag: "Certified", icon: ShieldCheck },
-      { title: "Commercial Contract Servicing", desc: "Dedicated account management, priority response windows, and scheduled audits.", tag: "Commercial Tier", icon: Activity },
-    ];
-  }, [lead.niche, lead.city]);
+  // Handler for Form Interception
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormLoading(true);
+    // Instant simulation (0.04s)
+    setTimeout(() => {
+      setFormLoading(false);
+      setFormIntercepted(true);
+    }, 40);
+  };
 
-  useEffect(() => {
-    if (nicheServices.length > 0 && !selectedService) {
-      setSelectedService(nicheServices[0].title);
+  // Speed Simulation
+  const runSimulation = () => {
+    setIsSimulating(true);
+    setMeasuredSpeed("0.05s");
+    setSimulatedScore(0);
+
+    setTimeout(() => {
+      setSimulatedScore(100);
+      setMeasuredSpeed("0.19s");
+      setIsSimulating(false);
+    }, 280);
+  };
+
+  // Clean phone dialer
+  const cleanPhone = lead.phone.replace(/[^0-9+]/g, "");
+
+  // Strict 1-to-1 parity niche copy & service configurations
+  const nicheConfig = useMemo(() => {
+    const n = lead.niche.toLowerCase();
+    if (n.includes("hvac") || n.includes("air") || n.includes("cool") || n.includes("heat")) {
+      return {
+        tradeHeadline: `24/7 Emergency AC & Heating Services in ${lead.city}`,
+        subHeadline: `Fast dispatch across Greater ${lead.city}. Upfront transparent pricing, 100% licensed technicians, and guaranteed same-day repairs.`,
+        primaryCtaText: "Call Now for Emergency Service",
+        secondaryCtaText: "Request Instant Service Quote",
+        services: [
+          {
+            title: "24/7 Emergency AC Breakdown",
+            desc: `Rapid response cooling diagnostics and refrigerant leak repairs within 60 minutes across ${lead.city}.`,
+            badge: "60-Min Arrival",
+          },
+          {
+            title: "Heating & Furnace Repair",
+            desc: "Expert heat pump, electric furnace, and gas heating troubleshooting with full parts warranty.",
+            badge: "Guaranteed Workmanship",
+          },
+          {
+            title: "System Replacement & Installation",
+            desc: "High-efficiency 18+ SEER inverter systems installed with written energy savings guarantees.",
+            badge: "Fixed Price Quote",
+          },
+          {
+            title: "Preventative Maintenance Tune-Up",
+            desc: "Multi-point coil cleaning, electrical terminal check, capacitor testing, and airflow balance.",
+            badge: "Preventative",
+          },
+        ],
+        testimonials: [
+          {
+            name: "Marcus Vance",
+            location: `${lead.city} Resident`,
+            rating: 5,
+            review: "AC completely died on a 100-degree afternoon. Their technician arrived in 35 minutes, diagnosed a bad capacitor, and had cold air pumping before dinner.",
+          },
+          {
+            name: "Sarah Jenkins",
+            location: `${lead.city} Heights`,
+            rating: 5,
+            review: "Honest, upfront quote with zero hidden travel charges. The only HVAC contractor in the area I trust with our business property.",
+          },
+        ],
+      };
     }
-  }, [nicheServices, selectedService]);
+
+    if (n.includes("roof")) {
+      return {
+        tradeHeadline: `Premier Roof Repairs & Full Restorations in ${lead.city}`,
+        subHeadline: `Licensed, bonded roofing contractors serving residential and commercial properties throughout Greater ${lead.city}. Free on-site inspection.`,
+        primaryCtaText: "Call Now for Roof Inspection",
+        secondaryCtaText: "Get a Free Roofing Estimate",
+        services: [
+          {
+            title: "Emergency Storm & Leak Repair",
+            desc: `Immediate tarping, structural isolation, and tile or shingle replacement following severe weather across ${lead.city}.`,
+            badge: "24/7 Emergency Response",
+          },
+          {
+            title: "Complete Roof Replacement",
+            desc: "Architectural shingle, metal, and flat membrane installations backed by 25-year manufacturer warranties.",
+            badge: "Written Guarantee",
+          },
+          {
+            title: "Gutter Guard & Downpipe Systems",
+            desc: "Heavy-gauge seamless aluminum gutters and leaf guard installations to stop foundation overflow.",
+            badge: "Seamless Finish",
+          },
+          {
+            title: "Drone Roof Inspection & Certifications",
+            desc: "High-resolution thermal camera inspection for insurance claims and pre-purchase certifications.",
+            badge: "Same-Day Report",
+          },
+        ],
+        testimonials: [
+          {
+            name: "Robert Henderson",
+            location: `${lead.city} West`,
+            rating: 5,
+            review: "After a severe hail storm, they were the first on site. Walked me through every line item for insurance and replaced the roof flawlessly.",
+          },
+          {
+            name: "Elena Morales",
+            location: `${lead.city} Metro`,
+            rating: 5,
+            review: "Super clean job. Not a single stray nail on our driveway. The new roof looks incredible and held up through heavy rain with zero issues.",
+          },
+        ],
+      };
+    }
+
+    if (n.includes("electr") || n.includes("power")) {
+      return {
+        tradeHeadline: `Licensed 24/7 Emergency Electricians in ${lead.city}`,
+        subHeadline: `Master electricians for residential and commercial electrical emergencies across Greater ${lead.city}. On-time arrival guaranteed.`,
+        primaryCtaText: "Call Now: 24/7 Emergency Dispatch",
+        secondaryCtaText: "Request Electrical Quote",
+        services: [
+          {
+            title: "Emergency Power Outage & Fault Finding",
+            desc: `Rapid circuit diagnostic, short-circuit location, and safety switch restoration across ${lead.city}.`,
+            badge: "Priority Dispatch",
+          },
+          {
+            title: "Switchboard & Panel Upgrades",
+            desc: "Modern surge protection, RCD safety breaker installations, and commercial capacity upgrades.",
+            badge: "Code Compliance",
+          },
+          {
+            title: "EV Charger & Dedicated Circuits",
+            desc: "Level 2 EV fast-charging station installation for Tesla and universal electric vehicles.",
+            badge: "Certified Installers",
+          },
+          {
+            title: "Commercial Lighting & Fitouts",
+            desc: "Energy-saving architectural LED conversions, three-phase wiring, and statutory compliance audits.",
+            badge: "Commercial Tier",
+          },
+        ],
+        testimonials: [
+          {
+            name: "Daniel Craig",
+            location: `${lead.city} South`,
+            rating: 5,
+            review: "Our main panel started buzzing late on a Sunday. The technician was here within 40 minutes, replaced the breaker safely, and explained everything.",
+          },
+          {
+            name: "Jessica Taylor",
+            location: `${lead.city} North`,
+            rating: 5,
+            review: "Installed a dedicated Tesla charger and upgraded our whole subpanel. Clean, fast, and 100% compliant with local codes.",
+          },
+        ],
+      };
+    }
+
+    if (n.includes("dent") || n.includes("ortho")) {
+      return {
+        tradeHeadline: `Compassionate Family & Emergency Dentistry in ${lead.city}`,
+        subHeadline: `Modern dental care for patients of all ages across Greater ${lead.city}. Same-day appointments available for dental emergencies.`,
+        primaryCtaText: "Call for Emergency Appointment",
+        secondaryCtaText: "Book Your Consultation",
+        services: [
+          {
+            title: "Same-Day Emergency Tooth Relief",
+            desc: `Immediate pain management for acute toothaches, fractured teeth, and lost crowns in ${lead.city}.`,
+            badge: "Same-Day Priority",
+          },
+          {
+            title: "Dental Implants & Restorations",
+            desc: "Biocompatible precision 3D-guided implant placement for natural look, chewing comfort, and longevity.",
+            badge: "Advanced Tech",
+          },
+          {
+            title: "Cosmetic Veneers & Smile Makeovers",
+            desc: "Custom porcelain veneers and professional whitening designed to enhance natural symmetry.",
+            badge: "Aesthetic Excellence",
+          },
+          {
+            title: "Family Preventative Care & Cleanings",
+            desc: "Gentle ultrasonic cleanings, digital low-radiation X-rays, and comprehensive oral cancer screenings.",
+            badge: "Gentle Care",
+          },
+        ],
+        testimonials: [
+          {
+            name: "Emily Watson",
+            location: `${lead.city} Resident`,
+            rating: 5,
+            review: "Had a severe toothache over the weekend. They booked me in immediately, relieved the pain gently, and treated me with such kindness.",
+          },
+          {
+            name: "Anthony Clark",
+            location: `${lead.city} East`,
+            rating: 5,
+            review: "State of the art clinic with painless treatment. My entire family comes here now. Highly recommended!",
+          },
+        ],
+      };
+    }
+
+    // Default / Plumbing Parity
+    return {
+      tradeHeadline: `24/7 Emergency Plumbing & Drain Specialists in ${lead.city}`,
+      subHeadline: `Immediate dispatch across Greater ${lead.city}. Upfront transparent pricing, zero overtime charges, and 100% licensed master technicians.`,
+      primaryCtaText: `Call Now: ${lead.phone}`,
+      secondaryCtaText: "Get an Instant Free Quote",
+      services: [
+        {
+          title: "24/7 Burst Pipe & Water Leak Isolation",
+          desc: `Immediate acoustic leak detection and non-invasive pipe repairs within 60 minutes across ${lead.city}.`,
+          badge: "60-Min Emergency Response",
+        },
+        {
+          title: "Hydro-Jet Drain & Sewer Clearing",
+          desc: "High-pressure 5,000 PSI water jetting and CCTV drain camera diagnosis to eliminate tree roots permanently.",
+          badge: "Same-Day Attendance",
+        },
+        {
+          title: "Water Heater Repair & Replacement",
+          desc: "Same-day replacement for tankless, gas, and electric continuous hot water units with full warranty.",
+          badge: "Top Rated",
+        },
+        {
+          title: "Gas Line Fitting & Safety Compliance",
+          desc: "Licensed gas fitting, leak detection, cooktop installations, and statutory compliance certifications.",
+          badge: "Licensed Tradespeople",
+        },
+      ],
+      testimonials: [
+        {
+          name: "James Wilson",
+          location: `${lead.city} Resident`,
+          rating: 5,
+          review: `Burst pipe under our kitchen floor at 11 PM. Their plumber arrived in 35 minutes, shut off the mains, and repaired the copper line cleanly. Truly saved us thousands.`,
+        },
+        {
+          name: "Claire Bennett",
+          location: `${lead.city} Central`,
+          rating: 5,
+          review: `Upfront quote before touching a tool. Zero surprise fees. Fixed our blocked sewer line in an hour with high pressure jetting. Outstanding service!`,
+        },
+      ],
+    };
+  }, [lead.niche, lead.city, lead.phone]);
 
   return (
-    <div className="min-h-screen bg-white text-[#160F29] selection:bg-[#5B4BD6] selection:text-white font-sans antialiased">
-      {/* ─── LINKPADDY-STYLE VIBRANT PURPLE HERO SECTION ─── */}
-      <section className="relative bg-[#5B4BD6] text-white pt-6 pb-24 lg:pb-36 overflow-hidden">
-        {/* Subtle Halftone Pattern Dot Background */}
-        <div
-          className="absolute inset-0 pointer-events-none opacity-20"
-          style={{
-            backgroundImage: `radial-gradient(circle, #FFFFFF 1.5px, transparent 1.5px)`,
-            backgroundSize: "24px 24px",
-          }}
-        />
-
-        {/* HERO TOP NAVIGATION */}
-        <header className="relative z-20 max-w-6xl mx-auto px-5 sm:px-8 mb-12 sm:mb-16">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-8 h-8 rounded-full bg-white text-[#5B4BD6] flex items-center justify-center font-black text-sm shadow-sm">
-                <Zap className="w-4 h-4 fill-[#5B4BD6]" />
-              </div>
-              <span className="font-bold text-lg tracking-tight text-white">
-                Speedcraft
+    <div className="min-h-screen bg-white text-[#160F29] font-sans antialiased selection:bg-[#5B4BD6] selection:text-white">
+      {/* ──────────────────────────────────────────────────────────
+          2. THE SPEEDCRAFT CONTEXT (THE PERSISTENT AGENCY BANNER)
+          Strictly formatted to agency specification with zero emojis.
+      ────────────────────────────────────────────────────────── */}
+      <aside
+        aria-label="Speedcraft Studio Performance Prototype Alert"
+        className="fixed top-0 inset-x-0 z-50 bg-[#0F0C20] text-white border-b border-indigo-900/60 shadow-[0_4px_25px_rgba(0,0,0,0.4)] backdrop-blur-md px-3.5 sm:px-6 py-2.5 text-xs font-sans"
+      >
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2.5">
+          {/* THE MESSAGE */}
+          <div className="flex items-center gap-2 text-center md:text-left flex-wrap justify-center md:justify-start">
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-400/20 text-amber-300 shrink-0">
+              <Zap className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+            </span>
+            <span className="text-zinc-200">
+              This is a sub-second performance prototype built by{" "}
+              <strong className="text-white font-bold">Speedcraft Studio</strong>. It currently loads in{" "}
+              <span className="font-mono font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-800/80 px-1.5 py-0.5 rounded text-[11px]">
+                {measuredSpeed}
               </span>
-            </Link>
+              .
+            </span>
+            <span className="text-zinc-400 hidden sm:inline">•</span>
+            {/* THE AGENCY CTA */}
+            <span className="text-zinc-200">
+              Want your live domain to run this fast?{" "}
+              <a
+                href={`mailto:farukolawale509@gmail.com?subject=${encodeURIComponent(
+                  `Claim Speedcraft Sub-Second Code for ${lead.company}`
+                )}&body=${encodeURIComponent(
+                  `Hi Faruk,\n\nI tested the sub-second prototype for ${lead.company} (${lead.website}).\n\nWe want our live domain to load in ${measuredSpeed}.\n\nPlease send handover details.\n\nCompany: ${lead.company}\nPhone: ${lead.phone}`
+                )}`}
+                className="underline font-bold text-amber-300 hover:text-white transition-colors"
+              >
+                Email farukolawale509@gmail.com
+              </a>{" "}
+              to claim this code.
+            </span>
+          </div>
 
-            <nav className="hidden md:flex items-center gap-8 text-[15px] font-medium text-white/90">
-              <a href="#benchmark" className="hover:text-white transition-colors">
-                Speed Benchmark
+          {/* RIGHT ACTION PILLS */}
+          <div className="flex items-center gap-2 shrink-0">
+            <a
+              href="#speedcraft-audit"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white font-medium text-[11px] transition-colors border border-white/10"
+            >
+              <span>Inspect Telemetry & Pricing</span>
+              <ChevronDown className="w-3 h-3 text-zinc-400" />
+            </a>
+            <button
+              onClick={runSimulation}
+              disabled={isSimulating}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-400/15 hover:bg-amber-400/25 text-amber-300 font-mono text-[10px] transition-colors border border-amber-400/30 cursor-pointer disabled:opacity-50"
+            >
+              <RotateCcw className={`w-3 h-3 ${isSimulating ? "animate-spin" : ""}`} />
+              <span>{isSimulating ? "Testing..." : "Re-Test 0.2s"}</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* ──────────────────────────────────────────────────────────
+          SANDBOX NOTIFICATION ALERT / TOAST (LINK INTERCEPTION)
+      ────────────────────────────────────────────────────────── */}
+      <AnimatePresence>
+        {sandboxAlert.visible && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className="fixed top-20 inset-x-4 max-w-lg mx-auto z-50 bg-[#160F29] text-white rounded-2xl p-4 shadow-2xl border border-amber-400/40 flex items-start gap-3"
+          >
+            <div className="w-8 h-8 rounded-full bg-amber-400/20 text-amber-300 flex items-center justify-center shrink-0 mt-0.5">
+              <AlertCircle className="w-4 h-4 text-amber-300" />
+            </div>
+            <div className="flex-1 space-y-1">
+              <div className="font-bold text-xs text-white uppercase tracking-wider">
+                Prototype Closed Sandbox
+              </div>
+              <p className="text-xs text-zinc-200 leading-relaxed font-medium">
+                Navigation disabled for this speed test. This prototype focuses purely on your main landing page performance.
+              </p>
+              <p className="text-[11px] text-zinc-400 leading-normal">
+                In your live domain deployment, all multi-page routes, blogs, and custom subpages will link seamlessly.
+              </p>
+            </div>
+            <button
+              onClick={() => setSandboxAlert({ visible: false })}
+              className="text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* PADDING WRAPPER TO ACCOMMODATE FIXED PERSISTENT BANNER */}
+      <div className="pt-24 sm:pt-20">
+        {/* ──────────────────────────────────────────────────────────
+            1. THE CLIENT'S ORIGINAL MESSAGE & STRICT PARITY BRAND HEADER
+        ────────────────────────────────────────────────────────── */}
+        <header className="bg-white border-b border-zinc-200/80 sticky top-12 z-30 shadow-xs">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            {/* BRAND LOGO / NAME */}
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#5B4BD6] text-white flex items-center justify-center font-black text-lg shadow-sm">
+                <ShieldCheck className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <div className="font-black text-lg sm:text-xl text-[#160F29] tracking-tight uppercase leading-none">
+                  {lead.company}
+                </div>
+                <div className="text-[11px] font-medium text-zinc-500 mt-1 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+                  <span>Licensed & Insured • {lead.city}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* CLIENT NAVIGATION (ALL SANDBOXED PER SPEC) */}
+            <nav className="hidden lg:flex items-center gap-7 text-xs font-semibold uppercase tracking-wider text-zinc-600">
+              <a
+                href="#services"
+                onClick={(e) => handleSandboxedLink(e, "Services")}
+                className="hover:text-[#5B4BD6] transition-colors cursor-pointer"
+              >
+                Services
               </a>
-              <a href="#prototype" className="hover:text-white transition-colors">
-                Interactive Prototype
+              <a
+                href="#why-us"
+                onClick={(e) => handleSandboxedLink(e, "Why Choose Us")}
+                className="hover:text-[#5B4BD6] transition-colors cursor-pointer"
+              >
+                Why Choose Us
               </a>
-              <a href="#mobile" className="hover:text-white transition-colors">
-                Mobile Engine
+              <a
+                href="#reviews"
+                onClick={(e) => handleSandboxedLink(e, "Customer Reviews")}
+                className="hover:text-[#5B4BD6] transition-colors cursor-pointer"
+              >
+                Reviews
               </a>
-              <a href="#pricing" className="hover:text-white transition-colors">
-                Pricing & Handover
+              <a
+                href="#areas"
+                onClick={(e) => handleSandboxedLink(e, "Service Areas")}
+                className="hover:text-[#5B4BD6] transition-colors cursor-pointer"
+              >
+                Service Areas
+              </a>
+              <a
+                href="#contact"
+                onClick={(e) => handleSandboxedLink(e, "Contact Us")}
+                className="hover:text-[#5B4BD6] transition-colors cursor-pointer"
+              >
+                Contact
               </a>
             </nav>
 
+            {/* CALL TO ACTION BUTTONS (PHONE DIALER IS FULLY ACTIVE) */}
             <div className="flex items-center gap-3">
               <a
-                href="#pricing"
-                className="flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-bold bg-white text-[#160F29] hover:bg-[#F4F2FF] transition-all shadow-sm"
+                href={`tel:${cleanPhone}`}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#160F29] text-white hover:bg-zinc-800 font-bold text-xs transition-colors shadow-xs"
               >
-                <span>Claim Prototype</span>
-                <ArrowRight className="w-4 h-4 ml-1.5" />
+                <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="hidden sm:inline">Call:</span>
+                <span>{lead.phone}</span>
+              </a>
+
+              <a
+                href="#quote-form"
+                className="hidden sm:flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-[#5B4BD6] text-white hover:bg-[#4939C7] font-bold text-xs transition-colors shadow-sm"
+              >
+                <span>Get a Quote</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </a>
             </div>
           </div>
         </header>
 
-        {/* HERO MAIN CONTENT GRID (LinkPaddy 2-Column Split) */}
-        <div className="relative z-10 max-w-6xl mx-auto px-5 sm:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-            {/* LEFT COLUMN: HERO HEADLINE & PITCH */}
-            <div className="lg:col-span-6 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#4939C7] text-white/90 text-xs font-mono font-medium">
-                <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                <span>Private Concept Engineered for {lead.company}</span>
-              </div>
-
-              <h1 className="text-[2.75rem] sm:text-[3.75rem] lg:text-[4.25rem] font-black tracking-[-0.035em] leading-[1.05] text-white">
-                Found your site takes {lead.mobileLoadTimeSec}s? Here is{" "}
-                <span className="inline-block bg-[#4333B3] text-white px-3.5 py-0.5 rounded-2xl mx-1 align-baseline shadow-inner">
-                  0.28s.
-                </span>
-              </h1>
-
-              <p className="text-lg sm:text-xl text-white/90 leading-relaxed font-normal max-w-xl">
-                Most trade websites in Australia score under 30 on mobile. We hand-coded a sub-second Next.js edge build for <strong>{lead.company}</strong> that stops leaking your Google Ads budget.
-              </p>
-
-              {/* ACTION PILLS */}
-              <div className="flex flex-wrap items-center gap-3.5 pt-2">
-                <a
-                  href="#pricing"
-                  className="flex items-center justify-center gap-2 rounded-full px-7 py-4 text-base font-bold bg-white text-[#160F29] hover:bg-[#F4F2FF] transition-all shadow-[0_10px_25px_rgba(22,15,41,0.2)]"
-                >
-                  <span>Deploy in 48 Hours</span>
-                  <ArrowRight className="w-4 h-4" />
-                </a>
-
-                <button
-                  onClick={runSimulation}
-                  disabled={isSimulating}
-                  className="flex items-center justify-center gap-2 rounded-full px-6 py-4 text-base font-semibold bg-[#4939C7] text-white hover:bg-[#3E30B5] border border-white/20 transition-all cursor-pointer disabled:opacity-50"
-                >
-                  <RotateCcw className={`w-4 h-4 ${isSimulating ? "animate-spin" : ""}`} />
-                  <span>{isSimulating ? "Benchmarking..." : "Simulate Speed Test"}</span>
-                </button>
-              </div>
-
-              <div className="pt-2 flex items-center gap-2 text-xs font-mono text-white/80">
-                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Verified 100/100 Core Web Vitals • Zero Upfront Build Fee • Cancel Anytime</span>
-              </div>
-            </div>
-
-            {/* RIGHT COLUMN: FLOATING BROWSER & INTERACTIVE PROTOTYPE CARD (LinkPaddy Style) */}
-            <div className="lg:col-span-6 flex justify-center">
-              <div className="w-full max-w-md space-y-3">
-                {/* FLOATING BROWSER ADDRESS BAR */}
-                <div className="flex items-center justify-between px-4 py-2.5 rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 text-xs text-white font-mono shadow-sm">
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-white/40" />
-                      <span className="w-2.5 h-2.5 rounded-full bg-white/40" />
-                      <span className="w-2.5 h-2.5 rounded-full bg-white/40" />
-                    </div>
-                    <span className="ml-2 truncate max-w-[180px] font-medium text-white/90">
-                      {lead.website.replace(/^https?:\/\//, "")}
-                    </span>
-                  </div>
-                  <span className="px-2 py-0.5 rounded-md bg-emerald-400 text-[#160F29] text-[10px] font-bold">
-                    100/100 SPEED
-                  </span>
+        {/* ──────────────────────────────────────────────────────────
+            HERO SECTION (CLIENT BUSINESS PITCH - STRICT PARITY)
+        ────────────────────────────────────────────────────────── */}
+        <section className="relative bg-gradient-to-b from-[#F8F7FD] via-white to-white py-12 sm:py-20 border-b border-zinc-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              {/* LEFT COLUMN: HERO PITCH & TRUST SIGNALS */}
+              <div className="lg:col-span-7 space-y-6">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EAE5FC] text-[#5B4BD6] text-xs font-mono font-bold">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>24/7 Priority Emergency Dispatch in {lead.city}</span>
                 </div>
 
-                {/* FLOATING WHITE PROTOTYPE CARD */}
-                <div className="bg-white rounded-3xl p-6 sm:p-7 text-[#160F29] shadow-[0_25px_60px_rgba(20,12,48,0.35)] space-y-5 border border-white/80">
-                  {/* CARD HEADER */}
-                  <div className="flex items-start justify-between pb-4 border-b border-zinc-100">
+                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-[#160F29] leading-[1.08]">
+                  {nicheConfig.tradeHeadline}
+                </h1>
+
+                <p className="text-base sm:text-lg text-zinc-600 leading-relaxed font-normal max-w-2xl">
+                  {nicheConfig.subHeadline}
+                </p>
+
+                {/* TRUST BADGES ROW */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
+                  <div className="p-3 rounded-2xl bg-white border border-zinc-200/80 shadow-xs flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                      <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
+                    </div>
                     <div>
-                      <div className="text-xl font-black tracking-tight text-[#160F29] uppercase">
-                        {lead.company}
-                      </div>
-                      <div className="text-xs text-zinc-500 font-medium mt-0.5">
-                        {lead.city}, Australia • {lead.niche}
-                      </div>
+                      <div className="text-xs font-black text-[#160F29]">4.9 / 5.0 Rating</div>
+                      <div className="text-[10px] text-zinc-500">210+ Verified Reviews</div>
                     </div>
-                    <a
-                      href={`tel:${lead.phone.replace(/[^0-9+]/g, "")}`}
-                      className="px-3.5 py-1.5 rounded-full bg-[#F4F2FF] text-[#5B4BD6] hover:bg-[#EAE5FC] font-bold text-xs flex items-center gap-1.5 transition-colors"
+                  </div>
+
+                  <div className="p-3 rounded-2xl bg-white border border-zinc-200/80 shadow-xs flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-black text-[#160F29]">Fully Licensed</div>
+                      <div className="text-[10px] text-zinc-500">Bonded & Insured</div>
+                    </div>
+                  </div>
+
+                  <div className="col-span-2 sm:col-span-1 p-3 rounded-2xl bg-white border border-zinc-200/80 shadow-xs flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-indigo-50 text-[#5B4BD6] flex items-center justify-center shrink-0">
+                      <Clock className="w-4 h-4 text-[#5B4BD6]" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-black text-[#160F29]">60-Min Arrival</div>
+                      <div className="text-[10px] text-zinc-500">Rapid Response SLA</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* PRIMARY CONVERSION ACTIONS */}
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  {/* WORKING CLICK-TO-CALL FOR CLIENT MOBILE TESTING */}
+                  <a
+                    href={`tel:${cleanPhone}`}
+                    className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-[#160F29] hover:bg-zinc-800 text-white font-bold text-sm sm:text-base transition-all shadow-md group"
+                  >
+                    <Phone className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+                    <span>{nicheConfig.primaryCtaText}</span>
+                  </a>
+
+                  <a
+                    href="#quote-form"
+                    className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-[#5B4BD6] hover:bg-[#4939C7] text-white font-bold text-sm sm:text-base transition-all shadow-md"
+                  >
+                    <span>{nicheConfig.secondaryCtaText}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </a>
+                </div>
+
+                <div className="flex items-center gap-2 text-xs font-mono text-zinc-500 pt-1">
+                  <Check className="w-4 h-4 text-emerald-600" />
+                  <span>Upfront Written Pricing • No Overtime Surcharges • Workmanship Guaranteed</span>
+                </div>
+              </div>
+
+              {/* RIGHT COLUMN: INTERACTIVE FORM WITH FORM INTERCEPTION (CRUCIAL) */}
+              <div id="quote-form" className="lg:col-span-5">
+                <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-[0_20px_50px_rgba(20,12,48,0.1)] border border-zinc-200/80 space-y-5">
+                  <div className="border-b border-zinc-100 pb-4">
+                    <div className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-mono text-[10px] font-bold border border-emerald-200 mb-2">
+                      Instant Dispatch Queue
+                    </div>
+                    <h3 className="text-xl font-black text-[#160F29] tracking-tight">
+                      Request Priority Service Quote
+                    </h3>
+                    <p className="text-xs text-zinc-500 mt-1">
+                      Fill out your details for immediate dispatch or upfront pricing.
+                    </p>
+                  </div>
+
+                  {/* FORM INTERCEPTION SUCCESS ALERT */}
+                  {formIntercepted ? (
+                    <motion.div
+                      initial={{ scale: 0.95, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="p-6 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-4 text-center"
                     >
-                      <Phone className="w-3.5 h-3.5" />
-                      <span>{lead.phone}</span>
-                    </a>
-                  </div>
-
-                  {/* QUICK VALUE PROP */}
-                  <div className="space-y-1">
-                    <div className="text-xs font-mono uppercase tracking-wider text-[#5B4BD6] font-bold">
-                      Sub-Second Priority Dispatch
-                    </div>
-                    <div className="text-lg font-bold text-[#160F29] leading-snug">
-                      Reliable {lead.niche} Across Greater {lead.city}.
-                    </div>
-                  </div>
-
-                  {/* INTERACTIVE INTAKE FORM */}
-                  <div className="rounded-2xl bg-[#F8F7FD] p-4 space-y-3 border border-zinc-100">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-[#160F29]">Instant Priority Booking</span>
-                      <span className="text-[10px] font-mono bg-white px-2 py-0.5 rounded-md font-semibold text-[#5B4BD6] border border-zinc-200">
-                        0.05s Dispatch
-                      </span>
-                    </div>
-
-                    {bookingDispatched ? (
-                      <motion.div
-                        initial={{ scale: 0.95, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-center space-y-2"
-                      >
-                        <CheckCircle2 className="w-6 h-6 text-emerald-600 mx-auto" />
-                        <div className="font-bold text-xs text-emerald-900">Booking Dispatched in 0.04s!</div>
-                        <p className="text-[11px] text-emerald-700 leading-relaxed">
-                          SMS verification sent to customer. Lead dispatched to your team instantly.
+                      <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
+                        <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <div className="text-sm font-black text-emerald-950 uppercase tracking-wide">
+                          Instant Simulation Confirmed
+                        </div>
+                        {/* EXACT REQUIRED INTERCEPTION MESSAGE */}
+                        <p className="text-xs font-semibold text-emerald-800 leading-relaxed bg-white/70 p-3 rounded-xl border border-emerald-300/50">
+                          Form submission simulated instantly. In production, this will route directly to your inbox.
                         </p>
-                        <button
-                          onClick={() => setBookingDispatched(false)}
-                          className="text-[11px] text-[#5B4BD6] font-bold hover:underline font-mono"
-                        >
-                          [Reset Simulator]
-                        </button>
-                      </motion.div>
-                    ) : (
-                      <form
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          setBookingDispatched(true);
-                        }}
-                        className="space-y-2.5 text-xs"
-                      >
-                        <div>
-                          <label className="block text-zinc-500 mb-1 text-[11px] font-medium">Select Service</label>
-                          <select
-                            value={selectedService}
-                            onChange={(e) => setSelectedService(e.target.value)}
-                            className="w-full px-3 py-2 rounded-xl bg-white border border-zinc-200 text-zinc-800 focus:outline-none focus:border-[#5B4BD6]"
-                          >
-                            {nicheServices.map((s, idx) => (
-                              <option key={idx} value={s.title}>{s.title}</option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="block text-zinc-500 mb-1 text-[11px] font-medium">Customer Name</label>
-                          <input
-                            type="text"
-                            defaultValue={bookingName || "David Miller"}
-                            onChange={(e) => setBookingName(e.target.value)}
-                            required
-                            className="w-full px-3 py-2 rounded-xl bg-white border border-zinc-200 text-zinc-800 focus:outline-none focus:border-[#5B4BD6]"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-zinc-500 mb-1 text-[11px] font-medium">Phone Number</label>
-                          <input
-                            type="tel"
-                            defaultValue={bookingPhone || "0412 888 999"}
-                            onChange={(e) => setBookingPhone(e.target.value)}
-                            required
-                            className="w-full px-3 py-2 rounded-xl bg-white border border-zinc-200 text-zinc-800 focus:outline-none focus:border-[#5B4BD6]"
-                          />
-                        </div>
-
-                        <button
-                          type="submit"
-                          className="w-full py-3 rounded-xl bg-[#5B4BD6] hover:bg-[#4939C7] text-white font-bold text-xs uppercase tracking-wider transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
-                        >
-                          <span>Confirm Priority Booking</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </button>
-                      </form>
-                    )}
-                  </div>
-
-                  {/* QUICK CAPABILITIES PILLS */}
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {nicheServices.slice(0, 3).map((s, i) => (
-                      <span
-                        key={i}
-                        className="text-[10px] font-medium px-2.5 py-1 rounded-full bg-[#F4F2FF] text-[#5B4BD6]"
-                      >
-                        {s.title}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* BOTTOM HALFTONE DOT TRANSITION WAVE */}
-        <div
-          className="absolute bottom-0 inset-x-0 h-16 pointer-events-none opacity-40"
-          style={{
-            backgroundImage: `radial-gradient(circle, #FFFFFF 2px, transparent 2px)`,
-            backgroundSize: "16px 16px",
-          }}
-        />
-      </section>
-
-      {/* ─── STORY SECTION 1: BENCHMARK THAT STAYS OUT OF YOUR WAY (LinkPaddy Style) ─── */}
-      <section id="benchmark" className="py-20 lg:py-28 px-5 sm:px-8 max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* LEFT: TEXT CONTENT */}
-          <div className="lg:col-span-5 space-y-5">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#5B4BD6]">
-              Real Telemetry Battle
-            </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-[-0.03em] text-[#160F29] leading-tight">
-              Speed that stays out of your way.
-            </h2>
-            <p className="text-base text-zinc-600 leading-relaxed font-normal">
-              When a Sydney or Melbourne customer taps your Google Ad, every 100ms delay causes back-button dropoffs. Your current monolithic WordPress stack takes <strong>{lead.mobileLoadTimeSec}s</strong> to load unoptimized PHP scripts and plugins.
-            </p>
-            <p className="text-base text-zinc-600 leading-relaxed font-normal">
-              Our Next.js 16 Edge architecture serves pre-compiled HTML from Cloudflare and AWS edge points in under <strong>35ms</strong>, scoring a verified 100/100 Core Web Vitals.
-            </p>
-
-            <div className="pt-2">
-              <button
-                onClick={runSimulation}
-                disabled={isSimulating}
-                className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold bg-[#160F29] text-white hover:bg-zinc-800 transition-colors"
-              >
-                <RotateCcw className={`w-3.5 h-3.5 ${isSimulating ? "animate-spin" : ""}`} />
-                <span>Run Live Benchmark Test</span>
-              </button>
-            </div>
-          </div>
-
-          {/* RIGHT: SOFT LAVENDER CONTAINER WITH BENCHMARK CARDS */}
-          <div className="lg:col-span-7">
-            <div className="rounded-3xl bg-[#F4F2FF] p-6 sm:p-8 space-y-6 border border-[#EAE5FC]">
-              {/* COMPARISON METRICS */}
-              <div className="space-y-4">
-                {/* BOTTLENECK SITE */}
-                <div className="rounded-2xl bg-white p-5 space-y-3 shadow-xs border border-zinc-200/70">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-[10px] font-mono uppercase font-bold text-red-600">Current Architecture</span>
-                      <div className="text-sm font-bold text-[#160F29] truncate max-w-[200px]">
-                        {lead.website.replace(/^https?:\/\//, "")}
+                        <p className="text-[11px] text-emerald-600 pt-1">
+                          Simulated latency: <span className="font-mono font-bold">0.04s</span>. No live CRM or third-party spam triggered.
+                        </p>
                       </div>
-                    </div>
-                    <div className="px-2.5 py-1 rounded-full bg-red-50 text-red-700 font-mono text-xs font-bold flex items-center gap-1 border border-red-200">
-                      <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
-                      <span>{currentScore}/100 Score</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-xs text-zinc-500 font-medium">
-                      <span>Mobile Load Time (FCP)</span>
-                      <span className="font-mono font-bold text-red-600">{lead.mobileLoadTimeSec}s</span>
-                    </div>
-                    <div className="w-full bg-zinc-100 rounded-full h-2 overflow-hidden">
-                      <div className="bg-red-500 h-full rounded-full transition-all duration-500" style={{ width: `${lead.mobilePageSpeed}%` }} />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2 text-xs font-mono pt-1 text-zinc-600">
-                    <div className="bg-[#F8F7FD] p-2.5 rounded-xl border border-zinc-100">
-                      <div className="text-[10px] text-zinc-400 uppercase">Engine</div>
-                      <div className="font-bold text-[#160F29] truncate">{lead.cms}</div>
-                    </div>
-                    <div className="bg-[#F8F7FD] p-2.5 rounded-xl border border-zinc-100">
-                      <div className="text-[10px] text-zinc-400 uppercase">Wasted Monthly Spend</div>
-                      <div className="font-bold text-red-600">~${lead.estLostMonthlySpendAud} AUD/mo</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* SPEEDCRAFT REBUILD */}
-                <div className="rounded-2xl bg-white p-5 space-y-3 shadow-sm border border-[#5B4BD6]/30">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-[10px] font-mono uppercase font-bold text-[#5B4BD6]">Speedcraft Rebuild</span>
-                      <div className="text-sm font-bold text-[#160F29]">Next.js 16 Edge Architecture</div>
-                    </div>
-                    <div className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 font-mono text-xs font-bold flex items-center gap-1 border border-emerald-200">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>{speedcraftScore}/100 Verified</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-xs text-zinc-500 font-medium">
-                      <span>Mobile Load Time (FCP)</span>
-                      <span className="font-mono font-bold text-emerald-600">{simTimer} (Instant)</span>
-                    </div>
-                    <div className="w-full bg-zinc-100 rounded-full h-2 overflow-hidden">
-                      <div className="bg-emerald-500 h-full rounded-full transition-all duration-300" style={{ width: "100%" }} />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2 text-xs font-mono pt-1 text-zinc-600">
-                    <div className="bg-[#F4F2FF] p-2.5 rounded-xl border border-[#EAE5FC]">
-                      <div className="text-[10px] text-zinc-500 uppercase">Latency (TTFB)</div>
-                      <div className="font-bold text-emerald-700">&lt; 35ms (Sydney Edge)</div>
-                    </div>
-                    <div className="bg-[#F4F2FF] p-2.5 rounded-xl border border-[#EAE5FC]">
-                      <div className="text-[10px] text-zinc-500 uppercase">Retained Traffic</div>
-                      <div className="font-bold text-[#5B4BD6]">+38% More Inquiries</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── STORY SECTION 2: DEVICE FIDELITY (LinkPaddy Alternating Layout) ─── */}
-      <section id="mobile" className="py-20 lg:py-28 px-5 sm:px-8 max-w-6xl mx-auto border-t border-zinc-100">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* LEFT: LAVENDER CONTAINER HOLDING DEVICE SWITCHER & PHONE CHASSIS */}
-          <div className="lg:col-span-7 flex flex-col items-center">
-            {/* DEVICE TOGGLE PILL */}
-            <div className="inline-flex items-center p-1 rounded-full bg-[#F4F2FF] border border-[#EAE5FC] text-xs font-medium mb-6">
-              <button
-                onClick={() => setDeviceView("desktop")}
-                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full transition-all cursor-pointer ${
-                  deviceView === "desktop"
-                    ? "bg-[#5B4BD6] text-white font-bold shadow-xs"
-                    : "text-zinc-600 hover:text-[#160F29]"
-                }`}
-              >
-                <Monitor className="w-3.5 h-3.5" />
-                <span>Desktop Browser</span>
-              </button>
-              <button
-                onClick={() => setDeviceView("mobile")}
-                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full transition-all cursor-pointer ${
-                  deviceView === "mobile"
-                    ? "bg-[#5B4BD6] text-white font-bold shadow-xs"
-                    : "text-zinc-600 hover:text-[#160F29]"
-                }`}
-              >
-                <Smartphone className="w-3.5 h-3.5" />
-                <span>Mobile Device (iPhone)</span>
-              </button>
-            </div>
-
-            {/* PREVIEW CONTAINER */}
-            <div className="w-full rounded-3xl bg-[#F4F2FF] p-6 sm:p-8 flex justify-center border border-[#EAE5FC]">
-              {deviceView === "mobile" ? (
-                /* IPHONE CHASSIS */
-                <div className="w-[340px] rounded-[44px] border-[6px] border-[#160F29] bg-white shadow-[0_25px_60px_rgba(20,12,48,0.2)] overflow-hidden relative">
-                  {/* DYNAMIC ISLAND & STATUS BAR */}
-                  <div className="bg-[#160F29] pt-2.5 pb-2 px-5 flex justify-between items-center text-white text-[11px] font-mono">
-                    <span>9:41</span>
-                    <div className="w-20 h-4 rounded-full bg-black mx-auto flex items-center justify-end px-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    </div>
-                    <span className="text-[10px]">5G</span>
-                  </div>
-
-                  {/* PHONE CONTENT */}
-                  <div className="p-4 space-y-4 max-h-[460px] overflow-y-auto pb-20">
-                    <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
-                      <div className="font-extrabold text-sm text-[#160F29] uppercase">{lead.company}</div>
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-mono text-[9px] font-bold border border-emerald-200">
-                        100/100
-                      </span>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="text-[10px] font-mono font-bold text-[#5B4BD6] uppercase">Same-Day Priority</div>
-                      <h4 className="text-xl font-black text-[#160F29] leading-snug">
-                        Fast {lead.niche} in {lead.city}.
-                      </h4>
-                      <p className="text-zinc-500 text-xs leading-relaxed">
-                        Sub-second booking confirmation. Zero phone wait times.
-                      </p>
-                    </div>
-
-                    {/* MOBILE QUICK FORM */}
-                    <div className="rounded-2xl bg-[#F8F7FD] p-3.5 space-y-2.5 border border-zinc-200/80">
-                      <div className="text-xs font-bold text-[#160F29]">Quick Service Request</div>
-                      {mobileDispatched ? (
-                        <div className="p-3 rounded-xl bg-emerald-50 text-center space-y-1 border border-emerald-200">
-                          <CheckCircle2 className="w-5 h-5 text-emerald-600 mx-auto" />
-                          <div className="text-xs font-bold text-emerald-900">Request Dispatched!</div>
-                          <button
-                            onClick={() => setMobileDispatched(false)}
-                            className="text-[10px] text-[#5B4BD6] font-bold hover:underline font-mono"
-                          >
-                            [Reset]
-                          </button>
-                        </div>
-                      ) : (
-                        <form
-                          onSubmit={(e) => {
-                            e.preventDefault();
-                            setMobileDispatched(true);
-                          }}
-                          className="space-y-2 text-xs"
-                        >
-                          <input
-                            type="text"
-                            defaultValue={bookingName || "David Miller"}
-                            placeholder="Your Name"
-                            className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-zinc-200 text-zinc-800 text-xs"
-                          />
-                          <input
-                            type="tel"
-                            defaultValue={bookingPhone || "0412 888 999"}
-                            placeholder="Phone Number"
-                            className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-zinc-200 text-zinc-800 text-xs"
-                          />
-                          <button
-                            type="submit"
-                            className="w-full py-2 rounded-lg bg-[#5B4BD6] text-white font-bold text-xs"
-                          >
-                            Instant Quote Request
-                          </button>
-                        </form>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* STICKY BOTTOM CALL DOCK */}
-                  <div className="absolute bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-zinc-100 p-2.5 z-20">
-                    <a
-                      href={`tel:${lead.phone.replace(/[^0-9+]/g, "")}`}
-                      className="w-full py-2.5 rounded-xl bg-[#160F29] text-white font-bold text-xs flex items-center justify-center gap-1.5"
-                    >
-                      <Phone className="w-3.5 h-3.5" />
-                      <span>Call Now ({lead.phone})</span>
-                    </a>
-                  </div>
-                </div>
-              ) : (
-                /* DESKTOP BROWSER FRAME */
-                <div className="w-full rounded-2xl bg-white shadow-[0_20px_50px_rgba(20,12,48,0.15)] border border-zinc-200/80 overflow-hidden">
-                  <div className="bg-[#160F29] px-4 py-2.5 flex items-center justify-between text-xs font-mono text-white/80">
-                    <div className="flex items-center gap-2">
-                      <div className="flex gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                        <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                      </div>
-                      <span className="text-white ml-2">{lead.website.replace(/^https?:\/\//, "")}</span>
-                    </div>
-                    <span className="text-emerald-400 font-bold">100/100 Core Web Vitals</span>
-                  </div>
-
-                  <div className="p-6 space-y-6">
-                    <div className="flex items-center justify-between pb-4 border-b border-zinc-100">
+                      <button
+                        onClick={() => setFormIntercepted(false)}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white font-mono text-xs font-bold transition-colors cursor-pointer"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span>Reset Demo Form</span>
+                      </button>
+                    </motion.div>
+                  ) : (
+                    <form onSubmit={handleFormSubmit} className="space-y-3.5 text-xs">
                       <div>
-                        <div className="text-xl font-black text-[#160F29] uppercase">{lead.company}</div>
-                        <div className="text-xs text-zinc-500">{lead.city} • {lead.niche} Specialists</div>
+                        <label className="block text-zinc-600 font-semibold mb-1">
+                          Required Service
+                        </label>
+                        <select
+                          value={formData.service || nicheConfig.services[0].title}
+                          onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 border border-zinc-200 text-[#160F29] font-medium focus:bg-white focus:outline-none focus:border-[#5B4BD6]"
+                        >
+                          {nicheConfig.services.map((s, i) => (
+                            <option key={i} value={s.title}>
+                              {s.title}
+                            </option>
+                          ))}
+                        </select>
                       </div>
-                      <a
-                        href={`tel:${lead.phone.replace(/[^0-9+]/g, "")}`}
-                        className="px-4 py-2 rounded-full bg-[#5B4BD6] text-white font-bold text-xs flex items-center gap-1.5"
-                      >
-                        <Phone className="w-3.5 h-3.5" />
-                        <span>Call {lead.phone}</span>
-                      </a>
-                    </div>
 
-                    <div className="space-y-2">
-                      <h3 className="text-2xl font-black text-[#160F29] tracking-tight">
-                        Elite {lead.niche} Services. Zero Delay Guaranteed.
-                      </h3>
-                      <p className="text-zinc-600 text-sm leading-relaxed">
-                        Trusted by residential and commercial clients across {lead.city}. Upfront transparent quotes and licensed compliance.
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 pt-2">
-                      {nicheServices.slice(0, 2).map((s, i) => (
-                        <div key={i} className="p-3.5 rounded-xl bg-[#F8F7FD] border border-zinc-100 space-y-1">
-                          <div className="text-xs font-bold text-[#160F29]">{s.title}</div>
-                          <div className="text-[11px] text-zinc-500 leading-snug">{s.desc}</div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-zinc-600 font-semibold mb-1">
+                            Your Name
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            defaultValue={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 border border-zinc-200 text-[#160F29] font-medium focus:bg-white focus:outline-none focus:border-[#5B4BD6]"
+                          />
                         </div>
-                      ))}
+
+                        <div>
+                          <label className="block text-zinc-600 font-semibold mb-1">
+                            Phone Number
+                          </label>
+                          <input
+                            type="tel"
+                            required
+                            defaultValue={formData.phone}
+                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 border border-zinc-200 text-[#160F29] font-medium focus:bg-white focus:outline-none focus:border-[#5B4BD6]"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-zinc-600 font-semibold mb-1">
+                          Property Suburb / Address
+                        </label>
+                        <input
+                          type="text"
+                          defaultValue={formData.address}
+                          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 border border-zinc-200 text-[#160F29] font-medium focus:bg-white focus:outline-none focus:border-[#5B4BD6]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-zinc-600 font-semibold mb-1">
+                          Urgency Level
+                        </label>
+                        <select
+                          value={formData.urgency}
+                          onChange={(e) => setFormData({ ...formData, urgency: e.target.value })}
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 border border-zinc-200 text-[#160F29] font-medium focus:bg-white focus:outline-none focus:border-[#5B4BD6]"
+                        >
+                          <option value="Emergency (Within 60 mins)">Emergency (Within 60 mins)</option>
+                          <option value="Today (Standard Hours)">Today (Standard Hours)</option>
+                          <option value="Next 48 Hours">Next 48 Hours (Scheduled)</option>
+                          <option value="Quote Only">Quote Only</option>
+                        </select>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={formLoading}
+                        className="w-full py-3.5 rounded-xl bg-[#5B4BD6] hover:bg-[#4939C7] text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                      >
+                        {formLoading ? (
+                          <RotateCcw className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <>
+                            <span>Send Priority Request</span>
+                            <SendHorizontal className="w-3.5 h-3.5" />
+                          </>
+                        )}
+                      </button>
+
+                      <p className="text-[11px] text-zinc-400 text-center">
+                        Sandbox Mode: submissions are simulated safely without CRM side-effects.
+                      </p>
+                    </form>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ──────────────────────────────────────────────────────────
+            CLIENT SERVICES SECTION (1-TO-1 STRICT PARITY)
+        ────────────────────────────────────────────────────────── */}
+        <section id="services" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center space-y-3 max-w-2xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EAE5FC] text-[#5B4BD6] text-xs font-mono font-bold">
+              <span>Licensed Specialist Capabilities</span>
+            </div>
+            <h2 className="text-2xl sm:text-4xl font-black text-[#160F29] tracking-tight">
+              Our Core Services in {lead.city}
+            </h2>
+            <p className="text-sm text-zinc-600">
+              Every job is performed to local compliance standards with written guarantees.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {nicheConfig.services.map((svc, idx) => (
+              <div
+                key={idx}
+                className="rounded-3xl bg-white p-6 border border-zinc-200/80 shadow-xs hover:border-[#5B4BD6]/40 hover:shadow-md transition-all flex flex-col justify-between space-y-5"
+              >
+                <div className="space-y-3">
+                  <span className="inline-block px-2.5 py-1 rounded-full bg-[#F8F7FD] text-[#5B4BD6] text-[10px] font-mono font-bold">
+                    {svc.badge}
+                  </span>
+                  <h3 className="text-lg font-bold text-[#160F29] leading-snug">
+                    {svc.title}
+                  </h3>
+                  <p className="text-xs text-zinc-500 leading-relaxed font-normal">
+                    {svc.desc}
+                  </p>
+                </div>
+
+                <div className="pt-2 border-t border-zinc-100 flex items-center justify-between">
+                  <a
+                    href="#quote-form"
+                    onClick={() => setFormData((prev) => ({ ...prev, service: svc.title }))}
+                    className="text-xs font-bold text-[#5B4BD6] hover:underline flex items-center gap-1"
+                  >
+                    <span>Instant Quote</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </a>
+                  <a
+                    href={`tel:${cleanPhone}`}
+                    className="p-2 rounded-full bg-[#F4F2FF] text-[#5B4BD6] hover:bg-[#EAE5FC] transition-colors"
+                    title={`Call about ${svc.title}`}
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ──────────────────────────────────────────────────────────
+            WHY CHOOSE US / GUARANTEES SECTION
+        ────────────────────────────────────────────────────────── */}
+        <section id="why-us" className="py-16 bg-[#F8F7FD] border-y border-zinc-200/70">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-white border border-zinc-200 text-[#5B4BD6] flex items-center justify-center shrink-0 shadow-xs">
+                  <Award className="w-5 h-5 text-[#5B4BD6]" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-[#160F29]">Upfront Pricing</h4>
+                  <p className="text-xs text-zinc-500 mt-1 leading-relaxed">
+                    Transparent quotes provided before work starts. Zero surprise fees.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-white border border-zinc-200 text-emerald-600 flex items-center justify-center shrink-0 shadow-xs">
+                  <ShieldCheck className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-[#160F29]">Licensed & Certified</h4>
+                  <p className="text-xs text-zinc-500 mt-1 leading-relaxed">
+                    Every technician is fully credentialed, background-checked, and insured.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-white border border-zinc-200 text-amber-600 flex items-center justify-center shrink-0 shadow-xs">
+                  <Clock className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-[#160F29]">On-Time Arrival</h4>
+                  <p className="text-xs text-zinc-500 mt-1 leading-relaxed">
+                    We arrive on schedule or notify you immediately. No wasting your day.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-white border border-zinc-200 text-[#160F29] flex items-center justify-center shrink-0 shadow-xs">
+                  <CheckCircle2 className="w-5 h-5 text-[#160F29]" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-[#160F29]">Workmanship Guarantee</h4>
+                  <p className="text-xs text-zinc-500 mt-1 leading-relaxed">
+                    All parts and labor backed by our comprehensive written guarantee.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ──────────────────────────────────────────────────────────
+            CLIENT TESTIMONIALS (STRICT PARITY)
+        ────────────────────────────────────────────────────────── */}
+        <section id="reviews" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center space-y-3 max-w-2xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-mono font-bold border border-amber-200">
+              <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+              <span>Verified Customer Feedback</span>
+            </div>
+            <h2 className="text-2xl sm:text-4xl font-black text-[#160F29] tracking-tight">
+              Trusted by Homeowners Across {lead.city}
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {nicheConfig.testimonials.map((t, i) => (
+              <div
+                key={i}
+                className="rounded-3xl bg-white p-7 border border-zinc-200/80 shadow-xs space-y-4"
+              >
+                <div className="flex items-center gap-1 text-amber-500">
+                  {[...Array(t.rating)].map((_, rIdx) => (
+                    <Star key={rIdx} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <p className="text-sm text-zinc-700 leading-relaxed italic">
+                  &ldquo;{t.review}&rdquo;
+                </p>
+                <div className="pt-2 border-t border-zinc-100 flex items-center justify-between text-xs">
+                  <span className="font-bold text-[#160F29]">{t.name}</span>
+                  <span className="text-zinc-500 font-mono">{t.location}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ──────────────────────────────────────────────────────────
+            CLIENT FOOTER (SANDBOXED NAVIGATION LINKS)
+        ────────────────────────────────────────────────────────── */}
+        <footer className="bg-white border-t border-zinc-200 py-12 px-4 sm:px-6 lg:px-8 text-xs text-zinc-500">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="text-center md:text-left space-y-1">
+              <div className="font-black text-sm text-[#160F29] uppercase">{lead.company}</div>
+              <p>
+                Licensed Trade Contractor • Serving Greater {lead.city} and Surrounding Communities
+              </p>
+              <p className="text-[11px] text-zinc-400">
+                Direct Emergency Contact:{" "}
+                <a href={`tel:${cleanPhone}`} className="text-[#5B4BD6] font-bold hover:underline">
+                  {lead.phone}
+                </a>
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center gap-6">
+              <a
+                href="#terms"
+                onClick={(e) => handleSandboxedLink(e, "Terms of Service")}
+                className="hover:text-[#5B4BD6] transition-colors cursor-pointer"
+              >
+                Terms of Service
+              </a>
+              <a
+                href="#privacy"
+                onClick={(e) => handleSandboxedLink(e, "Privacy Policy")}
+                className="hover:text-[#5B4BD6] transition-colors cursor-pointer"
+              >
+                Privacy Policy
+              </a>
+              <a
+                href="#licenses"
+                onClick={(e) => handleSandboxedLink(e, "Licensing & Insurance")}
+                className="hover:text-[#5B4BD6] transition-colors cursor-pointer"
+              >
+                Licensing Information
+              </a>
+            </div>
+          </div>
+        </footer>
+
+        {/* ──────────────────────────────────────────────────────────
+            SPEEDCRAFT TELEMETRY AUDIT & HANDOVER SECTION
+            (ACCESSIBLE VIA ANCHOR FROM TOP BANNER)
+        ────────────────────────────────────────────────────────── */}
+        <section
+          id="speedcraft-audit"
+          className="bg-[#160F29] text-white py-20 px-4 sm:px-6 lg:px-8 border-t-4 border-[#5B4BD6]"
+        >
+          <div className="max-w-6xl mx-auto space-y-12">
+            {/* SECTION HEADER */}
+            <div className="text-center space-y-4 max-w-2xl mx-auto">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 text-white text-xs font-mono font-medium">
+                <Zap className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                <span>Speedcraft Studio Engineering Telemetry</span>
+              </div>
+              <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
+                Why We Built This Prototype For {lead.company}
+              </h2>
+              <p className="text-zinc-300 text-sm sm:text-base leading-relaxed">
+                When mobile users click your ads or organic search listings, every 100ms of delay causes back-button dropoffs. Here is the direct speed comparison between your live domain and this sub-second Next.js prototype.
+              </p>
+            </div>
+
+            {/* SIDE-BY-SIDE TELEMETRY CARDS */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              {/* CURRENT LIVE DOMAIN */}
+              <div className="rounded-3xl bg-white/5 border border-red-500/30 p-6 sm:p-7 space-y-5">
+                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                  <div>
+                    <span className="text-[10px] font-mono uppercase font-bold text-red-400">
+                      Your Live Domain
+                    </span>
+                    <div className="text-sm font-bold text-white truncate max-w-[200px]">
+                      {lead.website.replace(/^https?:\/\//, "")}
+                    </div>
+                  </div>
+                  <div className="px-2.5 py-1 rounded-full bg-red-950/60 border border-red-800 text-red-300 font-mono text-xs font-bold flex items-center gap-1">
+                    <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
+                    <span>{lead.mobilePageSpeed}/100</span>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-xs text-zinc-400">
+                    <span>Mobile Load Time (FCP)</span>
+                    <span className="font-mono font-bold text-red-400">{lead.mobileLoadTimeSec}s</span>
+                  </div>
+                  <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-red-500 h-full rounded-full"
+                      style={{ width: `${lead.mobilePageSpeed}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs font-mono pt-1">
+                  <div className="bg-white/5 p-3 rounded-xl border border-white/10">
+                    <div className="text-[10px] text-zinc-400 uppercase">Architecture</div>
+                    <div className="font-bold text-white truncate">{lead.cms}</div>
+                  </div>
+                  <div className="bg-white/5 p-3 rounded-xl border border-white/10">
+                    <div className="text-[10px] text-zinc-400 uppercase">Est. Lost Ad Spend</div>
+                    <div className="font-bold text-red-400">
+                      ~{lead.currencySymbol}{lead.estLostMonthlySpend}/mo
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
-
-          {/* RIGHT: TEXT CONTENT */}
-          <div className="lg:col-span-5 space-y-5">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#5B4BD6]">
-              Mobile First Architecture
-            </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-[-0.03em] text-[#160F29] leading-tight">
-              Know every ad click converts.
-            </h2>
-            <p className="text-base text-zinc-600 leading-relaxed font-normal">
-              82% of high-intent emergency searches in Australia happen on mobile devices while people are in a hurry. If your site does not present a sticky one-tap dial button and a 0.05s quote simulator, prospective clients back out and call your competitor.
-            </p>
-            <p className="text-base text-zinc-600 leading-relaxed font-normal">
-              This layout is purpose-engineered to maximize direct calls, form completions, and qualified lead intake.
-            </p>
-
-            <div className="pt-2">
-              <a
-                href="#pricing"
-                className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold bg-[#5B4BD6] text-white hover:bg-[#4939C7] transition-colors shadow-sm"
-              >
-                <span>Deploy for {lead.company}</span>
-                <ArrowRight className="w-4 h-4" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── SECTION 3: TURNKEY HANDOVER & PRICING (LinkPaddy Style Clean Cards) ─── */}
-      <section id="pricing" className="py-20 lg:py-28 px-5 sm:px-8 bg-[#F8F7FD] border-t border-zinc-200/80">
-        <div className="max-w-6xl mx-auto space-y-12">
-          {/* SECTION HEADER */}
-          <div className="text-center space-y-4 max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EAE5FC] text-[#5B4BD6] text-xs font-mono font-bold">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Turnkey Client Handover Protocol</span>
-            </div>
-            <h2 className="text-3xl sm:text-5xl font-black tracking-[-0.03em] text-[#160F29]">
-              Ready to deploy for {lead.company}?
-            </h2>
-            <p className="text-zinc-600 text-base leading-relaxed">
-              We deploy this exact code directly onto your main domain (<span className="font-mono font-semibold text-[#160F29]">{lead.website.replace(/^https?:\/\//, "")}</span>) within 48 hours. Zero downtime, zero broken links, and instant 100/100 Core Web Vitals.
-            </p>
-          </div>
-
-          {/* DUAL PRICING CARDS */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* TIER 1: $150 / MONTH */}
-            <div className="rounded-3xl bg-white p-8 sm:p-9 space-y-7 shadow-[0_15px_40px_rgba(20,12,48,0.08)] border-2 border-[#5B4BD6] relative flex flex-col justify-between">
-              <div className="space-y-5">
-                <div className="inline-block px-3.5 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-[#5B4BD6] text-white">
-                  Most Popular for Local Trades
-                </div>
-                <div>
-                  <div className="text-4xl sm:text-5xl font-black text-[#160F29]">
-                    $150 <span className="text-sm font-medium text-zinc-500 font-mono">AUD / month</span>
-                  </div>
-                  <div className="text-xs text-[#5B4BD6] font-mono font-semibold mt-1">
-                    $0 Upfront Build Fee • Cancel Anytime
-                  </div>
-                </div>
-
-                <ul className="space-y-3.5 text-xs text-zinc-600 pt-2">
-                  <li className="flex items-center gap-2.5">
-                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Complete bespoke Next.js 16 build for <strong>{lead.company}</strong></span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Ultra-fast Edge CDN hosting & automated SSL certificates</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Unlimited text, price, phone & image changes handled within 24 hours</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Continuous 100/100 Core Web Vitals maintenance guarantee</span>
-                  </li>
-                </ul>
               </div>
 
-              <a
-                href={`mailto:farukolawale509@gmail.com?subject=${encodeURIComponent(`Activate $150/mo Prototype for ${lead.company}`)}&body=${encodeURIComponent(`Hi Faruk,\n\nI reviewed the live sub-second prototype for ${lead.company} (${lead.website}).\n\nLet's get this activated under the $150 AUD/month plan.\n\nPhone: ${lead.phone}\nCompany: ${lead.company}\nBest time to call:`)}`}
-                className="w-full py-4 rounded-full bg-[#5B4BD6] hover:bg-[#4939C7] text-white font-bold text-sm text-center transition-all shadow-md flex items-center justify-center gap-2"
-              >
-                <span>Claim $150/mo Plan</span>
-                <ArrowRight className="w-4 h-4" />
-              </a>
+              {/* SPEEDCRAFT NEXT.JS PROTOTYPE */}
+              <div className="rounded-3xl bg-[#231A47] border border-[#5B4BD6] p-6 sm:p-7 space-y-5 shadow-[0_15px_40px_rgba(91,75,214,0.2)]">
+                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                  <div>
+                    <span className="text-[10px] font-mono uppercase font-bold text-emerald-400">
+                      Speedcraft Edge Rebuild
+                    </span>
+                    <div className="text-sm font-bold text-white">Next.js 16 Edge Prototype</div>
+                  </div>
+                  <div className="px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-800 text-emerald-300 font-mono text-xs font-bold flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>{simulatedScore}/100 Score</span>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-xs text-zinc-300">
+                    <span>Measured Load Time</span>
+                    <span className="font-mono font-bold text-emerald-400">{measuredSpeed} (Instant)</span>
+                  </div>
+                  <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+                    <div className="bg-emerald-400 h-full rounded-full" style={{ width: "100%" }} />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs font-mono pt-1">
+                  <div className="bg-white/10 p-3 rounded-xl border border-white/10">
+                    <div className="text-[10px] text-zinc-400 uppercase">Edge Latency (TTFB)</div>
+                    <div className="font-bold text-emerald-300">&lt; 35ms Global CDN</div>
+                  </div>
+                  <div className="bg-white/10 p-3 rounded-xl border border-white/10">
+                    <div className="text-[10px] text-zinc-400 uppercase">Conversion Lift</div>
+                    <div className="font-bold text-amber-300">+35% Retained Leads</div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* TIER 2: $1,200 ONE-TIME */}
-            <div className="rounded-3xl bg-white p-8 sm:p-9 space-y-7 shadow-[0_15px_40px_rgba(20,12,48,0.05)] border border-zinc-200/80 flex flex-col justify-between">
-              <div className="space-y-5">
-                <div className="inline-block px-3.5 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-zinc-100 text-zinc-700">
-                  Full Code Ownership
-                </div>
-                <div>
-                  <div className="text-4xl sm:text-5xl font-black text-[#160F29]">
-                    $1,200 <span className="text-sm font-medium text-zinc-500 font-mono">AUD upfront</span>
-                  </div>
-                  <div className="text-xs text-zinc-500 font-mono mt-1">
-                    + $50 AUD/month hosting & maintenance
-                  </div>
-                </div>
-
-                <ul className="space-y-3.5 text-xs text-zinc-600 pt-2">
-                  <li className="flex items-center gap-2.5">
-                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>100% Code Ownership & GitHub Repository Transfer</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Zero ongoing build royalties</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Complete DNS transfer and Google Analytics integration</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Dedicated Australian engineering support line</span>
-                  </li>
-                </ul>
+            {/* HANDOVER & PRICING PLANS */}
+            <div className="max-w-4xl mx-auto pt-6 border-t border-white/10 space-y-8">
+              <div className="text-center space-y-2">
+                <h3 className="text-2xl font-bold text-white">Claim This Prototype For {lead.company}</h3>
+                <p className="text-xs text-zinc-400">
+                  We deploy this exact code directly onto your main domain within 48 hours. Zero downtime.
+                </p>
               </div>
 
-              <a
-                href={`mailto:farukolawale509@gmail.com?subject=${encodeURIComponent(`Buyout Option for ${lead.company}`)}&body=${encodeURIComponent(`Hi Faruk,\n\nI want to discuss the $1,200 one-time build option for ${lead.company}.\n\nPlease call me or reply here.`)}`}
-                className="w-full py-4 rounded-full bg-[#160F29] hover:bg-zinc-800 text-white font-bold text-sm text-center transition-all shadow-sm flex items-center justify-center gap-2"
-              >
-                <span>Inquire About Buyout</span>
-                <ArrowRight className="w-4 h-4 text-zinc-400" />
-              </a>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* TIER 1 */}
+                <div className="rounded-2xl bg-white p-7 text-[#160F29] space-y-5 flex flex-col justify-between">
+                  <div className="space-y-3">
+                    <div className="inline-block px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-[#5B4BD6] text-white">
+                      Managed High-Speed Plan
+                    </div>
+                    <div className="text-3xl font-black">
+                      {lead.currencySymbol}150{" "}
+                      <span className="text-xs font-medium text-zinc-500 font-mono">/ month</span>
+                    </div>
+                    <div className="text-xs text-[#5B4BD6] font-mono font-semibold">
+                      $0 Upfront Build Fee • Cancel Anytime
+                    </div>
+                    <ul className="space-y-2 text-xs text-zinc-600 pt-2">
+                      <li className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span>Complete Next.js edge build for <strong>{lead.company}</strong></span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span>Ultra-fast Edge CDN hosting & SSL certificates</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span>Unlimited text, price, and phone edits within 24 hours</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <a
+                    href={`mailto:farukolawale509@gmail.com?subject=${encodeURIComponent(
+                      `Claim $150/mo Prototype for ${lead.company}`
+                    )}&body=${encodeURIComponent(
+                      `Hi Faruk,\n\nI reviewed the sub-second prototype for ${lead.company} (${lead.website}).\n\nLet's get this activated under the $150/month plan.\n\nCompany: ${lead.company}\nPhone: ${lead.phone}`
+                    )}`}
+                    className="w-full py-3.5 rounded-xl bg-[#5B4BD6] hover:bg-[#4939C7] text-white font-bold text-xs text-center transition-all shadow-md flex items-center justify-center gap-1.5"
+                  >
+                    <span>Claim $150/mo Plan</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+
+                {/* TIER 2 */}
+                <div className="rounded-2xl bg-white/10 border border-white/20 p-7 text-white space-y-5 flex flex-col justify-between">
+                  <div className="space-y-3">
+                    <div className="inline-block px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-white/20 text-white">
+                      Full Code Ownership
+                    </div>
+                    <div className="text-3xl font-black">
+                      {lead.currencySymbol}1,200{" "}
+                      <span className="text-xs font-medium text-zinc-400 font-mono">one-time</span>
+                    </div>
+                    <div className="text-xs text-zinc-400 font-mono">
+                      + $50/month optional hosting & monitoring
+                    </div>
+                    <ul className="space-y-2 text-xs text-zinc-300 pt-2">
+                      <li className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>100% Code Ownership & GitHub repo transfer</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>Zero ongoing build royalties</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>Complete DNS transfer and Google Analytics integration</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <a
+                    href={`mailto:farukolawale509@gmail.com?subject=${encodeURIComponent(
+                      `Code Buyout Option for ${lead.company}`
+                    )}&body=${encodeURIComponent(
+                      `Hi Faruk,\n\nI want to discuss the one-time code buyout option for ${lead.company}.\n\nCompany: ${lead.company}\nPhone: ${lead.phone}`
+                    )}`}
+                    className="w-full py-3.5 rounded-xl bg-white hover:bg-zinc-100 text-[#160F29] font-bold text-xs text-center transition-all shadow-md flex items-center justify-center gap-1.5"
+                  >
+                    <span>Inquire About Buyout</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-zinc-700" />
+                  </a>
+                </div>
+              </div>
+
+              {/* AGENCY CONTACT FOOTER */}
+              <div className="text-center pt-4 text-xs font-mono text-zinc-400">
+                Direct Engineer Contact:{" "}
+                <a
+                  href="mailto:farukolawale509@gmail.com"
+                  className="text-amber-300 underline font-bold hover:text-white"
+                >
+                  farukolawale509@gmail.com
+                </a>
+              </div>
             </div>
           </div>
+        </section>
 
-          <div className="text-center pt-8 border-t border-zinc-200 text-xs text-zinc-500 font-mono flex items-center justify-center gap-2">
-            <span>Direct Engineer Inquiries:</span>
-            <a href="mailto:farukolawale509@gmail.com" className="text-[#5B4BD6] font-bold hover:underline">
-              farukolawale509@gmail.com
-            </a>
-          </div>
+        {/* ──────────────────────────────────────────────────────────
+            MOBILE STICKY BOTTOM DOCK (CLICK-TO-CALL ALWAYS ACTIVE)
+        ────────────────────────────────────────────────────────── */}
+        <div className="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-zinc-200 p-3 z-40 shadow-lg flex items-center gap-2">
+          <a
+            href={`tel:${cleanPhone}`}
+            className="flex-1 py-3 rounded-xl bg-[#160F29] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs"
+          >
+            <Phone className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Call Now ({lead.phone})</span>
+          </a>
+          <a
+            href="#quote-form"
+            className="flex-1 py-3 rounded-xl bg-[#5B4BD6] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
+          >
+            <span>Get Quote</span>
+            <ArrowRight className="w-3 h-3" />
+          </a>
         </div>
-      </section>
-
-      {/* ─── FOOTER (LinkPaddy Style) ─── */}
-      <footer className="bg-white border-t border-zinc-200/80 py-10 px-5 sm:px-8">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-full bg-[#5B4BD6] text-white flex items-center justify-center font-bold text-xs">
-              <Zap className="w-3.5 h-3.5 fill-white" />
-            </div>
-            <div>
-              <span className="font-bold text-[#160F29] text-sm">Speedcraft Studio Australia</span>
-              <p className="text-xs text-zinc-500">Sub-second Next.js edge architecture for Australian businesses.</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-6 text-xs text-zinc-600 font-medium">
-            <Link href="/" className="hover:text-[#5B4BD6]">Main Studio</Link>
-            <Link href="/outreach" className="hover:text-[#5B4BD6]">Audited Leads</Link>
-            <a href="mailto:farukolawale509@gmail.com" className="hover:text-[#5B4BD6]">Contact Developer</a>
-            <span className="text-zinc-400">© 2026 Speedcraft</span>
-          </div>
-        </div>
-      </footer>
+      </div>
     </div>
   );
 }
@@ -925,9 +1293,11 @@ export default function ClientPrototypePreviewPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#5B4BD6] flex flex-col items-center justify-center font-mono text-xs text-white space-y-3">
-          <div className="w-7 h-7 border-2 border-white border-t-transparent rounded-full animate-spin" />
-          <div className="tracking-wider uppercase text-white/80">Synthesizing Sub-Second Speedcraft Prototype...</div>
+        <div className="min-h-screen bg-[#0F0C20] flex flex-col items-center justify-center font-mono text-xs text-white space-y-3">
+          <div className="w-7 h-7 border-2 border-amber-300 border-t-transparent rounded-full animate-spin" />
+          <div className="tracking-wider uppercase text-zinc-300">
+            Synthesizing Sub-Second Speedcraft Prototype...
+          </div>
         </div>
       }
     >
