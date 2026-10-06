@@ -152,12 +152,8 @@ Direct Inquiries: farukolawale509@gmail.com`;
   };
 }
 
-export async function GET(req: NextRequest) {
+async function handlePlacesSearch(query: string, location: string) {
   try {
-    const { searchParams } = new URL(req.url);
-    const query = searchParams.get("query") || "Emergency Plumber";
-    const location = searchParams.get("location") || "Dallas, TX";
-
     const apiKey = process.env.GOOGLE_PLACES_API_KEY;
     const sentCompanies = getSentCompanySet();
 
@@ -352,3 +348,22 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: err.message || "Failed to search places" }, { status: 500 });
   }
 }
+
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const query = searchParams.get("query") || "Emergency Plumber";
+  const location = searchParams.get("location") || "Dallas, TX";
+  return handlePlacesSearch(query, location);
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json().catch(() => ({}));
+    const query = body.query || "Emergency Plumber";
+    const location = body.location || "Dallas, TX";
+    return handlePlacesSearch(query, location);
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message || "Invalid request" }, { status: 400 });
+  }
+}
+
