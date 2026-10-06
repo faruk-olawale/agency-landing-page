@@ -1389,97 +1389,103 @@ function PrototypeContent() {
         </footer>
 
         {/* ═══════════════════════════════════════════════════════════════
-            SPEEDCRAFT STUDIO AGENCY CONTROLLER (COLLAPSIBLE RIBBON)
-            - Desktop & Mobile: pinned at bottom with live latency & claim action
-            - Live Lead & Niche Switcher for testing across businesses
+            SPEEDCRAFT PERFORMANCE & HANDOVER FLOATING TRIGGER (FAB)
+            - Replaces full-width bottom nav bar with a sleek floating pill
+            - Displays real-time measured latency (0.24s) & PageSpeed 100/100
+            - Clicking expands the engineering handover & prospect switch panel
         ═══════════════════════════════════════════════════════════════ */}
-        <aside
-          aria-label="Speedcraft Studio Performance Ribbon"
-          className="fixed bottom-0 inset-x-0 z-50 transition-all pointer-events-none"
-        >
+        <div className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end gap-3 pointer-events-auto">
+          {/* Expanded Handover Panel (Floating Card) */}
           {bannerExpanded && (
-            <div className="toast-pop bg-[#0C0730] border-t border-[#6FD9C1]/30 p-4 sm:p-5 text-white text-[13px] shadow-2xl pointer-events-auto">
-              <div className="max-w-[1200px] mx-auto space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
+            <div className="toast-pop bg-[#0C0730] border border-[#6FD9C1]/35 p-5 text-white text-[13px] shadow-[0_24px_60px_rgba(12,7,48,0.7)] rounded-3xl max-w-[440px] sm:max-w-[560px] w-[calc(100vw-32px)] sm:w-auto animate-in slide-in-from-bottom-3 duration-200">
+              <div className="space-y-4">
+                <div className="flex items-start justify-between gap-3 pb-3 border-b border-white/10">
                   <div>
-                    <span className="text-[#6FD9C1] font-mono text-[11px] font-bold uppercase tracking-wider">
-                      Speedcraft Studio · Engineering Handover
-                    </span>
-                    <h4 className="text-[16px] font-extrabold text-white mt-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[#6FD9C1] font-mono text-[11px] font-bold uppercase tracking-wider">
+                        Speedcraft Studio
+                      </span>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#6FD9C1]/20 text-[#6FD9C1] border border-[#6FD9C1]/40">
+                        {measuredSpeed} · 100/100
+                      </span>
+                    </div>
+                    <h4 className="text-[15px] font-extrabold text-white mt-1">
                       Ready to Deploy on {lead.website.replace(/^https?:\/\//, "")}?
                     </h4>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setActiveLeadPicker(!activeLeadPicker)}
-                      className="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-[#6FD9C1] text-[12px] font-bold flex items-center gap-1.5 transition cursor-pointer"
-                    >
-                      <Sliders className="w-3.5 h-3.5" />
-                      <span>Switch Prospect</span>
-                      <ChevronDown className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => setBannerExpanded(false)}
-                      className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/60 hover:text-white cursor-pointer"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => setBannerExpanded(false)}
+                    className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer shrink-0"
+                    title="Close Panel"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
 
-                {/* Lead Switcher Drawer */}
-                {activeLeadPicker && (
-                  <div className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-2">
-                    <div className="text-[11px] font-mono text-white/60 uppercase">
-                      Select Pre-Audited Prospect:
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {PRESET_LEADS.map((pl) => (
-                        <button
-                          key={pl.slug}
-                          onClick={() => {
-                            setActiveLeadPicker(false);
-                            router.push(`/preview/${pl.slug}`);
-                          }}
-                          className={`px-3 py-1.5 rounded-xl text-[12px] font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                            slug === pl.slug
-                              ? "bg-[#6FD9C1] text-[#0C0730]"
-                              : "bg-white/10 hover:bg-white/20 text-white"
-                          }`}
-                        >
-                          <span>{pl.name}</span>
-                          <span className="text-[10px] opacity-75 font-mono">({pl.city})</span>
-                        </button>
-                      ))}
-                    </div>
+                {/* Prospect Switcher Button & Drawer */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-mono text-white/60 uppercase">Current Prospect:</span>
+                    <button
+                      onClick={() => setActiveLeadPicker(!activeLeadPicker)}
+                      className="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-[#6FD9C1] text-[11px] font-bold flex items-center gap-1.5 transition cursor-pointer"
+                    >
+                      <Sliders className="w-3 h-3" />
+                      <span>Switch Prospect</span>
+                      <ChevronDown className="w-3 h-3" />
+                    </button>
                   </div>
-                )}
+
+                  {activeLeadPicker && (
+                    <div className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-2 max-h-48 overflow-y-auto">
+                      <div className="flex flex-wrap gap-1.5">
+                        {PRESET_LEADS.map((pl) => (
+                          <button
+                            key={pl.slug}
+                            onClick={() => {
+                              setActiveLeadPicker(false);
+                              router.push(`/preview/${pl.slug}`);
+                            }}
+                            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer ${
+                              slug === pl.slug
+                                ? "bg-[#6FD9C1] text-[#0C0730]"
+                                : "bg-white/10 hover:bg-white/20 text-white"
+                            }`}
+                          >
+                            <span>{pl.name}</span>
+                            <span className="text-[10px] opacity-75 font-mono">({pl.city})</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 {/* Pricing / Claim Options */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="p-3.5 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-between">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                  <div className="p-3 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-between gap-2">
                     <div>
-                      <div className="text-[11px] font-bold text-[#6FD9C1]">Managed Zero-Upfront</div>
-                      <div className="text-[18px] font-black">{lead.currencySymbol}150 / mo</div>
-                      <div className="text-[11px] text-white/60">Includes hosting, SSL & edits</div>
+                      <div className="text-[10px] font-bold text-[#6FD9C1]">Managed Hosting</div>
+                      <div className="text-[16px] font-black">{lead.currencySymbol}150 / mo</div>
+                      <div className="text-[10px] text-white/60">Zero upfront, SSL included</div>
                     </div>
                     <a
                       href={`mailto:farukolawale509@gmail.com?subject=${encodeURIComponent(`Activate $150/mo Prototype for ${lead.company}`)}&body=${encodeURIComponent(`Hi Faruk,\n\nI reviewed the sub-second prototype for ${lead.company} (${lead.website}).\n\nLet's deploy this on our domain.\n\nPhone: ${lead.phone}`)}`}
-                      className="px-4 py-2 rounded-full bg-[#6FD9C1] hover:bg-[#5bc4ad] text-[#0C0730] font-extrabold text-[12px] shadow-sm transition"
+                      className="px-3.5 py-2 rounded-full bg-[#6FD9C1] hover:bg-[#5bc4ad] text-[#0C0730] font-extrabold text-[11.5px] shadow-sm transition shrink-0"
                     >
                       Claim $150/mo
                     </a>
                   </div>
 
-                  <div className="p-3.5 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-between">
+                  <div className="p-3 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-between gap-2">
                     <div>
-                      <div className="text-[11px] font-bold text-white/70">Full Code Buyout</div>
-                      <div className="text-[18px] font-black">{lead.currencySymbol}1,200 one-time</div>
-                      <div className="text-[11px] text-white/60">GitHub transfer & zero royalties</div>
+                      <div className="text-[10px] font-bold text-white/70">Full Code Buyout</div>
+                      <div className="text-[16px] font-black">{lead.currencySymbol}1,200</div>
+                      <div className="text-[10px] text-white/60">GitHub repo transfer</div>
                     </div>
                     <a
                       href={`mailto:farukolawale509@gmail.com?subject=${encodeURIComponent(`Code Buyout for ${lead.company}`)}&body=${encodeURIComponent(`Hi Faruk,\n\nI want to discuss the code buyout for ${lead.company} (${lead.website}).`)}`}
-                      className="px-4 py-2 rounded-full bg-white text-[#0A0A0D] hover:bg-white/90 font-extrabold text-[12px] shadow-sm transition"
+                      className="px-3.5 py-2 rounded-full bg-white text-[#0A0A0D] hover:bg-white/90 font-extrabold text-[11.5px] shadow-sm transition shrink-0"
                     >
                       Inquire Buyout
                     </a>
@@ -1489,39 +1495,27 @@ function PrototypeContent() {
             </div>
           )}
 
-          {/* Collapsed Control Strip (Desktop & Mobile) */}
-          <div className="pointer-events-auto bg-[#0A0A0D]/90 backdrop-blur-md border-t border-white/15 text-white px-3 sm:px-6 py-2 sm:py-2.5 shadow-[0_-4px_30px_rgba(0,0,0,0.35)]">
-            <div className="max-w-[1200px] mx-auto flex items-center justify-between gap-3">
-              <button
-                onClick={() => setBannerExpanded(!bannerExpanded)}
-                className="flex items-center gap-2 text-left group cursor-pointer"
-                style={{ minHeight: 38 }}
-              >
-                <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-[#6FD9C1]/20 flex items-center justify-center text-[#6FD9C1]">
-                  <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-[#6FD9C1]" />
-                </span>
-                <div className="flex items-center gap-1.5 sm:gap-2 text-[11.5px] sm:text-[12.5px] font-bold text-white">
-                  <span className="font-mono text-[#6FD9C1] bg-black/50 px-1.5 sm:px-2 py-0.5 rounded border border-[#6FD9C1]/40">
-                    {measuredSpeed}
-                  </span>
-                  <span className="text-white/80">PageSpeed: 100/100</span>
-                  <span className="text-white/40 hidden sm:inline">|</span>
-                  <span className="text-white/70 hidden md:inline truncate">{lead.company}</span>
-                </div>
-                <ChevronUp className={`w-3.5 h-3.5 text-white/60 group-hover:text-white transition-transform ${bannerExpanded ? "rotate-180" : ""}`} />
-              </button>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setBannerExpanded(!bannerExpanded)}
-                  className="px-3 sm:px-3.5 py-1.5 rounded-full bg-white text-[#0A0A0D] hover:bg-white/90 text-[11px] sm:text-[12px] font-extrabold shadow-sm transition cursor-pointer"
-                >
-                  {bannerExpanded ? "Close Panel" : "Claim Code"}
-                </button>
-              </div>
+          {/* Floating Trigger Pill (FAB) */}
+          <button
+            onClick={() => setBannerExpanded(!bannerExpanded)}
+            className="group flex items-center gap-2 h-12 px-4 rounded-full bg-[#0C0730] text-white border border-[#6FD9C1]/50 shadow-[0_10px_30px_rgba(12,7,48,0.5),0_0_15px_rgba(111,217,193,0.25)] hover:border-[#6FD9C1] hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md"
+            title="Speedcraft Audit & Engineering Handover"
+          >
+            <span className="w-6 h-6 rounded-full bg-[#6FD9C1]/20 flex items-center justify-center text-[#6FD9C1] group-hover:bg-[#6FD9C1]/30 transition">
+              <Zap className="w-3.5 h-3.5 fill-[#6FD9C1]" />
+            </span>
+            <div className="flex items-center gap-1.5 font-bold text-[12px]">
+              <span className="font-mono text-[#6FD9C1] tracking-tight">{measuredSpeed}</span>
+              <span className="text-white/40">·</span>
+              <span className="text-white/90 font-mono text-[11px]">100/100</span>
             </div>
-          </div>
-        </aside>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#6FD9C1] animate-pulse" />
+            <span className="hidden sm:inline text-[11px] font-extrabold text-[#6FD9C1] uppercase tracking-wider pl-0.5">
+              Claim Code
+            </span>
+            <ChevronUp className={`w-3.5 h-3.5 text-white/60 group-hover:text-white transition-transform ${bannerExpanded ? "rotate-180" : ""}`} />
+          </button>
+        </div>
       </div>
     </>
   );
