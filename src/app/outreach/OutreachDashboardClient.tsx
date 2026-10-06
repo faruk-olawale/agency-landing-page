@@ -94,6 +94,11 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
   const [errorMsgMap, setErrorMsgMap] = useState<Record<string, string>>({});
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Pitch Angle & Modal States (Zero-Jargon Conversion Messaging)
+  const [pitchAngle, setPitchAngle] = useState<"wasted_ads" | "direct_punchy">("wasted_ads");
+  const [activePitchLead, setActivePitchLead] = useState<Lead | null>(null);
+  const [pitchModalTab, setPitchModalTab] = useState<"email_wasted" | "email_direct" | "linkedin">("email_wasted");
+
   // Google Maps Search States
   const [mapsQuery, setMapsQuery] = useState("Emergency Plumber");
   const [mapsLocation, setMapsLocation] = useState("Dallas, TX");
@@ -388,39 +393,15 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
     }
   };
 
-  const copyPitch = (lead: Lead) => {
-    const slug = slugify(lead.company);
+  const getEmailSubject = (lead: Lead, angle: "wasted_ads" | "direct_punchy" = pitchAngle): string => {
     const domainClean = lead.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
-    const previewUrl = typeof window !== "undefined"
-      ? `${window.location.origin}/preview/${slug}`
-      : `https://agency-landing-page-smoky-psi.vercel.app/preview/${slug}`;
-    const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Team`;
-
-    const pitch = `Subject: ${lead.coldEmailSubject}
-
-Hey ${greeting},
-
-Noticed you're driving high-intent search traffic to ${domainClean}, but the mobile landing page takes ${lead.mobileLoadTimeSec}s to load (Google Mobile PageSpeed: ${lead.mobilePageSpeed}/100).
-
-Because Google penalizes slow mobile pages with lower Quality Scores, you're paying higher cost-per-click while losing ~${Math.round((100 - lead.mobilePageSpeed) * 0.42)}% of mobile visitors before the page renders.
-
-I run Speedcraft Studio. I hand-coded a sub-second Next.js edge prototype for ${lead.company} that loads in 0.28s and scores a verified 100/100 Core Web Vitals:
-Link: ${previewUrl}
-
-Zero strings attached — take a look on your mobile phone to feel the speed difference.
-
-Would you like me to deploy this live on your domain so you can stop leaking ad clicks?
-
-Best,
-Faruk — Lead Engineer, Speedcraft Studio
-Direct Inquiries: farukolawale509@gmail.com`;
-
-    navigator.clipboard.writeText(pitch);
-    setCopiedId(lead.company);
-    setTimeout(() => setCopiedId(null), 2000);
+    if (angle === "wasted_ads") {
+      return `Your Google Ads / ${lead.company}`;
+    }
+    return `Mobile site speed for ${domainClean}`;
   };
 
-  const getGmailUrl = (lead: Lead) => {
+  const getEmailBody = (lead: Lead, angle: "wasted_ads" | "direct_punchy" = pitchAngle): string => {
     const slug = slugify(lead.company);
     const domainClean = lead.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
     const previewUrl = typeof window !== "undefined"
@@ -428,61 +409,80 @@ Direct Inquiries: farukolawale509@gmail.com`;
       : `https://agency-landing-page-smoky-psi.vercel.app/preview/${slug}`;
     const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Team`;
 
-    const subject = `quick question regarding ${domainClean} mobile load speed`;
-    const body = `Hey ${greeting},
+    if (angle === "wasted_ads") {
+      return `Hey ${greeting},
 
-Noticed you're driving high-intent search traffic to ${domainClean}, but the mobile landing page takes ${lead.mobileLoadTimeSec}s to load (Google Mobile PageSpeed: ${lead.mobilePageSpeed}/100).
+I noticed you're driving search traffic to ${domainClean}, but the mobile landing page takes about ${lead.mobileLoadTimeSec} seconds to load.
 
-Because Google penalizes pages over 2.5s with lower Quality Scores, you're paying higher cost-per-click while losing ~${Math.round((100 - lead.mobilePageSpeed) * 0.42)}% of mobile visitors before the page renders.
+Because mobile users are impatient, you are likely losing about a third of your paid visitors before your site even loads. It also means Google is likely charging you a higher rate for your ads.
 
-I run Speedcraft Studio. I hand-coded a sub-second Next.js prototype for ${lead.company} that loads in 0.28s and scores a verified 100/100 Core Web Vitals:
+I run Speedcraft Studio. To show you what you're missing, I went ahead and built a custom, lightning-fast version of your landing page. It loads instantly (under half a second).
+
+Take a look on your phone to feel the speed difference:
 Link: ${previewUrl}
 
-Zero strings attached — take a look on your phone to feel the speed difference.
-
-Would you like me to deploy this live on your domain so you can stop leaking ad clicks?
+Zero strings attached. If you like the feel of it, would you like me to set this up on your actual domain so you stop leaking ad clicks?
 
 Best,
 Faruk — Lead Engineer, Speedcraft Studio
-Direct Inquiries: farukolawale509@gmail.com`;
+Direct: farukolawale509@gmail.com`;
+    }
 
+    return `Hey ${greeting},
+
+I noticed you are paying for search ads, but your mobile landing page takes ${lead.mobileLoadTimeSec} seconds to load. Usually, this means you are losing a massive chunk of potential leads before they even see your phone number.
+
+I help businesses fix this. I actually built a lightning-fast test version of your exact landing page to show you the difference.
+
+Tap this link on your phone to see how fast your site should be:
+Link: ${previewUrl}
+
+If you want to stop losing paid traffic to slow load times, would you be open to a quick chat about getting this new version running on your main domain?
+
+Best,
+Faruk — Lead Engineer, Speedcraft Studio
+Direct: farukolawale509@gmail.com`;
+  };
+
+  const getLinkedInText = (lead: Lead): string => {
+    const slug = slugify(lead.company);
+    const domainClean = lead.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
+    const previewUrl = typeof window !== "undefined"
+      ? `${window.location.origin}/preview/${slug}`
+      : `https://agency-landing-page-smoky-psi.vercel.app/preview/${slug}`;
+    const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Team`;
+
+    return `Hey ${greeting}, saw ${domainClean}. Your mobile site takes ${lead.mobileLoadTimeSec}s to load, which means you're likely losing paid leads before they can call you. I built a lightning-fast test version that loads in under half a second so customers don't bounce: ${previewUrl} — want to check it out?`;
+  };
+
+  const copyPitch = (lead: Lead) => {
+    setActivePitchLead(lead);
+    setPitchModalTab(pitchAngle === "wasted_ads" ? "email_wasted" : "email_direct");
+  };
+
+  const getGmailUrl = (lead: Lead, angle: "wasted_ads" | "direct_punchy" = pitchAngle) => {
+    const subject = getEmailSubject(lead, angle);
+    const body = getEmailBody(lead, angle);
     return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(lead.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
-  const handleGmailClick = (lead: Lead) => {
-    const url = getGmailUrl(lead);
+  const handleGmailClick = (lead: Lead, angle: "wasted_ads" | "direct_punchy" = pitchAngle) => {
+    const url = getGmailUrl(lead, angle);
     window.open(url, "_blank", "noopener,noreferrer");
     markAsSent(lead, "gmail");
   };
 
-  const sendViaApi = async (lead: Lead) => {
+  const sendViaApi = async (lead: Lead, angle: "wasted_ads" | "direct_punchy" = pitchAngle) => {
     setSendingMap((prev) => ({ ...prev, [lead.company]: "sending" }));
     setErrorMsgMap((prev) => ({ ...prev, [lead.company]: "" }));
 
     const slug = slugify(lead.company);
-    const domainClean = lead.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
     const previewUrl = typeof window !== "undefined"
       ? `${window.location.origin}/preview/${slug}`
       : `https://agency-landing-page-smoky-psi.vercel.app/preview/${slug}`;
-    const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Team`;
 
-    const subject = `quick question regarding ${domainClean} mobile load speed`;
-    const body = `Hey ${greeting},
-
-Noticed you're driving high-intent search traffic to ${domainClean}, but the mobile landing page takes ${lead.mobileLoadTimeSec}s to load (Google Mobile PageSpeed: ${lead.mobilePageSpeed}/100).
-
-Because Google penalizes pages over 2.5s with lower Quality Scores, you're paying higher cost-per-click while losing ~${Math.round((100 - lead.mobilePageSpeed) * 0.42)}% of mobile visitors before the page renders.
-
-I run Speedcraft Studio. I hand-coded a sub-second prototype for ${lead.company} that loads in 0.28s and scores a verified 100/100 Core Web Vitals:
-Link: ${previewUrl}
-
-Zero strings attached — take a look on your mobile phone to feel the speed difference.
-
-Would you like me to deploy this live on your domain so you can stop leaking ad clicks?
-
-Best,
-Faruk — Lead Engineer, Speedcraft Studio
-Direct Inquiries: farukolawale509@gmail.com`;
+    const subject = getEmailSubject(lead, angle);
+    const body = getEmailBody(lead, angle);
 
     try {
       const res = await fetch("/api/outreach/send", {
@@ -520,6 +520,160 @@ Direct Inquiries: farukolawale509@gmail.com`;
         </div>
       )}
 
+      {/* ─── PITCH ASSISTANT & JARGON-FREE MODAL ─── */}
+      {activePitchLead && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="bg-white rounded-2xl max-w-2xl w-full border border-zinc-200 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150">
+            {/* Modal Header */}
+            <div className="px-6 py-4 bg-[#160F29] text-white flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-extrabold text-sm">{activePitchLead.company}</span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-200 border border-purple-400/30">
+                    {activePitchLead.niche} • {activePitchLead.city}
+                  </span>
+                </div>
+                <p className="text-xs text-zinc-400 mt-0.5">
+                  High-converting, zero-jargon pitch focused strictly on business value & lost ad revenue.
+                </p>
+              </div>
+              <button
+                onClick={() => setActivePitchLead(null)}
+                className="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Angle Selection Tabs */}
+            <div className="p-4 bg-zinc-50 border-b border-zinc-200 flex flex-wrap items-center gap-2 text-xs font-semibold">
+              <button
+                onClick={() => setPitchModalTab("email_wasted")}
+                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  pitchModalTab === "email_wasted"
+                    ? "bg-[#5B4BD6] text-white shadow-xs"
+                    : "bg-white text-zinc-700 hover:bg-zinc-100 border border-zinc-200"
+                }`}
+              >
+                Angle 1: Wasted Ad Spend (Recommended)
+              </button>
+              <button
+                onClick={() => setPitchModalTab("email_direct")}
+                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  pitchModalTab === "email_direct"
+                    ? "bg-[#5B4BD6] text-white shadow-xs"
+                    : "bg-white text-zinc-700 hover:bg-zinc-100 border border-zinc-200"
+                }`}
+              >
+                Angle 2: Direct & Punchy
+              </button>
+              <button
+                onClick={() => setPitchModalTab("linkedin")}
+                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  pitchModalTab === "linkedin"
+                    ? "bg-[#0A66C2] text-white shadow-xs"
+                    : "bg-white text-zinc-700 hover:bg-zinc-100 border border-zinc-200"
+                }`}
+              >
+                Angle 3: LinkedIn DM
+              </button>
+            </div>
+
+            {/* Pitch Content Display */}
+            <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+              {pitchModalTab !== "linkedin" && (
+                <div>
+                  <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Subject Line</div>
+                  <div className="p-2.5 bg-zinc-100 rounded-lg text-xs font-mono font-medium text-zinc-900 border border-zinc-200 select-all">
+                    {getEmailSubject(activePitchLead, pitchModalTab === "email_wasted" ? "wasted_ads" : "direct_punchy")}
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-1">
+                  {pitchModalTab === "linkedin" ? "LinkedIn Direct Message" : "Email Body"}
+                </div>
+                <pre className="p-4 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-sans text-zinc-800 whitespace-pre-wrap leading-relaxed select-all">
+                  {pitchModalTab === "linkedin"
+                    ? getLinkedInText(activePitchLead)
+                    : getEmailBody(activePitchLead, pitchModalTab === "email_wasted" ? "wasted_ads" : "direct_punchy")}
+                </pre>
+              </div>
+            </div>
+
+            {/* Modal Footer Actions */}
+            <div className="px-6 py-4 bg-zinc-50 border-t border-zinc-200 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const text =
+                      pitchModalTab === "linkedin"
+                        ? getLinkedInText(activePitchLead)
+                        : `Subject: ${getEmailSubject(
+                            activePitchLead,
+                            pitchModalTab === "email_wasted" ? "wasted_ads" : "direct_punchy"
+                          )}\n\n${getEmailBody(
+                            activePitchLead,
+                            pitchModalTab === "email_wasted" ? "wasted_ads" : "direct_punchy"
+                          )}`;
+                    navigator.clipboard.writeText(text);
+                    setCopiedId(activePitchLead.company);
+                    setTimeout(() => setCopiedId(null), 2000);
+                    showToast(`Copied pitch for ${activePitchLead.company} to clipboard!`);
+                  }}
+                  className="px-4 py-2 bg-white hover:bg-zinc-100 border border-zinc-300 rounded-lg text-xs font-semibold text-zinc-800 flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                >
+                  <Copy className="w-3.5 h-3.5 text-zinc-500" />
+                  <span>{copiedId === activePitchLead.company ? "Copied!" : "Copy Pitch"}</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    markAsSent(activePitchLead, "manual");
+                    setActivePitchLead(null);
+                  }}
+                  className="px-3.5 py-2 bg-zinc-100 hover:bg-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Check className="w-3.5 h-3.5 text-zinc-500" />
+                  <span>Mark Sent</span>
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {activePitchLead.email && (
+                  <>
+                    <button
+                      onClick={() => {
+                        const angle = pitchModalTab === "email_wasted" ? "wasted_ads" : "direct_punchy";
+                        handleGmailClick(activePitchLead, angle);
+                        setActivePitchLead(null);
+                      }}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                    >
+                      <Mail className="w-3.5 h-3.5" />
+                      <span>Open in Gmail</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        const angle = pitchModalTab === "email_wasted" ? "wasted_ads" : "direct_punchy";
+                        sendViaApi(activePitchLead, angle);
+                        setActivePitchLead(null);
+                      }}
+                      className="px-4 py-2 bg-[#5B4BD6] hover:bg-[#4939C7] text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Dispatch API</span>
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ─── TOP BAR ─── */}
       <div className="bg-[#160F29] text-white border-b border-zinc-800 px-4 py-3 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
@@ -533,6 +687,27 @@ Direct Inquiries: farukolawale509@gmail.com`;
           </div>
 
           <div className="flex items-center gap-4 text-xs font-mono">
+            <div className="hidden sm:flex items-center gap-1.5 bg-zinc-800/80 px-2 py-1 rounded-lg border border-zinc-700/60">
+              <span className="text-[10px] text-zinc-400">Angle:</span>
+              <button
+                onClick={() => setPitchAngle("wasted_ads")}
+                className={`text-[10px] px-2 py-0.5 rounded cursor-pointer transition-all ${
+                  pitchAngle === "wasted_ads" ? "bg-[#5B4BD6] text-white font-bold" : "text-zinc-400 hover:text-white"
+                }`}
+                title="Framed around wasted Google Ads budget & impatient mobile visitors"
+              >
+                Wasted Ad Spend
+              </button>
+              <button
+                onClick={() => setPitchAngle("direct_punchy")}
+                className={`text-[10px] px-2 py-0.5 rounded cursor-pointer transition-all ${
+                  pitchAngle === "direct_punchy" ? "bg-[#5B4BD6] text-white font-bold" : "text-zinc-400 hover:text-white"
+                }`}
+                title="Direct, punchy message highlighting lost phone calls & leads"
+              >
+                Direct & Punchy
+              </button>
+            </div>
             <Link href="/" className="text-zinc-400 hover:text-white transition-colors">
               Main Studio
             </Link>
@@ -1136,13 +1311,14 @@ Direct Inquiries: farukolawale509@gmail.com`;
                           </a>
                         )}
 
-                        {/* COPY PITCH BUTTON */}
+                        {/* PITCH ASSISTANT MODAL TRIGGER */}
                         <button
                           onClick={() => copyPitch(lead)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 border border-zinc-200 bg-white hover:bg-zinc-50 rounded-md font-medium text-zinc-700 transition-all cursor-pointer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 border border-purple-200 bg-purple-50/70 hover:bg-purple-100 rounded-md font-medium text-[#5B4BD6] transition-all cursor-pointer shadow-2xs"
+                          title="View and customize zero-jargon pitch angles"
                         >
-                          {isCopied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3 text-zinc-400" />}
-                          <span>{isCopied ? "Copied!" : "Pitch"}</span>
+                          <Sparkles className="w-3 h-3 text-[#5B4BD6]" />
+                          <span>Pitch Assistant</span>
                         </button>
 
                         {/* MANUAL MARK AS CONTACTED / CLEAR */}

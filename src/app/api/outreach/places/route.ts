@@ -104,22 +104,25 @@ function enrichBusinessWithAudit(raw: {
   // Only assign email if real website exists; never construct fake domains that bounce
   const email = raw.isVerifiedWebsite && domainClean ? `info@${domainClean}` : "";
 
-  const coldEmailSubject = `quick question regarding ${domainClean || raw.name} mobile load speed`;
+  const coldEmailSubject = `Your Google Ads / ${raw.name}`;
   const coldEmailBody = `Hey ${contactName},
 
-Noticed you're driving high-intent search traffic to ${domainClean || raw.name}, but the mobile landing page takes ${mobileLoadTimeSec}s to load (Google Mobile PageSpeed: ${mobilePageSpeed}/100).
+I noticed you're driving search traffic to ${domainClean || raw.name}, but the mobile landing page takes about ${mobileLoadTimeSec} seconds to load.
 
-Because Google penalizes pages over 2.5s with lower Quality Scores, you're paying higher cost-per-click while losing ~${Math.round((100 - mobilePageSpeed) * 0.42)}% of mobile visitors before the page renders.
+Because mobile users are impatient, you are likely losing about a third of your paid visitors before your site even loads. It also means Google is likely charging you a higher rate for your ads.
 
-I run Speedcraft Studio. I hand-coded a sub-second Next.js edge prototype for ${raw.name} that loads in 0.28s and scores a verified 100/100 Core Web Vitals.
+I run Speedcraft Studio. To show you what you're missing, I went ahead and built a custom, lightning-fast version of your landing page. It loads instantly (under half a second).
 
-Would you like me to send over the live prototype link? Zero strings attached.
+Take a look on your phone to feel the speed difference:
+Link: https://agency-landing-page-smoky-psi.vercel.app/preview/${raw.name.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-")}
+
+Zero strings attached. If you like the feel of it, would you like me to set this up on your actual domain so you stop leaking ad clicks?
 
 Best,
 Faruk — Lead Engineer, Speedcraft Studio
-Direct Inquiries: farukolawale509@gmail.com`;
+Direct: farukolawale509@gmail.com`;
 
-  const linkedInMessage = `Hey ${contactName}, saw ${domainClean || raw.name}. Mobile takes ${mobileLoadTimeSec}s (PageSpeed: ${mobilePageSpeed}/100), leaking paid Google traffic. I built a 0.28s Next.js prototype for ${raw.name} scoring 100/100. Would you like to review the live preview?`;
+  const linkedInMessage = `Hey ${contactName}, saw ${domainClean || raw.name}. Your mobile site takes ${mobileLoadTimeSec}s to load, which means you're likely losing paid leads before they can call you. I built a lightning-fast test version that loads in under half a second so customers don't bounce: https://agency-landing-page-smoky-psi.vercel.app/preview/${raw.name.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-")} — want to check it out?`;
 
   return {
     company: raw.name,
