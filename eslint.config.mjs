@@ -14,6 +14,7 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     "scripts/**",
     "filter-leads.js",
+    "clean-database.js",
   ]),
 ]);
 

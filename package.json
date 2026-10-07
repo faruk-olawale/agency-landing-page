@@ -10,7 +10,8 @@
     "audit": "npx tsx scripts/audit.ts",
     "leads:au": "npx tsx scripts/generate-australian-leads.ts",
     "send:outreach": "npx tsx scripts/send-outreach.ts",
-    "filter:leads": "node scripts/filter-ad-leads.js"
+    "filter:leads": "node scripts/filter-ad-leads.js",
+    "clean:db": "node clean-database.js"
   },
   "dependencies": {
     "framer-motion": "^13.4.5",

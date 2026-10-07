@@ -22,8 +22,29 @@ import {
   Plus,
   UploadCloud,
   X,
+  Shield,
+  Layers,
+  Target,
+  Database,
 } from "lucide-react";
 import leadsData from "../../../leads/global_leads_audit.json";
+import qualifiedTargetedLeads from "../../../qualified_targeted_leads.json";
+import { auditWebsiteAction } from "@/app/actions/audit";
+import { getArchetype, getArchetypePrimaryColor } from "@/lib/archetypeMap";
+import type { Archetype } from "@/lib/archetypeMap";
+
+export const TARGET_NICHES = [
+  "Plumber",
+  "HVAC",
+  "Roofer",
+  "Electrician",
+  "Auto Mechanic",
+  "Law Firm",
+  "CPA",
+  "Dentist",
+  "MedSpa",
+  "Other",
+] as const;
 
 export interface Lead {
   company: string;
@@ -32,6 +53,9 @@ export interface Lead {
   countryCode: string;
   city: string;
   niche: string;
+  industry?: string;
+  archetype?: Archetype;
+  primaryColor?: string;
   contactName: string;
   phone: string;
   email: string;
@@ -52,6 +76,7 @@ export interface Lead {
   coldEmailSubject: string;
   coldEmailBody: string;
   linkedInMessage: string;
+  hasAdTags?: boolean;
   hasMarketingPixels?: boolean;
 }
 
@@ -77,11 +102,12 @@ interface OutreachClientProps {
 
 export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachClientProps) {
   const [activeTab, setActiveTab] = useState<"active" | "sent">("active");
-  const [sourceMode, setSourceMode] = useState<"vault" | "google_maps">("vault");
+  const [sourceMode, setSourceMode] = useState<"targeted" | "vault" | "google_maps">("targeted");
   const [search, setSearch] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("all");
   const [selectedCity, setSelectedCity] = useState("all");
   const [selectedNiche, setSelectedNiche] = useState("all");
+  const [selectedArchetype, setSelectedArchetype] = useState<string>("all");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [sendingMap, setSendingMap] = useState<Record<string, "idle" | "sending" | "sent" | "error">>({});
   const [errorMsgMap, setErrorMsgMap] = useState<Record<string, string>>({});
@@ -131,6 +157,19 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
     return s;
   }, [sentRecords]);
 
+  // Curated Targeted Ad Leads (69 high-value leads with verified ad spend)
+  const targetedLeadsPool = useMemo(() => {
+    return (qualifiedTargetedLeads as Lead[]).map((l) => {
+      const arch = l.archetype || getArchetype(l.industry || l.niche);
+      const color = l.primaryColor || getArchetypePrimaryColor(l.industry || l.niche, arch);
+      return {
+        ...l,
+        archetype: arch,
+        primaryColor: color,
+      };
+    });
+  }, []);
+
   const [vaultLeads, setVaultLeads] = useState<Lead[]>(leadsData as Lead[]);
 
   // Instant URL Auditor & Importer States
@@ -139,53 +178,62 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
   const [auditUrl, setAuditUrl] = useState("");
   const [auditCompany, setAuditCompany] = useState("");
   const [auditCity, setAuditCity] = useState("");
-  const [auditNiche, setAuditNiche] = useState("Plumbing");
+  const [auditIndustry, setAuditIndustry] = useState<string>("Plumber");
   const [isAuditing, setIsAuditing] = useState(false);
   const [bulkText, setBulkText] = useState("");
   const [isBulkImporting, setIsBulkImporting] = useState(false);
 
-  // Dynamic Country list from vault
+  // Active dataset depending on mode
+  const currentLeadsPool =
+    sourceMode === "google_maps"
+      ? mapsResults
+      : sourceMode === "targeted"
+      ? targetedLeadsPool
+      : vaultLeads;
+
+  // Dynamic Country list
   const countries = useMemo(() => {
     const counts: Record<string, number> = {};
-    vaultLeads.forEach((l) => {
+    currentLeadsPool.forEach((l) => {
       counts[l.country] = (counts[l.country] || 0) + 1;
     });
     return ["all", ...Object.keys(counts).sort()];
-  }, [vaultLeads]);
+  }, [currentLeadsPool]);
 
   // Dynamic City list (scoped to selected country)
   const cities = useMemo(() => {
-    const scoped = selectedCountry === "all" ? vaultLeads : vaultLeads.filter((l) => l.country === selectedCountry);
+    const scoped = selectedCountry === "all" ? currentLeadsPool : currentLeadsPool.filter((l) => l.country === selectedCountry);
     return ["all", ...new Set(scoped.map((l) => l.city))].sort();
-  }, [vaultLeads, selectedCountry]);
+  }, [currentLeadsPool, selectedCountry]);
 
   // Dynamic Niche list
   const niches = useMemo(() => {
-    const scoped = selectedCountry === "all" ? vaultLeads : vaultLeads.filter((l) => l.country === selectedCountry);
-    return ["all", ...new Set(scoped.map((l) => l.niche))].sort();
-  }, [vaultLeads, selectedCountry]);
-
-  // Active dataset depending on mode
-  const currentLeadsPool = sourceMode === "google_maps" ? mapsResults : vaultLeads;
+    const scoped = selectedCountry === "all" ? currentLeadsPool : currentLeadsPool.filter((l) => l.country === selectedCountry);
+    return ["all", ...new Set(scoped.map((l) => l.niche || l.industry || ""))].filter(Boolean).sort();
+  }, [currentLeadsPool, selectedCountry]);
 
   // Filtered Leads
   const filteredAll = useMemo(() => {
     return currentLeadsPool.filter((lead) => {
       const matchesSearch =
         lead.company.toLowerCase().includes(search.toLowerCase()) ||
-        lead.website.toLowerCase().includes(search.toLowerCase()) ||
-        lead.email.toLowerCase().includes(search.toLowerCase()) ||
-        lead.city.toLowerCase().includes(search.toLowerCase()) ||
-        lead.country.toLowerCase().includes(search.toLowerCase());
+        (lead.website && lead.website.toLowerCase().includes(search.toLowerCase())) ||
+        (lead.email && lead.email.toLowerCase().includes(search.toLowerCase())) ||
+        (lead.city && lead.city.toLowerCase().includes(search.toLowerCase())) ||
+        (lead.country && lead.country.toLowerCase().includes(search.toLowerCase()));
 
       if (sourceMode === "google_maps") return matchesSearch;
 
       const matchesCountry = selectedCountry === "all" || lead.country === selectedCountry;
       const matchesCity = selectedCity === "all" || lead.city.toLowerCase() === selectedCity.toLowerCase();
-      const matchesNiche = selectedNiche === "all" || lead.niche.toLowerCase() === selectedNiche.toLowerCase();
-      return matchesSearch && matchesCountry && matchesCity && matchesNiche;
+      const rawNiche = (lead.niche || lead.industry || "").toLowerCase();
+      const matchesNiche = selectedNiche === "all" || rawNiche === selectedNiche.toLowerCase();
+      const leadArchetype = lead.archetype || getArchetype(lead.industry || lead.niche || "");
+      const matchesArchetype = selectedArchetype === "all" || leadArchetype === selectedArchetype;
+
+      return matchesSearch && matchesCountry && matchesCity && matchesNiche && matchesArchetype;
     });
-  }, [currentLeadsPool, search, selectedCountry, selectedCity, selectedNiche, sourceMode]);
+  }, [currentLeadsPool, search, selectedCountry, selectedCity, selectedNiche, selectedArchetype, sourceMode]);
 
   // ACTIVE UNCONTACTED QUEUE (Strictly excludes sent companies in real time)
   const activeLeads = useMemo(() => {
@@ -234,29 +282,25 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
 
   const handleSingleAudit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!auditUrl.trim()) return;
+    if (!auditUrl.trim() || !auditIndustry) return;
 
     setIsAuditing(true);
     try {
-      const res = await fetch("/api/outreach/audit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          website: auditUrl.trim(),
-          company: auditCompany.trim() || undefined,
-          city: auditCity.trim() || undefined,
-          niche: auditNiche.trim() || undefined,
-        }),
+      const data = await auditWebsiteAction({
+        url: auditUrl.trim(),
+        industry: auditIndustry,
+        company: auditCompany.trim() || undefined,
+        city: auditCity.trim() || undefined,
       });
-      const data = await res.json();
+
       if (data.success && data.lead) {
-        setVaultLeads((prev) => [data.lead, ...prev]);
+        setVaultLeads((prev) => [data.lead as Lead, ...prev]);
         setAuditUrl("");
         setAuditCompany("");
         setAuditCity("");
-        const adStatusText = data.hasMarketingPixels
-          ? "🟢 Active Ad Tracking Detected"
-          : "⚪ No Ad Pixels Found";
+        const adStatusText = data.hasAdTags
+          ? "🟢 Active Ad Spend Detected (Wasted Ad Spend Pitch)"
+          : "⚪ No Ad Tags Found (Lost Organic SEO Pitch)";
         showToast(`Audited ${data.lead.company} (${data.lead.mobilePageSpeed}/100 Speed • ${adStatusText}) — added to queue!`);
         setShowImportDrawer(false);
         setSourceMode("vault");
@@ -282,31 +326,31 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
       let url = parts[0];
       let company = "";
       let city = "";
-      let niche = "";
+      let niche = auditIndustry;
 
       if (parts.length > 1) {
         if (parts[1].startsWith("http") || parts[1].includes(".")) {
           company = parts[0];
           url = parts[1];
           city = parts[2] || "";
-          niche = parts[3] || "";
+          niche = parts[3] || auditIndustry;
         } else {
           url = parts[0];
           company = parts[1] || "";
           city = parts[2] || "";
-          niche = parts[3] || "";
+          niche = parts[3] || auditIndustry;
         }
       }
 
       try {
-        const res = await fetch("/api/outreach/audit", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ website: url, company, city, niche }),
+        const data = await auditWebsiteAction({
+          url,
+          industry: niche || auditIndustry || "Other",
+          company: company || undefined,
+          city: city || undefined,
         });
-        const data = await res.json();
         if (data.success && data.lead) {
-          setVaultLeads((prev) => [data.lead, ...prev]);
+          setVaultLeads((prev) => [data.lead as Lead, ...prev]);
           successCount++;
         }
       } catch {}
@@ -319,7 +363,7 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
     setSourceMode("vault");
   };
 
-  // Generate accurate preview URL for any lead (Vault or Google Maps)
+  // Generate accurate preview URL for any lead (Targeted, Vault, or Google Maps)
   const getPreviewUrlForLead = (lead: Lead, absolute: boolean = false): string => {
     const slug = slugify(lead.company);
     const origin = typeof window !== "undefined"
@@ -327,21 +371,24 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
       : "https://agency-landing-page-smoky-psi.vercel.app";
     const base = absolute ? origin : "";
 
-    const isVaultLead = (leadsData as Lead[]).some((l) => slugify(l.company) === slug);
-    if (!isVaultLead || sourceMode === "google_maps") {
-      const params = new URLSearchParams();
-      if (lead.company) params.set("name", lead.company);
-      if (lead.city) params.set("city", lead.city);
-      if (lead.niche) params.set("niche", lead.niche);
-      if (lead.phone) params.set("phone", lead.phone);
-      if (lead.website) params.set("domain", lead.website);
-      if (lead.mobilePageSpeed) params.set("speed", String(lead.mobilePageSpeed));
-      if (lead.mobileLoadTimeSec) params.set("load", String(lead.mobileLoadTimeSec));
-      if (lead.estLostMonthlySpend) params.set("waste", String(lead.estLostMonthlySpend));
-      return `${base}/preview/${slug}?${params.toString()}`;
+    const params = new URLSearchParams();
+    if (lead.company) params.set("name", lead.company);
+    if (lead.city) params.set("city", lead.city);
+    const ind = lead.industry || lead.niche;
+    if (ind) {
+      params.set("industry", ind);
+      params.set("niche", ind);
     }
+    if (lead.phone) params.set("phone", lead.phone);
+    const brandColor = lead.primaryColor || getArchetypePrimaryColor(ind, lead.archetype);
+    if (brandColor) params.set("primaryColor", brandColor);
+    if (lead.website) params.set("domain", lead.website);
+    if (lead.mobilePageSpeed) params.set("speed", String(lead.mobilePageSpeed));
+    if (lead.mobileLoadTimeSec) params.set("load", String(lead.mobileLoadTimeSec));
+    if (lead.estLostMonthlySpend) params.set("waste", String(lead.estLostMonthlySpend));
 
-    return `${base}/preview/${slug}`;
+    const queryString = params.toString();
+    return queryString ? `${base}/preview/${slug}?${queryString}` : `${base}/preview/${slug}`;
   };
 
   // Register a lead as sent in real time
@@ -417,22 +464,29 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
 
   const getEmailSubject = (lead: Lead, angle: "wasted_ads" | "direct_punchy" = pitchAngle): string => {
     const domainClean = lead.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
-    if (lead.hasMarketingPixels === false) {
-      return `Organic search traffic & speed / ${domainClean}`;
+    const hasAds = lead.hasAdTags !== undefined ? lead.hasAdTags : (lead.hasMarketingPixels ?? false);
+
+    // If hasAdTags is false: Pitch "Lost Organic SEO Traffic due to slow mobile speeds"
+    if (!hasAds) {
+      return `Lost organic SEO traffic due to slow mobile speeds / ${domainClean}`;
     }
+
+    // If hasAdTags is true: Pitch "Wasted Ad Spend / Leaked Paid Clicks"
     if (angle === "wasted_ads") {
       return `Your Google Ads / ${lead.company}`;
     }
-    return `Mobile site speed for ${domainClean}`;
+    return `Wasted ad spend & mobile site speed for ${domainClean}`;
   };
 
   const getEmailBody = (lead: Lead, angle: "wasted_ads" | "direct_punchy" = pitchAngle): string => {
     const domainClean = lead.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
     const previewUrl = getPreviewUrlForLead(lead, true);
     const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Team`;
+    const hasAds = lead.hasAdTags !== undefined ? lead.hasAdTags : (lead.hasMarketingPixels ?? false);
+    const leadIndustry = lead.industry || lead.niche || "local";
 
-    // Pitch Angle: Organic SEO Visitors (Triggered when no ad pixels are detected)
-    if (lead.hasMarketingPixels === false) {
+    // Pitch Angle: Lost Organic SEO Traffic due to slow mobile speeds (when hasAdTags is false)
+    if (!hasAds) {
       if (angle === "direct_punchy") {
         return `Hey ${greeting},
 
@@ -443,7 +497,7 @@ Google's search algorithm heavily penalizes slow mobile pages, meaning you are s
 I built a sub-second, lightning-fast test version of your exact landing page:
 Link: ${previewUrl}
 
-If you want to recapture lost organic search traffic and boost your mobile Google ranking, would you be open to a quick chat about getting this live on your main domain?
+If you want to recapture lost organic SEO traffic and boost your mobile Google ranking, would you be open to a quick chat about getting this live on your main domain?
 
 Best,
 Faruk — Lead Engineer, Speedcraft Studio
@@ -452,36 +506,36 @@ Direct: farukolawale509@gmail.com`;
 
       return `Hey ${greeting},
 
-I came across ${domainClean} while researching top local businesses in ${lead.city || "your area"}, but noticed your mobile site takes about ${lead.mobileLoadTimeSec} seconds to load.
+I was looking up top ${leadIndustry} businesses in ${lead.city || "your area"} and came across ${domainClean}, but noticed your mobile site takes about ${lead.mobileLoadTimeSec} seconds to load.
 
-Because Google strongly penalizes slow mobile pages in organic local search rankings, a significant number of prospective clients are bouncing before your site even loads and choosing faster competitors.
+Because Google strongly penalizes slow mobile load times in organic search rankings, you are steadily losing prospective clients and organic search traffic to faster competitors before your page even loads.
 
 I run Speedcraft Studio. To demonstrate what a modern, high-performance site feels like, I built a custom, instant-loading version of your landing page that opens in under half a second.
 
 Take a look on your phone to feel the speed difference:
 Link: ${previewUrl}
 
-Zero strings attached. If you'd like to recapture lost organic search traffic and boost your mobile Google ranking, would you be open to a quick chat about deploying this to your actual domain?
+Zero strings attached. If you'd like to recapture lost organic SEO traffic and boost your mobile Google ranking, would you be open to a quick chat about deploying this to your actual domain?
 
 Best,
 Faruk — Lead Engineer, Speedcraft Studio
 Direct: farukolawale509@gmail.com`;
     }
 
-    // Pitch Angle: Wasted Google Ads Spend (Triggered when marketing pixels are detected)
+    // Pitch Angle: Wasted Ad Spend / Leaked Paid Clicks (when hasAdTags is true)
     if (angle === "wasted_ads") {
       return `Hey ${greeting},
 
 I noticed you're driving search traffic to ${domainClean}, but the mobile landing page takes about ${lead.mobileLoadTimeSec} seconds to load.
 
-Because mobile users are impatient, you are likely losing about a third of your paid visitors before your site even loads. It also means Google is likely charging you a higher rate for your ads.
+Because mobile users are impatient, you are likely losing about a third of your paid visitors before your site even loads. Wasted ad spend and leaked paid clicks mean Google is charging you for clicks that bounce before prospective clients ever see your phone number.
 
 I run Speedcraft Studio. To show you what you're missing, I went ahead and built a custom, lightning-fast version of your landing page. It loads instantly (under half a second).
 
 Take a look on your phone to feel the speed difference:
 Link: ${previewUrl}
 
-Zero strings attached. If you like the feel of it, would you like me to set this up on your actual domain so you stop leaking ad clicks?
+Zero strings attached. If you like the feel of it, would you like me to set this up on your actual domain so you stop leaking paid ad clicks?
 
 Best,
 Faruk — Lead Engineer, Speedcraft Studio
@@ -490,7 +544,7 @@ Direct: farukolawale509@gmail.com`;
 
     return `Hey ${greeting},
 
-I noticed you are paying for search ads, but your mobile landing page takes ${lead.mobileLoadTimeSec} seconds to load. Usually, this means you are losing a massive chunk of potential leads before they even see your phone number.
+I noticed you are paying for search ads, but your mobile landing page takes ${lead.mobileLoadTimeSec} seconds to load. Wasted ad spend due to slow mobile load times means you are losing a massive chunk of paid clicks before they even see your phone number.
 
 I help businesses fix this. I actually built a lightning-fast test version of your exact landing page to show you the difference.
 
@@ -508,8 +562,9 @@ Direct: farukolawale509@gmail.com`;
     const domainClean = lead.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
     const previewUrl = getPreviewUrlForLead(lead, true);
     const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Team`;
+    const hasAds = lead.hasAdTags !== undefined ? lead.hasAdTags : (lead.hasMarketingPixels ?? false);
 
-    if (lead.hasMarketingPixels === false) {
+    if (!hasAds) {
       return `Hey ${greeting}, saw ${domainClean}. Your mobile site takes ${lead.mobileLoadTimeSec}s to load, which hurts your organic search rankings and causes visitors to bounce. I built a lightning-fast test version that loads in under half a second: ${previewUrl} — want to check it out?`;
     }
 
@@ -518,7 +573,7 @@ Direct: farukolawale509@gmail.com`;
 
   const copyPitch = (lead: Lead) => {
     setActivePitchLead(lead);
-    setPitchModalTab(pitchAngle === "wasted_ads" ? "email_wasted" : "email_direct");
+    setPitchModalTab("email_wasted");
   };
 
   const getGmailUrl = (lead: Lead, angle: "wasted_ads" | "direct_punchy" = pitchAngle) => {
@@ -583,16 +638,24 @@ Direct: farukolawale509@gmail.com`;
             {/* Modal Header */}
             <div className="px-6 py-4 bg-[#160F29] text-white flex items-center justify-between">
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-extrabold text-sm">{activePitchLead.company}</span>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-200 border border-purple-400/30">
-                    {activePitchLead.niche} • {activePitchLead.city}
+                    {activePitchLead.industry || activePitchLead.niche} • {activePitchLead.city}
                   </span>
+                  {(() => {
+                    const arch = activePitchLead.archetype || getArchetype(activePitchLead.industry || activePitchLead.niche || "");
+                    return (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-zinc-200 border border-white/20">
+                        {arch} Archetype
+                      </span>
+                    );
+                  })()}
                 </div>
                 <p className="text-xs text-zinc-400 mt-0.5">
-                  {activePitchLead.hasMarketingPixels === false
-                    ? "High-converting, zero-jargon pitch focused on recovering lost organic search visitors & mobile SEO bounce rate."
-                    : "High-converting, zero-jargon pitch focused strictly on business value & lost ad revenue."}
+                  {(activePitchLead.hasAdTags ?? activePitchLead.hasMarketingPixels ?? false)
+                    ? "High-converting, zero-jargon pitch focused strictly on wasted ad spend & leaked paid clicks."
+                    : "High-converting pitch focused on recovering lost organic SEO traffic due to slow mobile speeds."}
                 </p>
               </div>
               <button
@@ -613,9 +676,9 @@ Direct: farukolawale509@gmail.com`;
                     : "bg-white text-zinc-700 hover:bg-zinc-100 border border-zinc-200"
                 }`}
               >
-                {activePitchLead.hasMarketingPixels === false
-                  ? "Angle 1: Lost Organic SEO Visitors (Recommended)"
-                  : "Angle 1: Wasted Ad Spend (Recommended)"}
+                {(activePitchLead.hasAdTags ?? activePitchLead.hasMarketingPixels ?? false)
+                  ? "Angle 1: Wasted Ad Spend / Leaked Paid Clicks (Recommended)"
+                  : "Angle 1: Lost Organic SEO Traffic (Recommended)"}
               </button>
               <button
                 onClick={() => setPitchModalTab("email_direct")}
@@ -768,6 +831,13 @@ Direct: farukolawale509@gmail.com`;
                 Direct & Punchy
               </button>
             </div>
+            <Link
+              href="/qa-gallery"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#5B4BD6]/30 text-purple-200 border border-[#5B4BD6]/50 hover:bg-[#5B4BD6]/50 hover:text-white transition-all text-xs font-semibold"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-purple-300" />
+              <span>QA Gallery ({targetedLeadsPool.length})</span>
+            </Link>
             <Link href="/" className="text-zinc-400 hover:text-white transition-colors">
               Main Studio
             </Link>
@@ -786,13 +856,13 @@ Direct: farukolawale509@gmail.com`;
             <div className="space-y-2 max-w-2xl">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-[#5B4BD6] border border-purple-200 text-xs font-semibold">
                 <Compass className="w-3.5 h-3.5" />
-                <span>Real-Time Business Discovery via Google Maps</span>
+                <span>Real-Time Business Discovery & 3 UI Archetypes</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-[#160F29] tracking-tight">
-                Live Google Maps Outreach & Prototype Engine
+                Live Outreach, Google Maps & Prototype Engine
               </h1>
               <p className="text-xs sm:text-sm text-zinc-500 leading-relaxed">
-                Search any city or country on Google Maps to discover live local businesses. Contacted targets vanish immediately from your dashboard to prevent duplicate outreach.
+                Seamlessly target high-intent local businesses mapped into 3 conversion archetypes: Urgent Service, Professional Trust, and Aesthetic Booking. Contacted targets vanish immediately from your dashboard to prevent duplicate outreach.
               </p>
             </div>
 
@@ -809,7 +879,11 @@ Direct: farukolawale509@gmail.com`;
               <div className="bg-purple-50 border border-purple-200 rounded-xl p-3.5 min-w-[125px] flex-1 sm:flex-none">
                 <div className="text-[11px] text-[#5B4BD6] font-medium">Active Mode</div>
                 <div className="text-sm font-bold text-[#160F29] mt-1 uppercase font-mono">
-                  {sourceMode === "google_maps" ? "Google Maps Live" : "Audited Vault"}
+                  {sourceMode === "targeted"
+                    ? "Targeted Ad Pool"
+                    : sourceMode === "google_maps"
+                    ? "Google Maps Live"
+                    : "Audited Vault"}
                 </div>
               </div>
             </div>
@@ -948,24 +1022,41 @@ Direct: farukolawale509@gmail.com`;
               </button>
             </div>
 
-            {/* SOURCE SWITCHER: GOOGLE MAPS vs VAULT */}
+            {/* SOURCE SWITCHER: TARGETED AD LEADS vs AUDITED VAULT vs GOOGLE MAPS */}
             {activeTab === "active" && (
-              <div className="flex items-center gap-1.5 bg-zinc-100 p-1 rounded-lg text-xs font-medium">
+              <div className="flex flex-wrap items-center gap-1.5 bg-zinc-100 p-1 rounded-lg text-xs font-medium">
                 <button
-                  onClick={() => setSourceMode("google_maps")}
-                  className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
-                    sourceMode === "google_maps" ? "bg-white text-[#5B4BD6] font-bold shadow-2xs" : "text-zinc-600"
+                  onClick={() => setSourceMode("targeted")}
+                  className={`px-3 py-1.5 rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
+                    sourceMode === "targeted"
+                      ? "bg-white text-[#5B4BD6] font-bold shadow-2xs"
+                      : "text-zinc-600 hover:text-zinc-900"
                   }`}
                 >
-                  Google Maps Results ({mapsResults.length})
+                  <Target className="w-3.5 h-3.5 text-[#5B4BD6]" />
+                  <span>Targeted Ad Leads ({targetedLeadsPool.length})</span>
                 </button>
                 <button
                   onClick={() => setSourceMode("vault")}
-                  className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
-                    sourceMode === "vault" ? "bg-white text-[#160F29] font-bold shadow-2xs" : "text-zinc-600"
+                  className={`px-3 py-1.5 rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
+                    sourceMode === "vault"
+                      ? "bg-white text-[#160F29] font-bold shadow-2xs"
+                      : "text-zinc-600 hover:text-zinc-900"
                   }`}
                 >
-                  Audited Lead Vault ({vaultLeads.length})
+                  <Database className="w-3.5 h-3.5" />
+                  <span>Audited Vault ({vaultLeads.length})</span>
+                </button>
+                <button
+                  onClick={() => setSourceMode("google_maps")}
+                  className={`px-3 py-1.5 rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
+                    sourceMode === "google_maps"
+                      ? "bg-white text-[#5B4BD6] font-bold shadow-2xs"
+                      : "text-zinc-600 hover:text-zinc-900"
+                  }`}
+                >
+                  <Compass className="w-3.5 h-3.5" />
+                  <span>Google Maps ({mapsResults.length})</span>
                 </button>
               </div>
             )}
@@ -1018,13 +1109,15 @@ Direct: farukolawale509@gmail.com`;
               {/* TAB 1: SINGLE URL AUDIT */}
               {importTab === "single" && (
                 <form onSubmit={handleSingleAudit} className="space-y-3">
-                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
-                    <div className="sm:col-span-4">
-                      <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                  <div className="space-y-3">
+                    {/* Business Website URL */}
+                    <div>
+                      <label htmlFor="audit-website-url" className="block text-[11px] font-semibold text-zinc-700 mb-1">
                         Business Website URL <span className="text-red-500">*</span>
                       </label>
                       <input
-                        type="text"
+                        id="audit-website-url"
+                        type="url"
                         required
                         value={auditUrl}
                         onChange={(e) => setAuditUrl(e.target.value)}
@@ -1032,49 +1125,56 @@ Direct: farukolawale509@gmail.com`;
                         className="w-full px-3 py-2 text-xs bg-white border border-zinc-300 rounded-lg focus:outline-none focus:border-[#5B4BD6]"
                       />
                     </div>
-                    <div className="sm:col-span-3">
-                      <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
-                        Company Name (Optional)
+
+                    {/* Client Industry Dropdown (Required, below URL input) */}
+                    <div>
+                      <label htmlFor="audit-client-industry" className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                        Client Industry <span className="text-red-500">*</span>
                       </label>
-                      <input
-                        type="text"
-                        value={auditCompany}
-                        onChange={(e) => setAuditCompany(e.target.value)}
-                        placeholder="Auto-detected if blank"
-                        className="w-full px-3 py-2 text-xs bg-white border border-zinc-300 rounded-lg focus:outline-none focus:border-[#5B4BD6]"
-                      />
-                    </div>
-                    <div className="sm:col-span-3">
-                      <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
-                        City / Metro (Optional)
-                      </label>
-                      <input
-                        type="text"
-                        value={auditCity}
-                        onChange={(e) => setAuditCity(e.target.value)}
-                        placeholder="e.g. Austin, TX or London"
-                        className="w-full px-3 py-2 text-xs bg-white border border-zinc-300 rounded-lg focus:outline-none focus:border-[#5B4BD6]"
-                      />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label className="block text-[11px] font-semibold text-zinc-700 mb-1">Trade Niche</label>
                       <select
-                        value={auditNiche}
-                        onChange={(e) => setAuditNiche(e.target.value)}
-                        className="w-full px-2.5 py-2 text-xs bg-white border border-zinc-300 rounded-lg focus:outline-none focus:border-[#5B4BD6]"
+                        id="audit-client-industry"
+                        required
+                        value={auditIndustry}
+                        onChange={(e) => setAuditIndustry(e.target.value)}
+                        className="w-full px-3 py-2 text-xs bg-white border border-zinc-300 rounded-lg focus:outline-none focus:border-[#5B4BD6] font-medium"
                       >
-                        <option value="Plumbing">Plumbing</option>
-                        <option value="Electrician">Electrician</option>
-                        <option value="Roofing">Roofing</option>
-                        <option value="HVAC">HVAC</option>
-                        <option value="Solar">Solar</option>
-                        <option value="Locksmith">Locksmith</option>
-                        <option value="Restoration">Restoration</option>
-                        <option value="Landscaping">Landscaping</option>
-                        <option value="Pest Control">Pest Control</option>
-                        <option value="Dental">Dental</option>
-                        <option value="Legal">Legal</option>
+                        <option value="" disabled>Select client industry...</option>
+                        {TARGET_NICHES.map((niche) => (
+                          <option key={niche} value={niche}>
+                            {niche}
+                          </option>
+                        ))}
                       </select>
+                    </div>
+
+                    {/* Optional Metadata Row */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label htmlFor="audit-company-name" className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                          Company Name (Optional)
+                        </label>
+                        <input
+                          id="audit-company-name"
+                          type="text"
+                          value={auditCompany}
+                          onChange={(e) => setAuditCompany(e.target.value)}
+                          placeholder="Auto-detected if blank"
+                          className="w-full px-3 py-2 text-xs bg-white border border-zinc-300 rounded-lg focus:outline-none focus:border-[#5B4BD6]"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="audit-city-name" className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                          City / Metro (Optional)
+                        </label>
+                        <input
+                          id="audit-city-name"
+                          type="text"
+                          value={auditCity}
+                          onChange={(e) => setAuditCity(e.target.value)}
+                          placeholder="e.g. Austin, TX or London"
+                          className="w-full px-3 py-2 text-xs bg-white border border-zinc-300 rounded-lg focus:outline-none focus:border-[#5B4BD6]"
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -1127,18 +1227,32 @@ Direct: farukolawale509@gmail.com`;
             </div>
           )}
 
-          {/* ─── FILTERS (When viewing Vault) ─── */}
-          {activeTab === "active" && sourceMode === "vault" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3 border-t border-zinc-100">
+          {/* ─── FILTERS (When viewing Targeted or Vault leads) ─── */}
+          {activeTab === "active" && sourceMode !== "google_maps" && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-3 border-t border-zinc-100">
               <div className="relative">
                 <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-2.5" />
                 <input
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Filter vault by business name..."
+                  placeholder={`Filter ${sourceMode === "targeted" ? "targeted leads" : "vault"}...`}
                   className="w-full pl-9 pr-3 py-2 text-xs bg-zinc-50 border border-zinc-200 rounded-lg focus:outline-none focus:border-[#5B4BD6] focus:bg-white"
                 />
+              </div>
+
+              <div>
+                <select
+                  value={selectedArchetype}
+                  onChange={(e) => setSelectedArchetype(e.target.value as "all" | Archetype)}
+                  className="w-full px-3 py-2 text-xs bg-zinc-50 border border-zinc-200 rounded-lg focus:outline-none focus:border-[#5B4BD6] font-semibold text-[#5B4BD6]"
+                >
+                  <option value="all">All Archetypes</option>
+                  <option value="UrgentService">⚡ Urgent Service (5 Niches)</option>
+                  <option value="ProfessionalTrust">🛡️ Professional Trust (Law / CPA)</option>
+                  <option value="AestheticBooking">✨ Aesthetic Booking (Dentist / MedSpa)</option>
+                  <option value="Generic">📦 Generic</option>
+                </select>
               </div>
 
               <div>
@@ -1149,7 +1263,7 @@ Direct: farukolawale509@gmail.com`;
                 >
                   {countries.map((c) => (
                     <option key={c} value={c}>
-                      {c === "all" ? `All Countries (${vaultLeads.length})` : c}
+                      {c === "all" ? `All Countries (${currentLeadsPool.length})` : c}
                     </option>
                   ))}
                 </select>
@@ -1232,7 +1346,8 @@ Direct: farukolawale509@gmail.com`;
                 </p>
                 <button
                   onClick={() => {
-                    setSourceMode("vault");
+                    setSourceMode("targeted");
+                    setSelectedArchetype("all");
                     setSelectedCountry("all");
                     setSelectedCity("all");
                     setSelectedNiche("all");
@@ -1240,7 +1355,7 @@ Direct: farukolawale509@gmail.com`;
                   }}
                   className="px-4 py-2 bg-zinc-900 text-white rounded-lg text-xs font-semibold mt-2 cursor-pointer"
                 >
-                  View Audited Lead Vault
+                  Reset Filters & View Targeted Pool
                 </button>
               </div>
             ) : (
@@ -1267,28 +1382,62 @@ Direct: farukolawale509@gmail.com`;
                                 {lead.city}
                               </span>
 
+                              {/* ARCHETYPE BADGE */}
+                              {(() => {
+                                const leadArchetype = lead.archetype || getArchetype(lead.industry || lead.niche || "");
+                                return (
+                                  <span
+                                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 border shadow-2xs ${
+                                      leadArchetype === "UrgentService"
+                                        ? "bg-amber-50 text-amber-800 border-amber-200"
+                                        : leadArchetype === "ProfessionalTrust"
+                                        ? "bg-blue-50 text-blue-800 border-blue-200"
+                                        : leadArchetype === "AestheticBooking"
+                                        ? "bg-rose-50 text-rose-800 border-rose-200"
+                                        : "bg-zinc-100 text-zinc-700 border-zinc-200"
+                                    }`}
+                                    title={`UI Archetype: ${leadArchetype}`}
+                                  >
+                                    {leadArchetype === "UrgentService" && <Zap className="w-2.5 h-2.5 text-amber-600 fill-amber-500" />}
+                                    {leadArchetype === "ProfessionalTrust" && <Shield className="w-2.5 h-2.5 text-blue-600" />}
+                                    {leadArchetype === "AestheticBooking" && <Sparkles className="w-2.5 h-2.5 text-rose-500" />}
+                                    {leadArchetype === "Generic" && <Layers className="w-2.5 h-2.5 text-zinc-500" />}
+                                    <span>{leadArchetype}</span>
+                                  </span>
+                                );
+                              })()}
+
+                              {/* BRAND COLOR SWATCH */}
+                              {lead.primaryColor && (
+                                <span
+                                  className="inline-flex items-center gap-1 text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-50 border border-zinc-200 text-zinc-600"
+                                  title={`Brand Color: ${lead.primaryColor}`}
+                                >
+                                  <span
+                                    className="w-2.5 h-2.5 rounded-full border border-black/20 shrink-0 inline-block shadow-2xs"
+                                    style={{ backgroundColor: lead.primaryColor }}
+                                  />
+                                  <span>{lead.primaryColor}</span>
+                                </span>
+                              )}
+
+                              {/* INDUSTRY / NICHE PILL */}
+                              {(lead.industry || lead.niche) && (
+                                <span className="text-[10px] font-medium bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded">
+                                  {lead.industry || lead.niche}
+                                </span>
+                              )}
+
                               {/* AD-STATUS PILL */}
-                              {lead.hasMarketingPixels !== undefined ? (
-                                lead.hasMarketingPixels ? (
-                                  <span className="text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-2xs">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                    <span>🟢 Active Ad Tracking Detected</span>
-                                  </span>
-                                ) : (
-                                  <span className="text-[10px] font-medium bg-zinc-100 text-zinc-600 border border-zinc-200 px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-2xs">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
-                                    <span>⚪ No Ad Pixels Found</span>
-                                  </span>
-                                )
-                              ) : lead.coldEmailSubject?.toLowerCase().includes("ads") ? (
+                              {(lead.hasAdTags !== undefined ? lead.hasAdTags : lead.hasMarketingPixels !== undefined ? lead.hasMarketingPixels : lead.coldEmailSubject?.toLowerCase().includes("ads")) ? (
                                 <span className="text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-2xs">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                  <span>🟢 Active Ad Tracking Detected</span>
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                  <span>🟢 Active Ad Spend Detected</span>
                                 </span>
                               ) : (
                                 <span className="text-[10px] font-medium bg-zinc-100 text-zinc-600 border border-zinc-200 px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-2xs">
                                   <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
-                                  <span>⚪ No Ad Pixels Found</span>
+                                  <span>⚪ No Ad Tags (Organic SEO Pitch)</span>
                                 </span>
                               )}
 
@@ -1339,10 +1488,10 @@ Direct: farukolawale509@gmail.com`;
                           </div>
                           <div className="text-right">
                             <div className="text-[11px] text-zinc-400">
-                              {lead.hasMarketingPixels === false ? "Organic Traffic Penalty:" : "Est. Ad Waste:"}
+                              {(lead.hasAdTags === false || (lead.hasAdTags === undefined && lead.hasMarketingPixels === false)) ? "Organic Traffic Penalty:" : "Est. Ad Waste:"}
                             </div>
-                            <div className={`font-bold font-mono ${lead.hasMarketingPixels === false ? "text-amber-600" : "text-red-600"}`}>
-                              {lead.hasMarketingPixels === false
+                            <div className={`font-bold font-mono ${(lead.hasAdTags === false || (lead.hasAdTags === undefined && lead.hasMarketingPixels === false)) ? "text-amber-600" : "text-red-600"}`}>
+                              {(lead.hasAdTags === false || (lead.hasAdTags === undefined && lead.hasMarketingPixels === false))
                                 ? `~${Math.round((1 - lead.mobilePageSpeed / 100) * 45)}% Bounce Rate`
                                 : `~${lead.currencySymbol || "$"}${lead.estLostMonthlySpend} ${lead.currency || "USD"}/mo`}
                             </div>

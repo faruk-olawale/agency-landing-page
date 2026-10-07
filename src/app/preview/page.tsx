@@ -1,5 +1,14 @@
-import ClientPrototypePreviewPage from "./[slug]/page";
+import PreviewPage from "./[slug]/page";
 
-export default function GenericPreviewPage() {
-  return <ClientPrototypePreviewPage />;
+export default async function GenericPreviewPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  return (
+    <PreviewPage
+      params={Promise.resolve({ slug: "preview" })}
+      searchParams={searchParams}
+    />
+  );
 }
