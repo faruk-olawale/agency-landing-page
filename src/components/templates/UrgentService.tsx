@@ -1,5 +1,10 @@
+"use client";
+
 import React from "react";
 import type { TemplateProps } from "@/lib/archetypeMap";
+import { motion } from "framer-motion";
+import { InfiniteReviewMarquee, MasonryProofGallery } from "@/components/universal";
+import { LiveDispatchSimulation } from "./urgent/LiveDispatchSimulation";
 import {
   Phone,
   CheckCircle2,
@@ -11,6 +16,9 @@ import {
   AlertTriangle,
   ArrowRight,
   Check,
+  Award,
+  ShieldCheck,
+  BadgeCheck,
 } from "lucide-react";
 
 /**
@@ -364,49 +372,76 @@ export function UrgentService({ clientData }: TemplateProps) {
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center flex flex-col items-center">
           {/* Urgency Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-slate-200 text-xs sm:text-sm font-semibold tracking-wide mb-6 shadow-xl backdrop-blur-md">
+          <motion.div
+            initial={{ opacity: 0, y: -15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-slate-200 text-xs sm:text-sm font-semibold tracking-wide mb-6 shadow-xl backdrop-blur-md"
+          >
             <span className="flex h-2 w-2 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
             </span>
             <span>Technicians On Call in {city} Right Now</span>
             <span className="text-slate-500">•</span>
-            <span className="text-emerald-400 font-mono">Avg Arrival ~28 Mins</span>
-          </div>
+            <span className="text-emerald-400 font-mono">Avg Arrival ~24 Mins</span>
+          </motion.div>
 
           {/* Headline (H1, Massive, White) */}
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-white tracking-tight leading-[1.08] mb-6 drop-shadow-md max-w-4xl">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-white tracking-tight leading-[1.08] mb-6 drop-shadow-md max-w-4xl"
+          >
             Voted #1 {industryNoun} Experts in {city}
-          </h1>
+          </motion.h1>
 
           {/* Subheadline (gray-300) */}
-          <p className="text-lg sm:text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-10 leading-relaxed font-normal">
-            Fast response times, upfront pricing, and guaranteed satisfaction.
-            Don&apos;t wait—call the experts today.
-          </p>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-lg sm:text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-10 leading-relaxed font-normal"
+          >
+            Fast response times, upfront flat-rate pricing, and guaranteed satisfaction.
+            Don&apos;t risk water or electrical damage—call the verified dispatchers today.
+          </motion.p>
 
           {/* Primary CTA: Massive, Pulsing Button using clientData.primaryColor */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center">
-            <a
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center"
+          >
+            <motion.a
               href={`tel:${cleanPhone}`}
               id="hero-call-now-button"
-              className="group relative inline-flex items-center justify-center gap-3.5 text-white font-black px-9 py-5 rounded-2xl text-xl sm:text-2xl shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 animate-pulse"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.96 }}
+              className="group relative inline-flex items-center justify-center gap-3.5 text-white font-black px-9 py-5 rounded-2xl text-xl sm:text-2xl shadow-2xl transition-all duration-300 animate-pulse cursor-pointer"
               style={{
                 backgroundColor: primaryColor,
-                boxShadow: `0 0 40px ${primaryColor}66`,
+                boxShadow: `0 0 45px ${primaryColor}77`,
               }}
             >
               <Phone className="w-7 h-7 transition-transform group-hover:rotate-12" />
               <span>Call Now: {phone}</span>
               <ArrowRight className="w-6 h-6 transition-transform group-hover:translate-x-1" />
-            </a>
-          </div>
+            </motion.a>
+          </motion.div>
 
           {/* Micro trust row below CTA */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-y-2 gap-x-6 text-xs sm:text-sm text-slate-300 font-medium">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="mt-8 flex flex-wrap items-center justify-center gap-y-2 gap-x-6 text-xs sm:text-sm text-slate-300 font-medium"
+          >
             <span className="inline-flex items-center gap-1.5">
               <Check className="w-4 h-4 text-emerald-400" />
-              No Hidden Fees
+              No Hidden Overtime Fees
             </span>
             <span className="inline-flex items-center gap-1.5">
               <Check className="w-4 h-4 text-emerald-400" />
@@ -416,46 +451,44 @@ export function UrgentService({ clientData }: TemplateProps) {
               <Check className="w-4 h-4 text-emerald-400" />
               100% Satisfaction Guarantee
             </span>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ──────────────────────────────────────────────────────────────────────
-          4. TRUST BAR (Directly under the hero, full-width row with Lucide icons)
+          4. TRUST BAR (High-Visibility BBB, Master License & Insured Badges)
       ────────────────────────────────────────────────────────────────────── */}
       <section
         aria-label="Trust and Qualifications"
         className="w-full bg-slate-900 border-y border-slate-800 py-6 px-4 sm:px-6 lg:px-8 relative z-20 shadow-xl"
       >
         <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-          {/* Indicator 1: Licensed & Insured */}
+          {/* Indicator 1: State Master Licensed */}
           <div className="flex items-center gap-3.5 justify-center sm:justify-start">
             <div
               className="w-12 h-12 rounded-xl flex items-center justify-center bg-slate-800 border border-slate-700/80 shrink-0"
               style={{ color: primaryColor }}
             >
-              <CheckCircle2 className="w-6 h-6" />
+              <BadgeCheck className="w-6 h-6" />
             </div>
             <div>
               <div className="text-sm sm:text-base font-bold text-white leading-tight">
-                Licensed & Insured
+                State Master Licensed
               </div>
               <div className="text-xs text-slate-400">
-                100% Verified in {city}
+                100% City Code Permitted
               </div>
             </div>
           </div>
 
-          {/* Indicator 2: 5-Star Rated */}
+          {/* Indicator 2: BBB Accredited A+ */}
           <div className="flex items-center gap-3.5 justify-center sm:justify-start">
-            <div
-              className="w-12 h-12 rounded-xl flex items-center justify-center bg-slate-800 border border-slate-700/80 shrink-0 text-amber-400"
-            >
-              <Star className="w-6 h-6 fill-amber-400" />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-slate-800 border border-slate-700/80 shrink-0 text-amber-400">
+              <Award className="w-6 h-6 text-amber-400" />
             </div>
             <div>
               <div className="text-sm sm:text-base font-bold text-white leading-tight">
-                5-Star Rated
+                BBB Accredited A+
               </div>
               <div className="text-xs text-slate-400">
                 Over 450+ Verified Reviews
@@ -463,20 +496,19 @@ export function UrgentService({ clientData }: TemplateProps) {
             </div>
           </div>
 
-          {/* Indicator 3: Upfront Pricing */}
+          {/* Indicator 3: $2M General Liability Insured */}
           <div className="flex items-center gap-3.5 justify-center sm:justify-start">
             <div
-              className="w-12 h-12 rounded-xl flex items-center justify-center bg-slate-800 border border-slate-700/80 shrink-0"
-              style={{ color: primaryColor }}
+              className="w-12 h-12 rounded-xl flex items-center justify-center bg-slate-800 border border-slate-700/80 shrink-0 text-emerald-400"
             >
-              <Shield className="w-6 h-6" />
+              <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
               <div className="text-sm sm:text-base font-bold text-white leading-tight">
-                Upfront Pricing
+                $2,000,000 Insured
               </div>
               <div className="text-xs text-slate-400">
-                No Surprise Surcharges
+                Zero Homeowner Liability
               </div>
             </div>
           </div>
@@ -494,12 +526,23 @@ export function UrgentService({ clientData }: TemplateProps) {
                 24/7 Rapid Response
               </div>
               <div className="text-xs text-slate-400">
-                Immediate Local Dispatch
+                Avg ~24 Min Arrival in {city}
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      {/* ──────────────────────────────────────────────────────────────────────
+          4B. ANIMATED LIVE DISPATCH SMS / CHAT SIMULATION
+      ────────────────────────────────────────────────────────────────────── */}
+      <LiveDispatchSimulation
+        industryNoun={industryNoun}
+        city={city}
+        companyName={companyName}
+        phone={phone}
+        primaryColor={primaryColor}
+      />
 
       {/* ──────────────────────────────────────────────────────────────────────
           5. SERVICE GRID (3-Column Grid titled "Our Core Services")
@@ -534,9 +577,14 @@ export function UrgentService({ clientData }: TemplateProps) {
             const IconComponent = service.icon;
 
             return (
-              <div
+              <motion.div
                 key={index}
-                className="group relative bg-slate-900/80 border border-slate-800 hover:border-slate-700 rounded-2xl p-8 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-black/60"
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.12 }}
+                whileHover={{ y: -6 }}
+                className="group relative bg-slate-900/80 border border-slate-800 hover:border-slate-700 rounded-2xl p-8 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-black/60"
               >
                 <div>
                   {/* Top Icon colored in primaryColor */}
@@ -588,18 +636,42 @@ export function UrgentService({ clientData }: TemplateProps) {
                 </div>
 
                 {/* Card CTA */}
-                <a
+                <motion.a
                   href={`tel:${cleanPhone}`}
-                  className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold bg-slate-800 group-hover:bg-red-600 text-white transition-all duration-200 border border-slate-700 group-hover:border-red-500"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold bg-slate-800 group-hover:bg-red-600 text-white transition-all duration-200 border border-slate-700 group-hover:border-red-500 cursor-pointer"
                 >
                   <Phone className="w-4 h-4" />
                   <span>Call For Immediate {service.title}</span>
-                </a>
-              </div>
+                </motion.a>
+              </motion.div>
             );
           })}
         </div>
       </section>
+
+      {/* ──────────────────────────────────────────────────────────────────────
+          5B. PROOF GALLERY (Actual on-the-job photographic documentation)
+      ────────────────────────────────────────────────────────────────────── */}
+      <MasonryProofGallery
+        industry={rawIndustry}
+        city={city}
+        companyName={companyName}
+        primaryColor={primaryColor}
+        theme="dark"
+      />
+
+      {/* ──────────────────────────────────────────────────────────────────────
+          5C. VERIFIED REVIEWS MARQUEE (Infinite ticker of 5-star Google reviews)
+      ────────────────────────────────────────────────────────────────────── */}
+      <InfiniteReviewMarquee
+        industry={rawIndustry}
+        city={city}
+        companyName={companyName}
+        primaryColor={primaryColor}
+        theme="dark"
+      />
 
       {/* ──────────────────────────────────────────────────────────────────────
           6. HIGH-CONVERSION BOTTOM CALLOUT (Second Conversion Touchpoint)
@@ -677,6 +749,32 @@ export function UrgentService({ clientData }: TemplateProps) {
           </div>
         </div>
       </footer>
+
+      {/* ──────────────────────────────────────────────────────────────────────
+          8. STICKY MOBILE EMERGENCY CALL BAR (Always accessible on phones)
+      ────────────────────────────────────────────────────────────────────── */}
+      <aside
+        role="region"
+        aria-label="Mobile Emergency Hotline"
+        className="sm:hidden fixed bottom-0 left-0 right-0 z-50 p-3 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 shadow-2xl flex items-center justify-between gap-3"
+      >
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping shrink-0" />
+          <div className="text-[11px] leading-tight">
+            <div className="font-bold text-white">Technicians On Call</div>
+            <div className="text-slate-400 text-[10px]">Avg ~24 Min Dispatch</div>
+          </div>
+        </div>
+        <a
+          href={`tel:${cleanPhone}`}
+          id="sticky-mobile-call-button"
+          className="px-4 py-2.5 rounded-xl text-white font-black text-xs flex items-center gap-2 shadow-lg animate-pulse"
+          style={{ backgroundColor: primaryColor }}
+        >
+          <Phone className="w-3.5 h-3.5" />
+          <span>Call: {phone}</span>
+        </a>
+      </aside>
     </div>
   );
 }
