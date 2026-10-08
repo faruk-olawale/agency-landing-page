@@ -16,7 +16,7 @@
     background-color: #ffffff;
     color: #09090b;
   }
-
+  
   ::selection {
     background-color: #06b6d4;
     color: #ffffff;
@@ -27,7 +27,7 @@
 .card-surface {
   background: #ffffff;
   border: 1px solid rgba(228, 228, 231, 0.85);
-  box-shadow:
+  box-shadow: 
     0px 0px 0px 1px rgba(0, 0, 0, 0.03),
     0px 1px 2px -1px rgba(0, 0, 0, 0.04),
     0px 2px 8px 0px rgba(0, 0, 0, 0.02);
@@ -36,7 +36,7 @@
 
 .card-surface:hover {
   border-color: rgba(212, 212, 216, 1);
-  box-shadow:
+  box-shadow: 
     0px 0px 0px 1px rgba(0, 0, 0, 0.06),
     0px 8px 24px -4px rgba(0, 0, 0, 0.06),
     0px 2px 6px 0px rgba(0, 0, 0, 0.03);
@@ -46,7 +46,7 @@
 /* Engineering & Dot Matrix Grid Textures */
 .bg-grid-pattern-light {
   background-size: 48px 48px;
-  background-image:
+  background-image: 
     linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
 }
@@ -56,32 +56,40 @@
   background-size: 20px 20px;
 }
 
-/* Editorial Brutalist Typography for "Slow Website." */
-.hollow-text-light {
-  color: transparent;
-  -webkit-text-stroke: 1.8px #09090b;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.hollow-text-light:hover {
-  -webkit-text-stroke: 1.8px #0891b2;
-  color: rgba(8, 145, 178, 0.05);
-  text-shadow: 0 0 24px rgba(6, 182, 212, 0.3);
-}
-
-/* Button & Badge Sheens */
-.glow-cyan-btn {
-  box-shadow: 0 4px 18px -2px rgba(6, 182, 212, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+/* Tactile primary button styling */
+.studio-btn-primary {
+  background-color: #09090b;
+  color: #ffffff;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.glow-cyan-btn:hover {
-  box-shadow: 0 6px 25px 0px rgba(6, 182, 212, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+.studio-btn-primary:hover {
+  background-color: #27272a;
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.12);
   transform: translateY(-1px);
 }
 
-.glow-cyan-btn:active {
-  transform: scale(0.97);
+.studio-btn-primary:active {
+  transform: scale(0.98);
+}
+
+/* Secondary outline button */
+.studio-btn-secondary {
+  background-color: #ffffff;
+  color: #09090b;
+  border: 1px solid #e4e4e7;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.studio-btn-secondary:hover {
+  background-color: #f4f4f5;
+  border-color: #d4d4d8;
+}
+
+.studio-btn-secondary:active {
+  transform: scale(0.98);
 }
 
 /* Custom Scrollbar for clean white theme */
@@ -100,28 +108,4 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: #06b6d4;
-}
-
-/* Scrolltide studio design system typography */
-.font-display {
-  font-family: var(--font-bricolage), system-ui, -apple-system, sans-serif;
-}
-
-.font-mono {
-  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-}
-
-/* Subtle analog film grain texture overlay */
-.grain {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-  pointer-events: none;
-}
-
-/* Atmospheric glowing nebula gradients */
-.tide-glow {
-  background: radial-gradient(circle at 50% 0%, rgba(70, 183, 255, 0.15) 0%, rgba(139, 243, 230, 0.05) 40%, transparent 70%);
-}
-
-.card-glow {
-  box-shadow: 0 0 35px -8px rgba(70, 183, 255, 0.25);
 }

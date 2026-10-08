@@ -40,6 +40,7 @@ interface CaseResultsVaultProps {
   companyName: string;
   primaryColor?: string;
   isCpa?: boolean;
+  theme?: "light" | "dark";
 }
 
 export function CaseResultsVault({
@@ -48,7 +49,9 @@ export function CaseResultsVault({
   companyName,
   primaryColor = "#1E3A8A",
   isCpa = false,
+  theme = "light",
 }: CaseResultsVaultProps) {
+  const isDark = theme === "dark";
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [selectedMatter, setSelectedMatter] = useState<CaseMatter | null>(null);
 
@@ -322,31 +325,35 @@ export function CaseResultsVault({
     <section
       id="case-results-vault"
       aria-labelledby="case-results-heading"
-      className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-800/80"
+      className={`py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t ${
+        isDark ? "border-slate-800/80 bg-slate-950 text-slate-100" : "border-slate-200 bg-white text-slate-900"
+      }`}
     >
       {/* ── Section Header ──────────────────────────────────────────────── */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
         <div className="max-w-2xl">
           <div
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider font-bold mb-3 border"
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-3 border shadow-2xs"
             style={{
-              color: primaryColor === "#1E3A8A" ? "#60A5FA" : primaryColor,
-              borderColor: `${primaryColor}40`,
-              backgroundColor: `${primaryColor}15`,
+              color: isDark ? "#60A5FA" : "#0F172A",
+              borderColor: isDark ? "rgba(96, 165, 250, 0.3)" : "#E2E8F0",
+              backgroundColor: isDark ? "rgba(96, 165, 250, 0.1)" : "#F8FAFC",
             }}
           >
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Audited Track Record & Precedent</span>
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Audited Precedent & Settlements</span>
           </div>
 
           <h2
             id="case-results-heading"
-            className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-white tracking-tight leading-tight"
+            className={`text-3xl sm:text-4xl md:text-5xl font-serif font-bold tracking-tight leading-tight ${
+              isDark ? "text-white" : "text-slate-900"
+            }`}
           >
             {isCpa ? "Financial Defenses & Audit Wins" : "Case Results & Settlements"}
           </h2>
 
-          <p className="text-slate-400 text-sm sm:text-base mt-3 leading-relaxed">
+          <p className={`text-sm sm:text-base mt-3 leading-relaxed ${isDark ? "text-slate-400" : "text-slate-600"}`}>
             Every case and client matter is fought with relentless technical rigor.
             Below is a verified record of recent high-stakes resolutions achieved
             for clients in {city} and federal jurisdictions.
@@ -354,47 +361,40 @@ export function CaseResultsVault({
         </div>
 
         {/* Filter Navigation Tabs */}
-        <div className="flex flex-wrap items-center gap-2 bg-slate-900/90 p-1.5 rounded-xl border border-slate-800 shrink-0">
-          <button
-            onClick={() => setActiveFilter("all")}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider font-bold transition-all ${
-              activeFilter === "all"
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
-            }`}
-          >
-            All Matters ({matters.length})
-          </button>
-          <button
-            onClick={() => setActiveFilter("commercial")}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider font-bold transition-all ${
-              activeFilter === "commercial"
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
-            }`}
-          >
-            Commercial
-          </button>
-          <button
-            onClick={() => setActiveFilter("tax")}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider font-bold transition-all ${
-              activeFilter === "tax"
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
-            }`}
-          >
-            {isCpa ? "Tax Defense" : "Regulatory"}
-          </button>
-          <button
-            onClick={() => setActiveFilter("litigation")}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider font-bold transition-all ${
-              activeFilter === "litigation"
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
-            }`}
-          >
-            {isCpa ? "Forensic" : "Litigation"}
-          </button>
+        <div className={`flex flex-wrap items-center gap-1.5 p-1.5 rounded-xl border shrink-0 ${
+          isDark ? "bg-slate-900/90 border-slate-800" : "bg-slate-100 border-slate-200"
+        }`}>
+          {["all", "commercial", "tax", "litigation"].map((fKey) => {
+            const label =
+              fKey === "all"
+                ? `All Matters (${matters.length})`
+                : fKey === "commercial"
+                ? "Commercial"
+                : fKey === "tax"
+                ? isCpa ? "Tax Defense" : "Regulatory"
+                : isCpa ? "Forensic" : "Litigation";
+
+            const isSelected = activeFilter === fKey;
+
+            return (
+              <button
+                key={fKey}
+                type="button"
+                onClick={() => setActiveFilter(fKey)}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                  isSelected
+                    ? isDark
+                      ? "bg-blue-600 text-white shadow-xs font-bold"
+                      : "bg-white text-slate-900 shadow-xs font-bold"
+                    : isDark
+                    ? "text-slate-400 hover:text-white"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -412,23 +412,33 @@ export function CaseResultsVault({
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.3 }}
               key={matter.id}
-              className="group relative bg-slate-900/60 hover:bg-slate-900/90 border border-slate-800 hover:border-slate-700/80 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between hover:shadow-2xl hover:shadow-blue-950/30"
+              className={`group relative rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between border ${
+                isDark
+                  ? "bg-slate-900/60 hover:bg-slate-900/90 border-slate-800 hover:border-slate-700 hover:shadow-2xl hover:shadow-blue-950/30"
+                  : "bg-white hover:bg-white border-slate-200 hover:border-slate-300 shadow-xs hover:shadow-md"
+              }`}
             >
               {/* Card Header: Matter ID & Outcome Badge */}
               <div>
                 <div className="flex items-center justify-between gap-2 mb-4">
-                  <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <Lock className="w-3 h-3 text-slate-400" />
+                  <span className={`text-xs font-medium flex items-center gap-1.5 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                    <Lock className="w-3 h-3" />
                     <span>{matter.matterNumber}</span>
                   </span>
 
                   <span
-                    className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                    className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
                       matter.outcomeColor === "emerald"
-                        ? "text-emerald-300 bg-emerald-500/10 border-emerald-500/30"
+                        ? isDark
+                          ? "text-emerald-300 bg-emerald-500/10 border-emerald-500/30"
+                          : "text-emerald-800 bg-emerald-50 border-emerald-200"
                         : matter.outcomeColor === "purple"
-                        ? "text-purple-300 bg-purple-500/10 border-purple-500/30"
-                        : "text-blue-300 bg-blue-500/10 border-blue-500/30"
+                        ? isDark
+                          ? "text-purple-300 bg-purple-500/10 border-purple-500/30"
+                          : "text-purple-800 bg-purple-50 border-purple-200"
+                        : isDark
+                        ? "text-blue-300 bg-blue-500/10 border-blue-500/30"
+                        : "text-blue-800 bg-blue-50 border-blue-200"
                     }`}
                   >
                     {matter.outcomeType}
@@ -437,51 +447,57 @@ export function CaseResultsVault({
 
                 {/* Big Number Headline */}
                 <div className="mb-4">
-                  <div className="text-3xl sm:text-4xl font-serif font-bold text-white tracking-tight text-emerald-400 group-hover:text-emerald-300 transition-colors">
+                  <div className={`text-3xl sm:text-4xl font-serif font-bold tracking-tight ${
+                    isDark ? "text-emerald-400" : "text-slate-900"
+                  }`}>
                     {matter.amount}
                   </div>
-                  <span className="text-xs font-mono text-slate-400 uppercase tracking-wider block mt-0.5">
+                  <span className={`text-xs uppercase tracking-wider block mt-0.5 font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                     {matter.amountLabel}
                   </span>
                 </div>
 
                 {/* Case Title */}
-                <h3 className="text-lg font-serif font-bold text-slate-100 group-hover:text-white mb-3 leading-snug">
+                <h3 className={`text-lg font-serif font-bold mb-3 leading-snug ${isDark ? "text-slate-100" : "text-slate-900"}`}>
                   {matter.title}
                 </h3>
 
                 {/* Brief Summary */}
-                <p className="text-xs text-slate-300 line-clamp-3 leading-relaxed mb-4">
+                <p className={`text-xs line-clamp-3 leading-relaxed mb-4 ${isDark ? "text-slate-300" : "text-slate-600"}`}>
                   {matter.summary}
                 </p>
 
                 {/* Metadata tags */}
-                <div className="space-y-1.5 pt-3 border-t border-slate-800/80 text-[11px] font-mono text-slate-400">
+                <div className={`space-y-1.5 pt-3 border-t text-xs ${
+                  isDark ? "border-slate-800/80 text-slate-400" : "border-slate-100 text-slate-500"
+                }`}>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Jurisdiction:</span>
-                    <span className="text-slate-300 font-medium truncate max-w-[180px]">
+                    <span>Jurisdiction:</span>
+                    <span className={`font-medium truncate max-w-[180px] ${isDark ? "text-slate-300" : "text-slate-800"}`}>
                       {matter.jurisdiction}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Resolution:</span>
-                    <span className="text-emerald-400 font-medium">{matter.timeline}</span>
+                    <span>Resolution:</span>
+                    <span className="text-emerald-600 font-semibold">{matter.timeline}</span>
                   </div>
                 </div>
               </div>
 
               {/* Bottom Action: Review Case Brief */}
-              <div className="mt-5 pt-4 border-t border-slate-800/80 flex items-center justify-between">
+              <div className={`mt-5 pt-4 border-t flex items-center justify-between ${
+                isDark ? "border-slate-800/80" : "border-slate-100"
+              }`}>
                 <button
                   type="button"
                   onClick={() => setSelectedMatter(matter)}
-                  className="text-xs font-mono uppercase font-bold text-blue-400 hover:text-blue-300 inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                  className="text-xs font-bold text-slate-800 hover:text-slate-950 inline-flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
-                  <span>Review Strategy Brief</span>
+                  <span>Review Case Brief</span>
                   <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                 </button>
 
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Verified Case Outcome" />
+                <span className="w-2 h-2 rounded-full bg-emerald-500" title="Verified Case Outcome" />
               </div>
             </motion.div>
           ))}

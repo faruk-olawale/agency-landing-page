@@ -322,8 +322,8 @@ export function AestheticBooking({ clientData }: TemplateProps) {
             className="max-w-xl lg:max-w-2xl bg-white/85 backdrop-blur-md border border-white/60 rounded-3xl p-8 sm:p-12 shadow-2xl shadow-slate-300/60 relative"
           >
             {/* Top Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-900/5 border border-slate-200/80 text-xs font-mono uppercase tracking-wider text-slate-700 font-semibold mb-6">
-              <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs uppercase tracking-wider text-slate-700 font-semibold mb-6">
+              <span className="w-2 h-2 rounded-full bg-rose-500" />
               <span>Boutique Private Suite Clinic • {city}</span>
             </div>
 

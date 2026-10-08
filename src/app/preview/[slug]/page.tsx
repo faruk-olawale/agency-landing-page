@@ -202,13 +202,15 @@ export async function generateMetadata({
   };
 }
 
+import { ScrolltidePreviewShell } from "@/components/preview/ScrolltidePreviewShell";
+
 /**
  * Controller Route: app/preview/[slug]/page.tsx
  * ============================================================================
  * 1. Fetches lead data based on the URL slug & query.
  * 2. Extracts normalized industry string.
  * 3. Passes industry to getArchetype(industry).
- * 4. Uses a switch statement on the archetype to render the correct template.
+ * 4. Renders the appropriate archetype inside the clean executive preview shell.
  * ============================================================================
  */
 export default async function PreviewPage({ params, searchParams }: PageProps) {
@@ -224,19 +226,38 @@ export default async function PreviewPage({ params, searchParams }: PageProps) {
   // 3. Pass it to getArchetype(industry)
   const archetype = getArchetype(normalizedIndustry);
 
-  // 4. Use a switch statement on the returned archetype to render and return the correct template
+  // Check if raw/direct mode is requested
+  const rawParam = getQueryValue(query?.raw) || getQueryValue(query?.mode);
+  const isRaw = rawParam === "true" || rawParam === "raw" || rawParam === "1";
+
+  // 4. Render archetype template
+  let renderedTemplate: React.ReactNode;
   switch (archetype) {
     case "UrgentService":
-      return <UrgentService clientData={lead} />;
+      renderedTemplate = <UrgentService clientData={lead} />;
+      break;
 
     case "ProfessionalTrust":
-      return <ProfessionalTrust clientData={lead} />;
+      renderedTemplate = <ProfessionalTrust clientData={lead} />;
+      break;
 
     case "AestheticBooking":
-      return <AestheticBooking clientData={lead} />;
+      renderedTemplate = <AestheticBooking clientData={lead} />;
+      break;
 
     case "Generic":
     default:
-      return <GenericTemplate clientData={lead} />;
+      renderedTemplate = <GenericTemplate clientData={lead} />;
+      break;
   }
+
+  if (isRaw) {
+    return renderedTemplate;
+  }
+
+  return (
+    <ScrolltidePreviewShell lead={lead} archetype={archetype} slug={slug}>
+      {renderedTemplate}
+    </ScrolltidePreviewShell>
+  );
 }

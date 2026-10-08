@@ -197,7 +197,7 @@ export function UrgentService({ clientData }: TemplateProps) {
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-emerald-400" />
             <span className="font-semibold text-slate-200">
               24/7 Emergency Dispatch Active in {city}
             </span>
@@ -275,10 +275,10 @@ export function UrgentService({ clientData }: TemplateProps) {
             <div className="lg:col-span-7 space-y-6 text-left">
               {/* Availability Pill */}
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-xs text-xs font-semibold text-slate-700">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                <span>On-Duty Units Ready in {city}</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span>On-Duty Technicians Ready in {city}</span>
                 <span className="text-slate-300">•</span>
-                <span className="text-slate-500">Fast 30-Min Dispatch</span>
+                <span className="text-slate-500">Fast 30-Min Arrival</span>
               </div>
 
               {/* Primary Headline */}
@@ -333,7 +333,7 @@ export function UrgentService({ clientData }: TemplateProps) {
               <div className="bg-white rounded-2xl border border-slate-200 shadow-xl p-6 sm:p-8">
                 <div className="mb-6 pb-4 border-b border-slate-100">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-sky-700 bg-sky-50 px-2.5 py-1 rounded-md inline-block mb-1.5">
-                    Direct Depot Request
+                    Priority Online Request
                   </span>
                   <h2 className="text-2xl font-bold text-slate-900">
                     Request Immediate Dispatch

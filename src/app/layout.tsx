@@ -1,24 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Bricolage_Grotesque, Space_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
-});
-
-const bricolage = Bricolage_Grotesque({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-bricolage",
-});
-
-const spaceMono = Space_Mono({
-  weight: ["400", "700"],
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-mono",
 });
 
 export const viewport: Viewport = {
@@ -46,11 +33,11 @@ const siteUrl = getBaseUrl();
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "SPEEDCRAFT // 100/100 PageSpeed Web Studio", // 42 chars - fits Google 60-char sweet spot
-    template: "%s | SPEEDCRAFT",
+    default: "SPEEDCRAFT Studio — High-Performance Websites for Local Businesses",
+    template: "%s | SPEEDCRAFT Studio",
   },
   description:
-    "Hand-coded, sub-second websites for local businesses. Guaranteed 100/100 Google PageSpeed and zero bloated WordPress to convert clicks into calls.", // 146 chars - fits Google 150-160 char limit
+    "Bespoke, high-converting Next.js web applications engineered for sub-second speeds, zero WordPress bloat, and maximum local client acquisition.",
   keywords: [
     "creative studio",
     "web performance agency",
@@ -154,10 +141,7 @@ export default function RootLayout({
   };
 
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} ${bricolage.variable} ${spaceMono.variable} scroll-smooth`}
-    >
+    <html lang="en" className={`${inter.variable} scroll-smooth`}>
       <head>
         <script
           type="application/ld+json"

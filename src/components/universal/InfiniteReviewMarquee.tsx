@@ -403,12 +403,6 @@ export function InfiniteReviewMarquee({
         isDark ? "bg-slate-950 text-white" : "bg-slate-50 text-slate-900"
       }`}
     >
-      {/* Background Ambience Glow */}
-      <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-32 blur-3xl opacity-15 pointer-events-none rounded-full"
-        style={{ backgroundColor: primaryColor }}
-      />
-
       {/* Header Badge & Title */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-10 relative z-10">
         <motion.div
