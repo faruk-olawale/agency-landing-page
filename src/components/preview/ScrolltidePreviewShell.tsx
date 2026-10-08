@@ -51,10 +51,7 @@ export function ScrolltidePreviewShell({
   };
 
   return (
-    <div className="min-h-screen bg-slate-100/70 font-sans text-slate-900 selection:bg-slate-900 selection:text-white">
-      {/* ──────────────────────────────────────────────────────────────────────
-          1. SLEEK EXECUTIVE FLOATING TOP TOOLBAR
-      ────────────────────────────────────────────────────────────────────── */}
+    <div className="min-h-screen bg-[#07090e] font-sans text-zinc-100 selection:bg-sky-500 selection:text-white">
       {/* ──────────────────────────────────────────────────────────────────────
           1. SLEEK EXECUTIVE DESKTOP TOOLBAR (Hidden on mobile to avoid navbar stacking)
       ────────────────────────────────────────────────────────────────────── */}
@@ -64,29 +61,29 @@ export function ScrolltidePreviewShell({
           <aside
             role="region"
             aria-label="Design Prototype Controller"
-            className="hidden sm:block sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-xs"
+            className="hidden sm:block sticky top-0 z-50 w-full bg-[#0b0f17]/90 backdrop-blur-md border-b border-white/[0.08] shadow-xs text-xs"
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3 text-xs">
               {/* Left: Client Context */}
               <div className="flex items-center gap-3 min-w-0">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold text-[11px] shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono font-semibold text-[11px] shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   Live Prototype
                 </span>
-                <div className="truncate text-slate-700 font-medium">
-                  Custom proposal for <strong className="text-slate-950 font-bold">{companyName}</strong> ({city})
+                <div className="truncate text-zinc-400 font-medium">
+                  Custom proposal for <strong className="text-white font-bold">{companyName}</strong> ({city})
                 </div>
               </div>
 
               {/* Center: Device View Switcher */}
-              <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-slate-600">
+              <div className="flex items-center bg-zinc-900/80 p-0.5 rounded-lg border border-white/[0.08] text-zinc-400">
                 <button
                   type="button"
                   onClick={() => setDeviceMode("desktop")}
                   className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold transition cursor-pointer ${
                     deviceMode === "desktop"
-                      ? "bg-white text-slate-900 shadow-xs font-bold"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-zinc-800 text-white shadow-xs font-bold"
+                      : "text-zinc-400 hover:text-white"
                   }`}
                 >
                   <Monitor className="w-3.5 h-3.5" />
@@ -97,8 +94,8 @@ export function ScrolltidePreviewShell({
                   onClick={() => setDeviceMode("mobile")}
                   className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold transition cursor-pointer ${
                     deviceMode === "mobile"
-                      ? "bg-white text-slate-900 shadow-xs font-bold"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-zinc-800 text-white shadow-xs font-bold"
+                      : "text-zinc-400 hover:text-white"
                   }`}
                 >
                   <Smartphone className="w-3.5 h-3.5" />
@@ -111,7 +108,7 @@ export function ScrolltidePreviewShell({
                 <button
                   type="button"
                   onClick={() => setShowModal(true)}
-                  className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-slate-900 text-white font-bold hover:bg-slate-800 active:scale-98 transition shadow-xs text-xs cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-white text-zinc-950 font-bold hover:bg-zinc-200 active:scale-98 transition shadow-xs text-xs cursor-pointer"
                 >
                   <span>Launch This Website</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -121,7 +118,7 @@ export function ScrolltidePreviewShell({
                   type="button"
                   onClick={() => setBannerDismissed(true)}
                   title="Hide preview toolbar"
-                  className="p-1.5 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+                  className="p-1.5 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800 transition cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -130,13 +127,13 @@ export function ScrolltidePreviewShell({
           </aside>
 
           {/* Mobile Discrete Floating Capsule (leaves top 100% clean for website navbar) */}
-          <div className="sm:hidden fixed bottom-4 right-4 z-50 flex items-center gap-2 bg-slate-900/95 text-white backdrop-blur-md px-3.5 py-2 rounded-full shadow-2xl border border-slate-700 text-xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span className="font-semibold text-[11px]">Prototype</span>
+          <div className="sm:hidden fixed bottom-4 right-4 z-50 flex items-center gap-2 bg-zinc-900/95 text-white backdrop-blur-md px-3.5 py-2 rounded-full shadow-2xl border border-white/10 text-xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-semibold text-[11px] font-mono">Prototype</span>
             <button
               type="button"
               onClick={() => setShowModal(true)}
-              className="px-2.5 py-1 rounded-full bg-white text-slate-950 font-bold text-[10px] ml-1"
+              className="px-2.5 py-1 rounded-full bg-white text-zinc-950 font-bold text-[10px] ml-1"
             >
               Launch Site →
             </button>
@@ -145,27 +142,27 @@ export function ScrolltidePreviewShell({
       )}
 
       {/* ──────────────────────────────────────────────────────────────────────
-          2. PREVIEW CANVAS
+          2. VIEWPORT CANVAS
       ────────────────────────────────────────────────────────────────────── */}
       <main className="w-full">
         {deviceMode === "desktop" ? (
           /* Pure full-width native presentation */
-          <div className="w-full bg-white">{children}</div>
+          <div className="w-full bg-[#07090e]">{children}</div>
         ) : (
           /* Centered mobile frame for instant conversion inspection */
-          <div className="py-8 px-4 flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] bg-slate-200/60">
-            <div className="w-full max-w-[400px] rounded-[44px] p-3 bg-slate-950 shadow-[0_24px_60px_-12px_rgba(0,0,0,0.35)] border-4 border-slate-800 relative">
+          <div className="py-8 px-4 flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] bg-zinc-950">
+            <div className="w-full max-w-[400px] rounded-[44px] p-3 bg-zinc-950 shadow-[0_24px_60px_-12px_rgba(0,0,0,0.8)] border-4 border-zinc-800 relative">
               {/* Phone Speaker & Camera Notch */}
-              <div className="absolute top-5 left-1/2 -translate-x-1/2 w-24 h-4 bg-slate-950 rounded-full z-30 flex items-center justify-end px-3">
-                <span className="w-2 h-2 rounded-full bg-slate-900 border border-slate-700 inline-block" />
+              <div className="absolute top-5 left-1/2 -translate-x-1/2 w-24 h-4 bg-zinc-900 rounded-full z-30 flex items-center justify-end px-3">
+                <span className="w-2 h-2 rounded-full bg-zinc-800 border border-zinc-700 inline-block" />
               </div>
 
               {/* Viewport Screen */}
-              <div className="rounded-[36px] overflow-hidden bg-white max-h-[820px] overflow-y-auto select-none border border-slate-700/50">
+              <div className="rounded-[36px] overflow-hidden bg-[#07090e] max-h-[820px] overflow-y-auto select-none border border-zinc-800">
                 {children}
               </div>
             </div>
-            <p className="text-xs text-slate-500 mt-4 font-medium">
+            <p className="text-xs text-zinc-500 mt-4 font-mono">
               Mobile Preview • Scroll to test touch interaction
             </p>
           </div>
