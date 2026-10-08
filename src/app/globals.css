@@ -2,102 +2,111 @@
 
 @layer base {
   :root {
-    --bg-main: #ffffff;
-    --text-primary: #09090b;
-    --text-secondary: #52525b;
-    --cyan-accent: #00d2e0;
-    --citrus-neon: #65a30d;
+    --ink: #07080a;
+    --ink-2: #0b0d11;
+    --surface: #11151c;
+    --surface-elevated: #161c24;
+    --bone: #f5f5f3;
+    --mist: #9ba1a6;
+    --dim: #5c636a;
+    --line: rgba(255, 255, 255, 0.08);
+    --line-strong: rgba(255, 255, 255, 0.18);
+    --tide: #46b7ff;
+    --tide-deep: #1d4ed8;
+    --foam: #8bf3e6;
   }
 
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #ffffff;
-    color: #09090b;
+    background-color: #07080a;
+    color: #f5f5f3;
   }
   
+  body {
+    background-color: #07080a;
+    color: #f5f5f3;
+    overflow-x: clip;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
   ::selection {
-    background-color: #06b6d4;
-    color: #ffffff;
+    background-color: rgba(70, 183, 255, 0.28);
+    color: #f5f5f3;
   }
 }
 
-/* Layered elevation shadows (Godly / Awwwards / Linear design system) */
-.card-surface {
-  background: #ffffff;
-  border: 1px solid rgba(228, 228, 231, 0.85);
-  box-shadow: 
-    0px 0px 0px 1px rgba(0, 0, 0, 0.03),
-    0px 1px 2px -1px rgba(0, 0, 0, 0.04),
-    0px 2px 8px 0px rgba(0, 0, 0, 0.02);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+/* ────────────────────────────────────────────────────────────────────────────
+   Scrolltide Aesthetic Typography Tokens
+   ──────────────────────────────────────────────────────────────────────────── */
+.font-display {
+  font-family: 'Bricolage Grotesque', sans-serif;
 }
 
-.card-surface:hover {
-  border-color: rgba(212, 212, 216, 1);
-  box-shadow: 
-    0px 0px 0px 1px rgba(0, 0, 0, 0.06),
-    0px 8px 24px -4px rgba(0, 0, 0, 0.06),
-    0px 2px 6px 0px rgba(0, 0, 0, 0.03);
-  transform: translateY(-2px);
+.font-mono {
+  font-family: 'Space Mono', monospace;
 }
 
-/* Engineering & Dot Matrix Grid Textures */
-.bg-grid-pattern-light {
-  background-size: 48px 48px;
-  background-image: 
-    linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+.font-sans {
+  font-family: 'Inter', -apple-system, sans-serif;
 }
 
-.bg-dot-pattern {
-  background-image: radial-gradient(rgba(0, 0, 0, 0.07) 1px, transparent 1px);
-  background-size: 20px 20px;
+/* ────────────────────────────────────────────────────────────────────────────
+   Atmospheric Textures & Visual Mesh (Scrolltide Inspiration)
+   ──────────────────────────────────────────────────────────────────────────── */
+/* Film grain texture */
+.grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.06'/%3E%3C/svg%3E");
+  pointer-events: none;
 }
 
-/* Editorial Brutalist Typography for "Slow Website." */
-.hollow-text-light {
-  color: transparent;
-  -webkit-text-stroke: 1.8px #09090b;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+/* Atmospheric Tide Nebula Glow */
+.tide-glow {
+  background: 
+    radial-gradient(circle at 50% 15%, rgba(70, 183, 255, 0.22) 0%, transparent 58%),
+    radial-gradient(circle at 82% 35%, rgba(139, 243, 230, 0.14) 0%, transparent 48%),
+    radial-gradient(circle at 18% 55%, rgba(46, 125, 255, 0.12) 0%, transparent 52%),
+    radial-gradient(circle at 50% 85%, rgba(70, 183, 255, 0.08) 0%, transparent 60%);
+  pointer-events: none;
 }
 
-.hollow-text-light:hover {
-  -webkit-text-stroke: 1.8px #0891b2;
-  color: rgba(8, 145, 178, 0.05);
-  text-shadow: 0 0 24px rgba(6, 182, 212, 0.3);
+/* Inner border sheen for cards */
+.card-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
 }
 
-/* Button & Badge Sheens */
-.glow-cyan-btn {
-  box-shadow: 0 4px 18px -2px rgba(6, 182, 212, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+/* Scrolltide Card Hover Elevation */
+.scrolltide-card {
+  background: #0b0d11;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.glow-cyan-btn:hover {
-  box-shadow: 0 6px 25px 0px rgba(6, 182, 212, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  transform: translateY(-1px);
+.scrolltide-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 60px -15px rgba(70, 183, 255, 0.35);
 }
 
-.glow-cyan-btn:active {
-  transform: scale(0.97);
-}
-
-/* Custom Scrollbar for clean white theme */
+/* Custom Scrollbar for Cinematic Dark Theme */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #fafafa;
+  background: #07080a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d4d4d8;
-  border-radius: 3px;
+  background: #1a202c;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #06b6d4;
+  background: #46b7ff;
 }

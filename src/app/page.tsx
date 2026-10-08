@@ -11,72 +11,49 @@ import {
   Check,
   CheckCircle2,
   Gauge,
-  Terminal,
   Sparkles,
   Layers,
   Send,
   ChevronRight,
-  Smartphone,
-  Monitor,
-  X,
-  TrendingUp,
-  Sliders,
-  ChevronLeft,
   Phone,
-  Video,
-  Plus,
-  Mic,
-  ArrowUp,
-  RotateCcw,
-  Heart,
-  AlertCircle,
+  Sliders,
+  SlidersHorizontal,
+  Flame,
+  Award,
+  Lock,
+  Eye,
+  Activity,
+  Play,
+  ExternalLink,
+  Laptop,
+  Smartphone,
+  ChevronLeft,
+  Calendar,
+  Clock,
+  Scale,
+  Stethoscope,
+  Radio,
+  FileCheck,
 } from "lucide-react";
 
-export default function WhiteCreativeStudioAgency() {
-  // Navigation & Scroll state
+export default function ScrolltideInspiredAgency() {
   const [scrolled, setScrolled] = useState(false);
-  
-  // Pricing toggle state: 'subscription' | 'lumpSum'
-  const [billingPlan, setBillingPlan] = useState<"subscription" | "lumpSum">("subscription");
-  
-  // Interactive Speed Benchmark Simulator in Bento Box
+  const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [activeTab, setActiveTab] = useState<string>("featured");
+
+  // Speed simulator state
   const [isSimulating, setIsSimulating] = useState(false);
   const [speedProgress, setSpeedProgress] = useState(100);
   const [wpProgress, setWpProgress] = useState(24);
 
-  // Interactive ROI Calculator State
+  // ROI Calculator state
   const [dealValue, setDealValue] = useState<number>(750);
-  const [monthlyTraffic, setMonthlyTraffic] = useState<number>(1200);
+  const [monthlyTraffic, setMonthlyTraffic] = useState<number>(1400);
 
-  // Interactive Live iMessage unfolding animation state
-  const [chatStep, setChatStep] = useState(0);
-  const [chatStarted, setChatStarted] = useState(false);
+  // Pricing plan state
+  const [billingPlan, setBillingPlan] = useState<"subscription" | "lumpSum">("subscription");
 
-  useEffect(() => {
-    if (!chatStarted) return;
-    
-    const t1 = setTimeout(() => setChatStep(1), 800);
-    const t2 = setTimeout(() => setChatStep(2), 1600);
-    const t3 = setTimeout(() => setChatStep(3), 2300);
-    const t4 = setTimeout(() => setChatStep(4), 3600);
-
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
-      clearTimeout(t4);
-    };
-  }, [chatStarted]);
-
-  const handleReplayChat = () => {
-    setChatStep(0);
-    setTimeout(() => setChatStep(1), 800);
-    setTimeout(() => setChatStep(2), 1600);
-    setTimeout(() => setChatStep(3), 2300);
-    setTimeout(() => setChatStep(4), 3600);
-  };
-
-  // Form State
+  // Contact / Prototype form state
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -89,54 +66,26 @@ export default function WhiteCreativeStudioAgency() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Template demo modal state
-  const [activeModalDemo, setActiveModalDemo] = useState<null | {
-    title: string;
-    category: string;
-    fcp: string;
-    lcp: string;
-    tbt: string;
-    cls: string;
-    highlights: string[];
-    sampleName: string;
-    tagline: string;
-  }>(null);
-  const [modalDeviceView, setModalDeviceView] = useState<"desktop" | "mobile">("desktop");
-
-  // Scroll listener for sticky glass header
+  // Scroll listener for glassmorphic header
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 24);
+      setScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Update selected plan text when toggle changes
-  const handleSelectPlan = (plan: "subscription" | "lumpSum") => {
-    setBillingPlan(plan);
-    setFormData((prev) => ({
-      ...prev,
-      selectedTier:
-        plan === "subscription"
-          ? "Zero-Upfront Subscription ($150/mo)"
-          : "Full Build & Care ($1,200 + $50/mo)",
-    }));
-  };
-
-  // Speed simulator handler
+  // Speed Benchmark Simulator Handler
   const handleRunSpeedBenchmark = () => {
     if (isSimulating) return;
     setIsSimulating(true);
     setSpeedProgress(0);
     setWpProgress(0);
 
-    // Fast Next.js finishes in ~280ms
     setTimeout(() => {
       setSpeedProgress(100);
     }, 280);
 
-    // Bloated WP finishes in ~4800ms
     const interval = setInterval(() => {
       setWpProgress((prev) => {
         if (prev >= 100) {
@@ -144,12 +93,12 @@ export default function WhiteCreativeStudioAgency() {
           setIsSimulating(false);
           return 100;
         }
-        return prev + 10;
+        return prev + 12;
       });
-    }, 380);
+    }, 350);
   };
 
-  // Live API form submission handler
+  // Live Contact Submission Handler
   const handleSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email) return;
@@ -160,21 +109,14 @@ export default function WhiteCreativeStudioAgency() {
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...formData,
-          honeypot,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...formData, honeypot }),
       });
 
       const result = await res.json();
-
       if (!res.ok) {
         throw new Error(result.error || "Failed to submit request.");
       }
-
       setFormSubmitted(true);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Something went wrong. Please email directly.";
@@ -184,1706 +126,1132 @@ export default function WhiteCreativeStudioAgency() {
     }
   };
 
-  // ROI calculations: 2.2% average conversion lift on sub-second sites
-  const estimatedExtraLeads = Math.max(1, Math.round((monthlyTraffic * 0.022)));
+  // ROI calculations
+  const estimatedExtraLeads = Math.max(1, Math.round(monthlyTraffic * 0.024));
   const estimatedAddedRevenue = estimatedExtraLeads * dealValue;
   const roiMultiple = Math.round((estimatedAddedRevenue / 150) * 10) / 10;
 
-  return (
-    <div className="min-h-screen bg-[#fafafa] text-zinc-950 font-sans selection:bg-cyan-200 selection:text-zinc-950 relative overflow-x-hidden antialiased">
-      
-      {/* BACKGROUND ARCHITECTURAL GRID & SUBTLE AMBIENT CONES (GODLY / AWWWARDS AESTHETIC) */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        {/* Subtle Engineering Dot Matrix */}
-        <div 
-          className="absolute inset-0 opacity-[0.4]"
-          style={{
-            backgroundImage: `radial-gradient(rgba(0, 0, 0, 0.08) 1px, transparent 1px)`,
-            backgroundSize: "28px 28px",
-            maskImage: "radial-gradient(ellipse 90% 70% at 50% 0%, #000 50%, transparent 100%)",
-            WebkitMaskImage: "radial-gradient(ellipse 90% 70% at 50% 0%, #000 50%, transparent 100%)"
-          }}
-        />
+  // Curated Library of Archetypes & Prototypes (Scrolltide-style Showcase)
+  const prototypeShowcase = [
+    {
+      id: "apex-plumbing",
+      title: "Apex 24/7 Emergency Plumbing",
+      category: "urgent",
+      categoryLabel: "UrgentService Archetype",
+      niche: "Plumbing & HVAC",
+      badge: "Live Telemetry Dispatch",
+      badgeColor: "emerald",
+      previewUrl: "/preview/apex-emergency-plumbing?name=Apex+24%2F7+Emergency+Plumbing&industry=plumber&city=Dallas",
+      img: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=1200&q=80",
+      stats: "0.26s FCP • 100 PageSpeed",
+      description: "High-contrast emergency layout with simulated GPS dispatch, licensed/insured trust bar, and click-to-call mobile conversion engine.",
+    },
+    {
+      id: "dr-glow-medspa",
+      title: "Aura Aesthetic Laser & MedSpa",
+      category: "aesthetic",
+      categoryLabel: "AestheticBooking Archetype",
+      niche: "MedSpa & Dermatology",
+      badge: "Interactive Before/After Slider",
+      badgeColor: "rose",
+      previewUrl: "/preview/dr-glow-medspa?name=Aura+Aesthetic+Clinic&industry=MedSpa&city=Beverly+Hills",
+      img: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1200&q=80",
+      stats: "0.29s FCP • VIP Suite Booking",
+      description: "Luxury glassmorphic clinic experience with real-time draggable Before & After comparison slider and multi-step concierge reservation.",
+    },
+    {
+      id: "smith-law-firm",
+      title: "Vance & Sterling Corporate Defense",
+      category: "professional",
+      categoryLabel: "ProfessionalTrust Archetype",
+      niche: "Law Firm & Fiduciary",
+      badge: "$50M+ Verified Settlements",
+      badgeColor: "cyan",
+      previewUrl: "/preview/smith-law-firm?name=Vance+%26+Sterling+Legal+Counsel&industry=Law+Firm&city=Dallas",
+      img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
+      stats: "0.27s FCP • 256-Bit Encrypted",
+      description: "Executive slate palette with animated number counters ($50M+ Recovered), 3-column verified case outcomes grid, and confidential intake form.",
+    },
+    {
+      id: "pearly-whites",
+      title: "Pearly Whites Cosmetic Dentistry",
+      category: "aesthetic",
+      categoryLabel: "AestheticBooking Archetype",
+      niche: "Cosmetic Dentistry",
+      badge: "Itero 3D Smile Design",
+      badgeColor: "rose",
+      previewUrl: "/preview/pearly-whites-dental?name=Pearly+Whites+Dental&industry=dentist&city=Austin",
+      img: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=1200&q=80",
+      stats: "0.28s FCP • Zero Impressions",
+      description: "Boutique private suite layout featuring porcelain veneer transformations, spa hygiene menu, and direct calendar reservation pass.",
+    },
+    {
+      id: "sterling-cpa",
+      title: "Sterling & Partners CPA Advisory",
+      category: "professional",
+      categoryLabel: "ProfessionalTrust Archetype",
+      niche: "CPA & Tax Strategy",
+      badge: "IRS Audit Defense Shield",
+      badgeColor: "cyan",
+      previewUrl: "/preview/sterling-cpa?name=Sterling+Tax+Advisors&industry=CPA&city=Chicago",
+      img: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80",
+      stats: "0.25s FCP • 99.4% Abatements",
+      description: "Data-driven tax defense architecture with Section 368 restructuring case briefs, AICPA board accreditation, and client privilege shield.",
+    },
+    {
+      id: "rapid-hvac",
+      title: "Rapid Arctic Air & Heating",
+      category: "urgent",
+      categoryLabel: "UrgentService Archetype",
+      niche: "HVAC & Climate Defense",
+      badge: "60-Min Dispatch Guarantee",
+      badgeColor: "emerald",
+      previewUrl: "/preview/rapid-arctic-hvac?name=Rapid+Arctic+HVAC&industry=hvac&city=Phoenix",
+      img: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1200&q=80",
+      stats: "0.28s FCP • 24/7 Hotline",
+      description: "Engineered for panic-driven climate emergencies. Extreme temperature alerts, emergency response fee waiver, and instant technician routing.",
+    },
+  ];
 
-        {/* Top Center Spotlight Glow */}
-        <div className="absolute top-[-12%] left-1/2 -translate-x-1/2 w-[70vw] h-[400px] max-w-[900px] bg-gradient-to-b from-cyan-400/[0.12] via-emerald-300/[0.05] to-transparent rounded-full blur-[130px]" />
-        
-        {/* Subtle Right Horizon Glow */}
-        <div className="absolute top-[40%] right-[-10%] w-[45vw] h-[45vw] max-w-[500px] rounded-full bg-cyan-500/[0.05] blur-[150px]" />
+  const filteredShowcase =
+    activeCategory === "all"
+      ? prototypeShowcase
+      : prototypeShowcase.filter((p) => p.category === activeCategory);
+
+  return (
+    <div className="min-h-screen bg-[#07080a] text-[#f5f5f3] font-sans selection:bg-[#46b7ff]/25 selection:text-[#f5f5f3] relative overflow-x-clip antialiased">
+      {/* ──────────────────────────────────────────────────────────────────────
+          1. TOP ANNOUNCEMENT BANNER (Scrolltide Inspiration)
+          Deep tide blue banner with film grain & pulsing live dot
+      ────────────────────────────────────────────────────────────────────── */}
+      <div className="relative z-50 w-full bg-[#46b7ff] text-[#04121f]">
+        <div className="grain absolute inset-0 opacity-20" />
+        <div className="relative mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-3 gap-y-1 px-4 py-2 text-center text-[12px] font-medium sm:text-[13px]">
+          <span className="hidden sm:inline-flex h-1.5 w-1.5 rounded-full bg-[#04121f] animate-pulse" />
+          <span className="font-mono uppercase tracking-wide font-bold">100/100 Core Web Vitals Guaranteed</span>
+          <span className="opacity-60 hidden md:inline">•</span>
+          <span className="font-semibold hidden md:inline">Zero Bloated Plugins • Sub-Second Mobile Load Times</span>
+          <a
+            href="#prototype-request"
+            className="ml-1 rounded-full bg-[#04121f] px-3.5 py-1 text-xs font-semibold text-[#8bf3e6] transition hover:bg-[#04121f]/85 shadow-sm"
+          >
+            Claim Prototype →
+          </a>
+        </div>
       </div>
 
-      {/* FIXED TOP NAVIGATION BAR WITH STRATEGIC GLASSMORPHISM */}
-      <header
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-          scrolled
-            ? "bg-white/70 backdrop-blur-xl border-b border-zinc-200/60 py-3 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.03)] supports-[backdrop-filter]:bg-white/60"
-            : "bg-transparent py-5"
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 flex items-center justify-between">
-          {/* Studio Moniker */}
-          <a
-            href="#"
-            className="group flex items-center gap-3 text-sm tracking-wider font-mono uppercase text-zinc-900 transition-colors"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
-            </span>
-            <span className="font-black text-base tracking-tight font-sans text-zinc-950 flex items-center">
-              SPEEDCRAFT<span className="text-cyan-600 font-mono">.</span>
-            </span>
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[10px] font-mono font-bold text-emerald-800 border border-emerald-300/60 rounded-full bg-emerald-50/80 backdrop-blur-md tracking-normal shadow-2xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              100/100 AUDIT GUARANTEED
-            </span>
-          </a>
+      {/* ──────────────────────────────────────────────────────────────────────
+          2. STICKY GLASSMORPHIC HEADER (Scrolltide Navigation)
+          Border-b transparent with subtle blur, pill links, high-contrast CTA
+      ────────────────────────────────────────────────────────────────────── */}
+      <header className="sticky top-0 z-40 w-full transition-colors duration-300">
+        <div
+          className={`border-b transition-all duration-300 ${
+            scrolled
+              ? "border-white/10 bg-[#07080a]/80 backdrop-blur-md shadow-2xl shadow-black/40"
+              : "border-transparent bg-[#07080a]/40 backdrop-blur-sm"
+          }`}
+        >
+          <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
+            {/* Logo Moniker */}
+            <a href="#" className="group flex items-center gap-2.5">
+              <span className="relative inline-flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-black ring-1 ring-white/20 shadow-md">
+                <span className="w-3.5 h-3.5 rounded-full bg-[#46b7ff] group-hover:scale-125 transition-transform" />
+              </span>
+              <span className="text-[17px] font-display font-bold tracking-tight text-[#f5f5f3]">
+                speed<span className="text-[#9ba1a6]">craft</span>
+              </span>
+            </a>
 
-          {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center gap-8 text-xs font-mono tracking-wider text-zinc-600">
-            <a
-              href="#why-custom"
-              className="hover:text-cyan-600 transition-colors flex items-center gap-1.5"
-            >
-              <span className="text-zinc-400 font-bold">{"//"} 01</span> Why Custom
-            </a>
-            <a
-              href="#work"
-              className="hover:text-cyan-600 transition-colors flex items-center gap-1.5"
-            >
-              <span className="text-zinc-400 font-bold">{"//"} 02</span> Selected Work
-            </a>
-            <a
-              href="#roi-calculator"
-              className="hover:text-cyan-600 transition-colors flex items-center gap-1.5"
-            >
-              <span className="text-zinc-400 font-bold">{"//"} 03</span> ROI Calculator
-            </a>
-            <a
-              href="#pricing"
-              className="hover:text-cyan-600 transition-colors flex items-center gap-1.5"
-            >
-              <span className="text-zinc-400 font-bold">{"//"} 04</span> Pricing
-            </a>
+            {/* Nav Pill Links */}
+            <div className="hidden items-center gap-1 md:flex">
+              <a
+                href="#library"
+                className="rounded-full px-3.5 py-1.5 text-sm text-[#9ba1a6] transition-colors hover:text-[#f5f5f3] hover:bg-white/5"
+              >
+                Archetypes
+              </a>
+              <a
+                href="#benchmark"
+                className="rounded-full px-3.5 py-1.5 text-sm text-[#9ba1a6] transition-colors hover:text-[#f5f5f3] hover:bg-white/5"
+              >
+                Speed Simulator
+              </a>
+              <a
+                href="#roi"
+                className="rounded-full px-3.5 py-1.5 text-sm text-[#9ba1a6] transition-colors hover:text-[#f5f5f3] hover:bg-white/5"
+              >
+                ROI Calculator
+              </a>
+              <a
+                href="#pricing"
+                className="rounded-full px-3.5 py-1.5 text-sm text-[#9ba1a6] transition-colors hover:text-[#f5f5f3] hover:bg-white/5"
+              >
+                Pricing
+              </a>
+              <a
+                href="/qa-gallery"
+                className="rounded-full px-3.5 py-1.5 text-sm text-[#8bf3e6] transition-colors hover:text-white hover:bg-white/5 font-mono"
+              >
+                QA Gallery
+              </a>
+            </div>
+
+            {/* Header Right Action */}
+            <div className="flex items-center gap-2.5">
+              <a
+                href="/qa-gallery"
+                className="hidden rounded-full px-3.5 py-2 text-xs font-mono font-medium text-[#9ba1a6] transition hover:text-[#f5f5f3] sm:inline-flex"
+              >
+                Live Gallery (100+)
+              </a>
+              <a
+                href="#prototype-request"
+                className="rounded-full bg-[#f5f5f3] px-4 sm:px-5 py-2 text-xs sm:text-sm font-semibold text-[#07080a] transition hover:bg-white hover:scale-105 active:scale-95 shadow-md inline-flex items-center gap-1.5"
+              >
+                <span>Get Prototype</span>
+                <span className="hidden sm:inline">→</span>
+              </a>
+            </div>
           </nav>
-
-          {/* Action CTA */}
-          <div className="flex items-center gap-3">
-            <a
-              href="#prototype"
-              className="group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-mono font-bold tracking-wide uppercase transition-all duration-200 bg-zinc-950 text-white hover:bg-cyan-500 hover:text-zinc-950 active:scale-[0.97] shadow-sm"
-            >
-              <span>Get Free Prototype</span>
-              <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </a>
-          </div>
         </div>
       </header>
 
-      {/* MAIN CONTENT AREA */}
-      <main className="relative z-10">
+      {/* ──────────────────────────────────────────────────────────────────────
+          3. CINEMATIC HERO SECTION (Scrolltide Inspiration)
+          Mesh canvas tide-glow, radial dark vignette, massive Bricolage Grotesque H1,
+          inverted bone buttons, avatar stack, and play demo capsule
+      ────────────────────────────────────────────────────────────────────── */}
+      <section id="top" className="relative overflow-hidden pt-12 pb-20 sm:pt-20 sm:pb-28">
+        {/* Background Mesh Glow & Dark Vignette */}
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+          <div className="tide-glow absolute inset-0" />
+          <div className="grain absolute inset-0 opacity-20" />
+          <div className="absolute inset-0 bg-[radial-gradient(50%_42%_at_50%_46%,rgba(7,8,10,0.65),transparent_75%)]" />
+          <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-b from-transparent to-[#07080a]" />
+        </div>
 
-        {/* 1. HERO SECTION (EDITORIAL BRUTALIST + STUDIO POLISH) */}
-        <section className="relative pt-32 pb-16 md:pt-40 md:pb-28 px-6 sm:px-8 border-b border-zinc-200/80 overflow-hidden">
-          <div className="max-w-7xl mx-auto">
-            {/* Top Telemetry Tag */}
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/75 border border-white/80 text-zinc-700 text-xs font-mono tracking-wide mb-8 shadow-2xs backdrop-blur-md ring-1 ring-zinc-200/60"
-            >
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="font-semibold text-zinc-900">HAND-CRAFTED NEXT.JS 15 ENGINE</span>
-              <span className="text-zinc-300">|</span>
-              <span className="text-cyan-700 font-bold">0.28S TIME-TO-INTERACTIVE</span>
-            </motion.div>
+        <div className="relative z-10 mx-auto flex min-h-[78vh] max-w-5xl flex-col items-center justify-center px-4 text-center">
+          {/* Eyebrow Pill */}
+          <motion.a
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            href="#library"
+            className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#11151c]/70 px-4 py-1.5 text-xs font-medium text-[#9ba1a6] backdrop-blur transition hover:border-white/20 hover:text-[#f5f5f3] shadow-inner mb-6"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-[#8bf3e6] animate-pulse" />
+            <span className="font-mono uppercase tracking-wider text-[11px]">
+              Engineered For Local High-Ticket Conversions
+            </span>
+            <span className="text-[#5c636a] transition group-hover:translate-x-0.5 group-hover:text-[#f5f5f3]">
+              →
+            </span>
+          </motion.a>
 
-            {/* Left-Aligned Massive Headline */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
-              className="max-w-5xl"
+          {/* Massive Display H1 */}
+          <motion.h1
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="font-display text-[clamp(2.5rem,7.5vw,5.5rem)] font-extrabold leading-[0.95] tracking-[-0.035em] text-[#f5f5f3]"
+          >
+            <span>Websites that move at the</span><br />
+            <span>speed of light. </span>
+            <span className="text-[#46b7ff]">Zero bloat.</span>
+          </motion.h1>
+
+          {/* Subheadline */}
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mt-6 max-w-2xl text-balance text-base sm:text-lg leading-relaxed text-[#9ba1a6]"
+          >
+            A curated pipeline of sub-second, mathematically conversion-optimized Next.js
+            landing pages for local businesses. Guaranteed 100/100 Core Web Vitals, zero bloated
+            WordPress plugins, and motion that turns clicks into booked calls.
+          </motion.p>
+
+          {/* Hero Action CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5 w-full sm:w-auto"
+          >
+            {/* Primary Inverted Bone Pill */}
+            <a
+              href="#prototype-request"
+              className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full bg-[#f5f5f3] px-7 py-3.5 text-sm font-semibold text-[#07080a] transition hover:bg-white hover:scale-105 active:scale-95 shadow-xl w-full sm:w-auto"
             >
-              <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[6.2rem] font-black tracking-[-0.04em] leading-[0.94] text-zinc-950 mb-7">
-                Stop Losing <br />
-                Customers to a <br />
-                <span
-                  className="inline-block relative text-transparent cursor-default transition-all duration-300 hover:text-cyan-600 hover:drop-shadow-[0_0_30px_rgba(6,182,212,0.4)]"
-                  style={{
-                    WebkitTextStroke: "2px #09090b",
-                  }}
-                  title="Hand-coded sub-second sites convert 3x more local traffic"
-                >
-                  Slow Website.
+              <span className="absolute inset-0 -z-0 opacity-0 blur-lg transition group-hover:opacity-40 bg-[#46b7ff]" />
+              <span className="relative">Claim Free Prototype</span>
+              <span className="relative transition group-hover:translate-x-0.5">→</span>
+            </a>
+
+            {/* Secondary Border Pill */}
+            <a
+              href="#library"
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-6 py-3.5 text-sm font-medium text-[#f5f5f3] transition hover:bg-[#11151c] hover:border-white/30 w-full sm:w-auto"
+            >
+              <span>Explore Archetypes</span>
+            </a>
+          </motion.div>
+
+          {/* Video / Interactive Benchmark Pill */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-8"
+          >
+            <a
+              href="#benchmark"
+              className="group relative isolate inline-flex items-center transition duration-300 gap-3.5 rounded-full border border-[#46b7ff]/30 bg-[#46b7ff]/[0.07] px-6 py-3 hover:border-[#46b7ff]/60 hover:bg-[#46b7ff]/[0.12]"
+            >
+              <span
+                aria-hidden="true"
+                className="absolute inset-0 -z-10 rounded-full bg-[#46b7ff] opacity-0 blur-xl transition duration-300 group-hover:opacity-25"
+              />
+              <span
+                aria-hidden="true"
+                className="grid shrink-0 place-items-center rounded-full transition duration-300 group-hover:scale-105 h-8 w-8 bg-[#46b7ff] text-[#04121f]"
+              >
+                <Play className="ml-0.5 h-3.5 w-3.5 fill-current" />
+              </span>
+              <span className="flex flex-col items-start leading-tight">
+                <span className="font-semibold text-[#f5f5f3] text-[14px]">
+                  Why Speed Converts?
                 </span>
-              </h1>
+                <span className="text-[#9ba1a6] text-[12px]">
+                  0.28s interactive speed benchmark
+                </span>
+              </span>
+              <span
+                aria-hidden="true"
+                className="ml-1 text-[#9ba1a6] transition duration-300 group-hover:translate-x-0.5 group-hover:text-[#f5f5f3]"
+              >
+                →
+              </span>
+            </a>
+          </motion.div>
 
-              {/* Subtext */}
-              <p className="text-lg sm:text-xl md:text-2xl text-zinc-600 font-normal leading-relaxed max-w-2xl mb-10">
-                I hand-code sub-second web experiences for local businesses and high-ticket service clinics.{" "}
-                <span className="text-zinc-950 font-semibold">No bloated WordPress, no fragile plugins</span>—just pure performance engineered to turn paid clicks into phone calls.
+          {/* Social Proof Client Counter with Avatar Stack */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="mt-8 flex items-center justify-center gap-3 text-xs sm:text-sm text-[#9ba1a6]"
+          >
+            <div className="flex -space-x-2">
+              <span
+                className="h-7 w-7 rounded-full border-2 border-[#07080a]"
+                style={{ background: "radial-gradient(circle at 30% 30%, #46b7ff, #0b0d10)" }}
+              />
+              <span
+                className="h-7 w-7 rounded-full border-2 border-[#07080a]"
+                style={{ background: "radial-gradient(circle at 30% 30%, #8bf3e6, #0b0d10)" }}
+              />
+              <span
+                className="h-7 w-7 rounded-full border-2 border-[#07080a]"
+                style={{ background: "radial-gradient(circle at 30% 30%, #2e7dff, #0b0d10)" }}
+              />
+              <span
+                className="h-7 w-7 rounded-full border-2 border-[#07080a]"
+                style={{ background: "radial-gradient(circle at 30% 30%, #7c93ff, #0b0d10)" }}
+              />
+            </div>
+            <span>
+              <strong className="font-semibold text-[#f5f5f3]">4,800+</strong> local inbound calls generated
+            </span>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ──────────────────────────────────────────────────────────────────────
+          4. INFINITE PERFORMANCE TICKER (Scrolltide Ticker)
+          Mask-image fade on left/right with starry asterisks
+      ────────────────────────────────────────────────────────────────────── */}
+      <div className="relative overflow-hidden border-y border-white/10 py-5 bg-[#0b0d11]/60">
+        <div
+          className="flex w-max animate-marquee gap-12 whitespace-nowrap"
+          style={{
+            maskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
+            WebkitMaskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
+          }}
+        >
+          {[0, 1].map((copyIdx) => (
+            <React.Fragment key={copyIdx}>
+              <span className="font-mono text-xs uppercase tracking-widest text-[#5c636a] flex items-center">
+                Next.js 15 Engine <span className="ml-12 text-white/20">✦</span>
+              </span>
+              <span className="font-mono text-xs uppercase tracking-widest text-[#5c636a] flex items-center">
+                0.28s Sub-Second TTI <span className="ml-12 text-white/20">✦</span>
+              </span>
+              <span className="font-mono text-xs uppercase tracking-widest text-[#5c636a] flex items-center">
+                100/100 Core Web Vitals <span className="ml-12 text-white/20">✦</span>
+              </span>
+              <span className="font-mono text-xs uppercase tracking-widest text-[#5c636a] flex items-center">
+                Zero WordPress Plugins <span className="ml-12 text-white/20">✦</span>
+              </span>
+              <span className="font-mono text-xs uppercase tracking-widest text-[#5c636a] flex items-center">
+                Live GPS Dispatch Telemetry <span className="ml-12 text-white/20">✦</span>
+              </span>
+              <span className="font-mono text-xs uppercase tracking-widest text-[#5c636a] flex items-center">
+                Before & After Drag Sliders <span className="ml-12 text-white/20">✦</span>
+              </span>
+              <span className="font-mono text-xs uppercase tracking-widest text-[#5c636a] flex items-center">
+                256-Bit Encrypted Intake <span className="ml-12 text-white/20">✦</span>
+              </span>
+              <span className="font-mono text-xs uppercase tracking-widest text-[#5c636a] flex items-center">
+                Framer Motion 60fps <span className="ml-12 text-white/20">✦</span>
+              </span>
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+
+      {/* ──────────────────────────────────────────────────────────────────────
+          5. THE PROTOTYPE LIBRARY WALL ("The library, at a glance")
+          Directly modeled after Scrolltide's iconic template wall
+      ────────────────────────────────────────────────────────────────────── */}
+      <section id="library" className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6">
+        <div className="flex flex-col gap-6">
+          {/* Section Heading & Quick View Tabs */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-b border-white/10 pb-6">
+            <div>
+              <p className="font-mono text-[11px] uppercase tracking-wider text-[#8bf3e6] font-bold">
+                100+ Audited Local Leads & Custom Archetypes
               </p>
+              <h2 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl text-[#f5f5f3]">
+                The Archetype Library, at a glance
+              </h2>
+            </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-1">
-                {/* Pill-shaped glowing button (tactile press) */}
-                <a
-                  href="#prototype"
-                  className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-[#00f0ff] text-zinc-950 font-black text-sm tracking-wider uppercase transition-all duration-200 hover:bg-[#00d8e6] active:scale-[0.97] glow-cyan-btn cursor-pointer"
-                >
-                  <span>Request a Free Prototype</span>
-                  <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
-                </a>
+            {/* Quick Pill Filter Tabs */}
+            <div className="inline-flex rounded-full border border-white/10 bg-[#11151c]/70 p-1 shrink-0">
+              <button
+                onClick={() => setActiveTab("featured")}
+                className={`relative rounded-full px-4 py-1.5 text-xs font-semibold transition ${
+                  activeTab === "featured"
+                    ? "bg-[#f5f5f3] text-[#07080a] shadow-md"
+                    : "text-[#9ba1a6] hover:text-[#f5f5f3]"
+                }`}
+              >
+                Featured
+              </button>
+              <button
+                onClick={() => setActiveTab("popular")}
+                className={`relative rounded-full px-4 py-1.5 text-xs font-semibold transition ${
+                  activeTab === "popular"
+                    ? "bg-[#f5f5f3] text-[#07080a] shadow-md"
+                    : "text-[#9ba1a6] hover:text-[#f5f5f3]"
+                }`}
+              >
+                Highest Converting
+              </button>
+              <a
+                href="/qa-gallery"
+                className="relative rounded-full px-4 py-1.5 text-xs font-semibold transition text-[#8bf3e6] hover:text-white"
+              >
+                Full QA Gallery →
+              </a>
+            </div>
+          </div>
 
-                {/* Secondary Proof Strip */}
-                <a
-                  href="#why-custom"
-                  className="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full bg-white border border-zinc-300 hover:border-zinc-950 text-zinc-800 hover:text-zinc-950 text-xs font-mono uppercase tracking-wider transition-all duration-200 shadow-2xs active:scale-[0.97]"
-                >
-                  <span>Explore Architecture</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-zinc-400" />
-                </a>
-              </div>
-            </motion.div>
-
-            {/* TELEMETRY STATS GRID (STUDIO GRADE, ZERO EMOJIS, TACTILE CARDS WITH FROSTED GLASS) */}
-            <motion.div
-              initial={{ opacity: 0, y: 25 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-16 pt-10 border-t border-zinc-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
+          {/* Category Filter Pills (Scrollable) */}
+          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:px-0">
+            <button
+              onClick={() => setActiveCategory("all")}
+              className={`whitespace-nowrap rounded-full border px-4 py-1.5 text-xs font-medium transition cursor-pointer ${
+                activeCategory === "all"
+                  ? "border-transparent bg-[#f5f5f3] text-[#07080a] font-semibold"
+                  : "border-white/10 text-[#9ba1a6] hover:border-white/20 hover:text-[#f5f5f3]"
+              }`}
             >
-              {/* Stat 1: Google Lighthouse Verification Gauge */}
-              <div className="p-5 rounded-2xl flex flex-col justify-between bg-white/70 backdrop-blur-md border border-white/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-zinc-200/60 transition-all duration-200 hover:bg-white/85 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
-                <div>
-                  <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 tracking-wider uppercase mb-3">
-                    <span>{"// CORE WEB VITALS"}</span>
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-[10px]">
-                      100/100
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-3.5 my-1">
-                    {/* SVG Radial Progress Dial */}
-                    <div className="relative w-12 h-12 flex items-center justify-center shrink-0">
-                      <svg className="w-12 h-12 -rotate-90" viewBox="0 0 48 48">
-                        <circle cx="24" cy="24" r="19" stroke="#e4e4e7" strokeWidth="3.5" fill="none" />
-                        <circle
-                          cx="24"
-                          cy="24"
-                          r="19"
-                          stroke="#10b981"
-                          strokeWidth="3.5"
-                          fill="none"
-                          strokeDasharray="119.38"
-                          strokeDashoffset="0"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                      <span className="absolute font-mono text-xs font-black text-emerald-600">100</span>
-                    </div>
-
-                    <div>
-                      <div className="text-2xl font-black text-zinc-950 tracking-tight font-mono">100/100</div>
-                      <div className="text-xs font-semibold text-emerald-700 flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Mobile & Desktop 4G
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="text-[11px] font-mono text-zinc-400 mt-4 pt-3 border-t border-zinc-100">
-                  CLS: 0.00 · TBT: 0ms · FID: 12ms
-                </div>
-              </div>
-
-              {/* Stat 2: Edge Network Latency */}
-              <div className="p-5 rounded-2xl flex flex-col justify-between bg-white/70 backdrop-blur-md border border-white/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-zinc-200/60 transition-all duration-200 hover:bg-white/85 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
-                <div>
-                  <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 tracking-wider uppercase mb-3">
-                    <span>{"// FIRST CONTENTFUL PAINT"}</span>
-                    <span className="px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-800 border border-cyan-200 font-bold text-[10px]">
-                      TOP 0.1%
-                    </span>
-                  </div>
-
-                  <div className="my-1">
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-black text-zinc-950 tracking-tight font-mono">0.28s</span>
-                      <span className="text-xs font-mono font-bold text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded border border-cyan-200">
-                        280ms cold
-                      </span>
-                    </div>
-                    <div className="text-xs font-mono text-zinc-600 mt-1 flex items-center gap-1.5">
-                      <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-                      </span>
-                      <span>Global edge node cache</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="text-[11px] font-mono text-zinc-400 mt-4 pt-3 border-t border-zinc-100">
-                  TTFB &lt; 40ms worldwide
-                </div>
-              </div>
-
-              {/* Stat 3: Vulnerability Surface */}
-              <div className="p-5 rounded-2xl flex flex-col justify-between bg-white/70 backdrop-blur-md border border-white/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-zinc-200/60 transition-all duration-200 hover:bg-white/85 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
-                <div>
-                  <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 tracking-wider uppercase mb-3">
-                    <span>{"// ATTACK SURFACE"}</span>
-                    <span className="px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-800 border border-zinc-200 font-bold text-[10px]">
-                      IMMUTABLE
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-3.5 my-1">
-                    <div className="w-12 h-12 rounded-xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center text-zinc-900 shrink-0">
-                      <ShieldCheck className="w-6 h-6 text-emerald-600" />
-                    </div>
-                    <div>
-                      <div className="text-2xl sm:text-3xl font-black text-zinc-950 tracking-tight font-mono">0.00%</div>
-                      <div className="text-xs font-mono text-zinc-600 font-semibold">Zero SQL Database</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="text-[11px] font-mono text-zinc-400 mt-4 pt-3 border-t border-zinc-100">
-                  Pre-compiled static HTML & Edge SSL
-                </div>
-              </div>
-
-              {/* Stat 4: Verified Client Conversion Lift with Sparkline */}
-              <div className="p-5 rounded-2xl flex flex-col justify-between bg-white/70 backdrop-blur-md border border-white/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-zinc-200/60 transition-all duration-200 hover:bg-white/85 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
-                <div>
-                  <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 tracking-wider uppercase mb-3">
-                    <span>{"// REVENUE UPTICK"}</span>
-                    <span className="px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-800 border border-cyan-200 font-bold text-[10px]">
-                      +3.4x CALLS
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between my-1">
-                    <div>
-                      <div className="text-2xl sm:text-3xl font-black text-zinc-950 tracking-tight font-mono">+185%</div>
-                      <div className="text-xs font-mono text-zinc-600 font-semibold">Average lead lift</div>
-                    </div>
-
-                    {/* SVG Sparkline Graph */}
-                    <div className="w-20 h-10 shrink-0">
-                      <svg viewBox="0 0 100 45" className="w-full h-full overflow-visible">
-                        <defs>
-                          <linearGradient id="sparkline-grad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.4" />
-                            <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.0" />
-                          </linearGradient>
-                        </defs>
-                        <path
-                          d="M 0 38 Q 25 32, 50 20 T 100 6"
-                          fill="none"
-                          stroke="#0891b2"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                        />
-                        <path
-                          d="M 0 38 Q 25 32, 50 20 T 100 6 L 100 45 L 0 45 Z"
-                          fill="url(#sparkline-grad)"
-                        />
-                        <circle cx="100" cy="6" r="3.5" fill="#0891b2" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="text-[11px] font-mono text-zinc-400 mt-4 pt-3 border-t border-zinc-100">
-                  Verified across 140k+ local ad clicks
-                </div>
-              </div>
-            </motion.div>
+              All Archetypes
+            </button>
+            <button
+              onClick={() => setActiveCategory("urgent")}
+              className={`whitespace-nowrap rounded-full border px-4 py-1.5 text-xs font-medium transition cursor-pointer ${
+                activeCategory === "urgent"
+                  ? "border-transparent bg-[#f5f5f3] text-[#07080a] font-semibold"
+                  : "border-white/10 text-[#9ba1a6] hover:border-white/20 hover:text-[#f5f5f3]"
+              }`}
+            >
+              Urgent Service (Plumbing / HVAC / Roofing)
+            </button>
+            <button
+              onClick={() => setActiveCategory("aesthetic")}
+              className={`whitespace-nowrap rounded-full border px-4 py-1.5 text-xs font-medium transition cursor-pointer ${
+                activeCategory === "aesthetic"
+                  ? "border-transparent bg-[#f5f5f3] text-[#07080a] font-semibold"
+                  : "border-white/10 text-[#9ba1a6] hover:border-white/20 hover:text-[#f5f5f3]"
+              }`}
+            >
+              Aesthetic Booking (Dentists / MedSpas)
+            </button>
+            <button
+              onClick={() => setActiveCategory("professional")}
+              className={`whitespace-nowrap rounded-full border px-4 py-1.5 text-xs font-medium transition cursor-pointer ${
+                activeCategory === "professional"
+                  ? "border-transparent bg-[#f5f5f3] text-[#07080a] font-semibold"
+                  : "border-white/10 text-[#9ba1a6] hover:border-white/20 hover:text-[#f5f5f3]"
+              }`}
+            >
+              Professional Trust (Law Firms / CPAs)
+            </button>
           </div>
-        </section>
 
-        {/* 2. WHY CUSTOM SECTION (BENTO GRID ARCHITECTURE) */}
-        <section id="why-custom" className="py-24 md:py-32 px-6 sm:px-8 border-b border-zinc-200/80 relative bg-[#fdfdfd]">
-          <div className="max-w-7xl mx-auto">
-            {/* Section Heading */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-              <div>
-                <div className="inline-flex items-center gap-2 text-xs font-mono text-cyan-700 uppercase tracking-widest mb-3 font-semibold">
-                  <Terminal className="w-3.5 h-3.5" />
-                  <span>{"// 01 ARCHITECTURE DEEP DIVE"}</span>
-                </div>
-                <h2 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-zinc-950">
-                  Why Custom Code <br className="hidden sm:block" />
-                  Obliterates WordPress.
-                </h2>
-              </div>
-              <p className="text-zinc-600 text-sm sm:text-base max-w-md font-normal leading-relaxed">
-                Standard WordPress templates come bloated with 40+ plugins, slow MySQL queries, and perpetual security holes. We engineer pure static performance.
-              </p>
-            </div>
-
-            {/* BENTO GRID (White Theme Surfaces) */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-
-              {/* BENTO ITEM 1: INTERACTIVE SPEED BENCHMARK SIMULATOR (SPAN 8) */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-                className="md:col-span-8 card-surface rounded-3xl p-6 sm:p-8 flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between pb-4 border-b border-zinc-100 mb-6">
-                    <span className="font-mono text-xs text-zinc-500 uppercase tracking-wider flex items-center gap-2 font-semibold">
-                      <Gauge className="w-4 h-4 text-cyan-600" />
-                      LIVE NETWORK BENCHMARK SIMULATION
-                    </span>
-                    <button
-                      onClick={handleRunSpeedBenchmark}
-                      disabled={isSimulating}
-                      className="px-3.5 py-1.5 rounded-full text-xs font-mono font-bold bg-zinc-950 text-white hover:bg-cyan-500 hover:text-zinc-950 active:scale-[0.97] transition-all cursor-pointer disabled:opacity-50"
-                    >
-                      {isSimulating ? "Testing Network..." : "Run Test Again ↺"}
-                    </button>
-                  </div>
-
-                  <h3 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight mb-2">
-                    Sub-Second Edge Rendering vs Monolithic Bloat
-                  </h3>
-                  <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed mb-6">
-                    Every 100ms of latency drops visitor conversion by 7%. See how your site actually loads on a standard 4G mobile device:
-                  </p>
-
-                  {/* Benchmark Meter 1: SPEEDCRAFT NEXT.JS */}
-                  <div className="space-y-6">
-                    <div>
-                      <div className="flex justify-between items-baseline text-xs font-mono mb-2">
-                        <span className="font-bold text-zinc-900 flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 rounded-full bg-cyan-500" />
-                          SPEEDCRAFT (Next.js 15 Static Edge Engine)
-                        </span>
-                        <span className="text-cyan-700 font-bold font-mono">
-                          {isSimulating ? `${Math.round(speedProgress * 0.28)}ms` : "0.28s (Instant)"}
-                        </span>
-                      </div>
-                      <div className="h-3 w-full bg-zinc-100 rounded-full overflow-hidden p-0.5 border border-zinc-200">
-                        <motion.div
-                          className="h-full bg-cyan-500 rounded-full shadow-[0_0_12px_rgba(6,182,212,0.4)]"
-                          style={{ width: `${speedProgress}%` }}
-                          transition={{ duration: 0.28, ease: "easeOut" }}
-                        />
-                      </div>
-                      <div className="flex justify-between text-[11px] font-mono text-zinc-400 mt-1.5">
-                        <span>Payload: 45 KB · TTFB: 28ms</span>
-                        <span className="text-emerald-700 font-bold">100/100 Core Web Vitals</span>
-                      </div>
-                    </div>
-
-                    {/* Benchmark Meter 2: BLOATED WORDPRESS */}
-                    <div>
-                      <div className="flex justify-between items-baseline text-xs font-mono mb-2">
-                        <span className="text-zinc-600 flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                          Average Local WordPress Site (38 Plugins + Elementor)
-                        </span>
-                        <span className="text-rose-600 font-bold font-mono">
-                          {isSimulating ? `${(wpProgress * 0.048).toFixed(2)}s` : "4.8s (Lagging)"}
-                        </span>
-                      </div>
-                      <div className="h-3 w-full bg-zinc-100 rounded-full overflow-hidden p-0.5 border border-zinc-200">
-                        <div
-                          className="h-full bg-rose-500/80 rounded-full transition-all duration-300"
-                          style={{ width: `${wpProgress}%` }}
-                        />
-                      </div>
-                      <div className="flex justify-between text-[11px] font-mono text-zinc-400 mt-1.5">
-                        <span>Payload: 4.8 MB · 42 Database Queries</span>
-                        <span className="text-rose-600 font-bold">Failing Mobile Vitals</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-8 pt-5 border-t border-zinc-100 flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-zinc-500">
-                  <span className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    Zero server-side database bottlenecks
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    Global CDN points of presence in 300+ cities
-                  </span>
-                </div>
-              </motion.div>
-
-              {/* BENTO ITEM 2: ZERO-DATABASE SECURITY (SPAN 4) */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="md:col-span-4 card-surface rounded-3xl p-6 sm:p-8 flex flex-col justify-between"
-              >
-                <div>
-                  <div className="w-11 h-11 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 mb-6">
-                    <ShieldCheck className="w-6 h-6" />
-                  </div>
-
-                  <span className="font-mono text-[11px] text-zinc-400 uppercase tracking-widest block mb-1">
-                    ZERO ATTACK SURFACE
-                  </span>
-                  <h3 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight mb-3">
-                    Impossible to Hack.
-                  </h3>
-
-                  <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed mb-6">
-                    Over 90% of hacked small business sites trace back to vulnerable WordPress plugins and outdated MySQL databases. We compile to static assets with zero breach vectors.
-                  </p>
-
-                  <ul className="space-y-2.5 text-xs font-mono text-zinc-700">
-                    <li className="flex items-center gap-2">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span>No SQL injection vectors</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span>No vulnerable wp-login portals</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span>Automatic edge SSL & DDoS mitigation</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-zinc-100 flex items-center justify-between text-xs font-mono">
-                  <span className="text-zinc-500">Security SLA</span>
-                  <span className="text-emerald-700 font-bold">99.99% Guaranteed</span>
-                </div>
-              </motion.div>
-
-              {/* BENTO ITEM 3: DONE-FOR-YOU CONCIERGE CHAT MOCKUP (STREAMLINED & DYNAMIC GLASS) */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                onViewportEnter={() => {
-                  if (!chatStarted) setChatStarted(true);
-                }}
-                transition={{ duration: 0.5, delay: 0.15 }}
-                className="md:col-span-12 relative overflow-hidden rounded-3xl p-6 sm:p-8 flex flex-col lg:flex-row items-center justify-between gap-8 bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_12px_40px_rgba(0,0,0,0.04)] ring-1 ring-zinc-950/5"
-              >
-                {/* Colorful Ambient Mesh Glows behind frosted glass */}
-                <div className="absolute -top-24 -right-20 w-96 h-96 bg-gradient-to-br from-cyan-400/20 via-emerald-300/15 to-transparent rounded-full blur-3xl pointer-events-none -z-0" />
-                <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-gradient-to-tr from-blue-500/15 via-cyan-400/10 to-transparent rounded-full blur-3xl pointer-events-none -z-0" />
-
-                <div className="max-w-xl relative z-10">
-                  <div className="flex items-center gap-2.5 mb-3 flex-wrap">
-                    <div className="w-8 h-8 rounded-xl bg-cyan-50/80 border border-cyan-200/80 backdrop-blur-md flex items-center justify-center text-cyan-700 shadow-2xs">
-                      <Wrench className="w-4 h-4" />
-                    </div>
-                    <span className="font-mono text-xs px-2.5 py-0.5 rounded-full bg-zinc-100/80 border border-zinc-200/80 backdrop-blur-md text-zinc-700 font-semibold shadow-2xs">
-                      DIRECT DEV ACCESS // ZERO DASHBOARDS
-                    </span>
-                    <button
-                      type="button"
-                      onClick={handleReplayChat}
-                      className="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium text-cyan-800 hover:text-cyan-950 bg-white/80 hover:bg-white px-2.5 py-0.5 rounded-full border border-cyan-200/80 backdrop-blur-md transition-all cursor-pointer shadow-2xs"
-                      title="Replay live message interaction"
-                    >
-                      <RotateCcw className="w-3 h-3" />
-                      <span>Replay Interaction</span>
-                    </button>
-                  </div>
-
-                  <h3 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight mb-2">
-                    100% Done-For-You Concierge Maintenance
-                  </h3>
-
-                  <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed mb-4">
-                    Never wrestle with WordPress admin passwords, plugin updates, or broken layouts again. Just text or email us what you need changed—pricing updates, new photos, seasonal promotions. We handle it directly in hours.
-                  </p>
-
-                  <div className="flex items-center gap-4 text-xs font-mono text-zinc-600">
-                    <span className="flex items-center gap-1.5 text-emerald-700 font-semibold">
-                      <Check className="w-4 h-4" /> Unlimited content edits
-                    </span>
-                    <span className="flex items-center gap-1.5 text-emerald-700 font-semibold">
-                      <Check className="w-4 h-4" /> &lt; 2h turnaround SLA
-                    </span>
-                  </div>
-                </div>
-
-                {/* Compact, Ultra-Realistic iPhone 16 Pro Dynamic Chat */}
-                <div className="w-full max-w-[340px] sm:max-w-[370px] lg:max-w-[380px] shrink-0 mx-auto relative z-10">
-                  {/* Physical iPhone 16 Pro Chassis */}
-                  <div className="relative rounded-[46px] p-2 bg-gradient-to-b from-zinc-800 via-zinc-900 to-black shadow-[0_20px_50px_-15px_rgba(0,0,0,0.35),0_0_0_1px_rgba(255,255,255,0.12)]">
-                    {/* Hardware Buttons */}
-                    <div className="absolute -left-[3px] top-20 w-[3px] h-6 bg-zinc-700 rounded-l-sm" />
-                    <div className="absolute -left-[3px] top-30 w-[3px] h-10 bg-zinc-700 rounded-l-sm" />
-                    <div className="absolute -left-[3px] top-44 w-[3px] h-10 bg-zinc-700 rounded-l-sm" />
-                    <div className="absolute -right-[3px] top-28 w-[3px] h-12 bg-zinc-700 rounded-r-sm" />
-
-                    {/* iPhone Display Glass */}
-                    <div className="rounded-[38px] bg-white overflow-hidden flex flex-col relative border border-zinc-200/40 select-none isolate [transform:translateZ(0)]">
-                      
-                      {/* iOS Status Bar */}
-                      <div className="pt-2.5 pb-1 px-5 bg-[#f6f6f6] rounded-t-[38px] flex items-center justify-between text-zinc-950">
-                        {/* Time */}
-                        <span className="text-xs font-semibold tracking-tight font-sans">9:41</span>
-                        
-                        {/* Dynamic Island */}
-                        <div className="w-[84px] h-[19px] bg-black rounded-full mx-auto relative flex items-center justify-end px-2 shadow-inner">
-                          <div className="w-2 h-2 rounded-full bg-[#0d1326] ring-1 ring-blue-500/20" />
-                        </div>
-
-                        {/* Status Icons: Cellular, 5G, Battery */}
-                        <div className="flex items-center gap-1 text-zinc-900">
-                          <svg className="w-3.5 h-2.5 fill-current" viewBox="0 0 17 12">
-                            <rect x="0" y="8" width="2.5" height="4" rx="0.5" />
-                            <rect x="4.5" y="5.5" width="2.5" height="6.5" rx="0.5" />
-                            <rect x="9" y="3" width="2.5" height="9" rx="0.5" />
-                            <rect x="13.5" y="0" width="2.5" height="12" rx="0.5" />
-                          </svg>
-
-                          <span className="text-[9px] font-bold tracking-tighter leading-none">5G</span>
-
-                          <svg className="w-4.5 h-2.5 text-zinc-900" viewBox="0 0 25 12" fill="none">
-                            <rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" strokeWidth="1" />
-                            <rect x="2" y="2" width="16" height="8" rx="1.5" fill="currentColor" />
-                            <path d="M23 4v4" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
-                          </svg>
-                        </div>
-                      </div>
-
-                      {/* iOS Navigation Bar */}
-                      <div className="px-3.5 py-1.5 bg-[#f6f6f6] border-b border-[#e5e5ea] flex items-center justify-between">
-                        {/* Back to Messages */}
-                        <div className="flex items-center text-[#007aff] text-xs font-medium cursor-default">
-                          <ChevronLeft className="w-4 h-4 stroke-[2.5] -ml-1" />
-                          <span>12</span>
-                        </div>
-
-                        {/* Center Contact Header */}
-                        <div className="flex flex-col items-center">
-                          <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-cyan-600 via-cyan-500 to-emerald-400 p-[1.2px] shadow-2xs">
-                            <div className="w-full h-full rounded-full bg-zinc-900 flex items-center justify-center font-bold text-[10px] text-white tracking-tight">
-                              FO
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-0.5 mt-0.5">
-                            <span className="font-semibold text-[11px] text-zinc-950">Faruk (Speedcraft)</span>
-                            <ChevronRight className="w-2.5 h-2.5 text-zinc-400 stroke-[2]" />
-                          </div>
-                          <span className="text-[9px] text-zinc-400 font-medium leading-none">iMessage</span>
-                        </div>
-
-                        {/* FaceTime & Phone Icons */}
-                        <div className="flex items-center gap-2.5 text-[#007aff]">
-                          <Video className="w-3.5 h-3.5 stroke-[2]" />
-                          <Phone className="w-3 h-3 stroke-[2]" />
-                        </div>
-                      </div>
-
-                      {/* Compact Conversation Scroll Body */}
-                      <div className="p-3 space-y-2 bg-[#ffffff] text-[12.5px] sm:text-[13px] leading-snug font-sans min-h-[205px] flex flex-col justify-end">
-                        {/* Timestamp */}
-                        <div className="text-center text-[9.5px] text-zinc-400 font-medium my-0.5">
-                          Today 10:14 AM
-                        </div>
-
-                        {/* Message 1: Incoming Emergency Request */}
-                        <motion.div
-                          initial={{ opacity: 0, y: 10, scale: 0.97 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          transition={{ duration: 0.35, ease: "easeOut" }}
-                          className="flex justify-start"
-                        >
-                          <div className="relative bg-[#e9e9eb] text-zinc-950 px-3 py-1.5 rounded-[18px] rounded-bl-[4px] max-w-[85%] font-normal">
-                            Hey Faruk! Emergency — board approved a $50 promo. Can we get the banner live before 11 AM?
-                            {/* Incoming Bubble Tail */}
-                            <svg className="absolute -bottom-[0.5px] -left-[5px] w-[14px] h-[14px] text-[#e9e9eb] fill-current pointer-events-none" viewBox="0 0 14 14">
-                              <path d="M14,0 C14,7.732 7.732,14 0,14 C4.5,14 8,11 9.5,8 C10.2,6 10.5,3.5 10.5,0 Z" />
-                            </svg>
-                          </div>
-                        </motion.div>
-
-                        {/* Message 2: Outgoing Live Deployment & Tapback (Unfolds at Step 1+) */}
-                        <AnimatePresence>
-                          {chatStep >= 1 && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 12, scale: 0.95 }}
-                              animate={{ opacity: 1, y: 0, scale: 1 }}
-                              transition={{ duration: 0.35, ease: "easeOut" }}
-                              className="flex flex-col items-end pt-0.5"
-                            >
-                              {/* Compact Live Audit Badge */}
-                              <div className="bg-zinc-950 text-white rounded-xl px-2.5 py-1 mb-1 flex items-center justify-between text-[10px] w-fit max-w-[88%] border border-zinc-800 shadow-2xs gap-2.5">
-                                <div className="flex items-center gap-1.5 truncate">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 animate-pulse" />
-                                  <span className="font-semibold text-zinc-200 truncate">speedcraft.dev/live</span>
-                                </div>
-                                <span className="font-mono text-emerald-400 font-bold shrink-0 text-[9.5px]">100/100 · 0.28s</span>
-                              </div>
-
-                              {/* Message bubble with Loved Tapback reaction */}
-                              <div className="relative bg-[#007aff] text-white px-3 py-1.5 rounded-[18px] rounded-br-[4px] max-w-[88%] font-normal">
-                                Done! Live across all 310 global edge nodes in 9 minutes. Cache purged &amp; PageSpeed 100/100.
-                                
-                                {/* Outgoing Bubble Tail */}
-                                <svg className="absolute -bottom-[0.5px] -right-[5px] w-[14px] h-[14px] text-[#007aff] fill-current pointer-events-none" viewBox="0 0 14 14">
-                                  <path d="M0,0 C0,7.732 6.268,14 14,14 C9.5,14 6,11 4.5,8 C3.8,6 3.5,3.5 3.5,0 Z" />
-                                </svg>
-
-                                {/* Loved Tapback Sticker - Springs in at Step 2 */}
-                                <AnimatePresence>
-                                  {chatStep >= 2 && (
-                                    <motion.div
-                                      initial={{ scale: 0, opacity: 0 }}
-                                      animate={{ scale: 1, opacity: 1 }}
-                                      transition={{ type: "spring", stiffness: 450, damping: 16 }}
-                                      className="absolute -top-3 -left-2 flex items-center z-10 select-none"
-                                    >
-                                      <div className="bg-white rounded-full px-1.5 py-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-zinc-200/80 flex items-center gap-0.5">
-                                        <Heart className="w-2.5 h-2.5 text-red-500 fill-red-500" />
-                                        <span className="text-[9px] font-bold text-zinc-600 font-sans">1</span>
-                                      </div>
-                                    </motion.div>
-                                  )}
-                                </AnimatePresence>
-                              </div>
-
-                              {/* Delivered status receipt */}
-                              <div className="text-[9px] text-zinc-400 font-medium mt-0.5 pr-1">
-                                Delivered · 10:23 AM
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-
-                        {/* Step 3: Brief Client Typing Indicator before final response */}
-                        <AnimatePresence>
-                          {chatStep === 3 && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 8, scale: 0.9 }}
-                              animate={{ opacity: 1, y: 0, scale: 1 }}
-                              exit={{ opacity: 0, scale: 0.8 }}
-                              transition={{ duration: 0.2 }}
-                              className="flex justify-start pt-0.5"
-                            >
-                              <div className="relative bg-[#e9e9eb] px-3 py-2 rounded-[18px] rounded-bl-[4px] flex items-center gap-1.5 shadow-2xs">
-                                <span className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{ animationDelay: "0ms" }} />
-                                <span className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{ animationDelay: "150ms" }} />
-                                <span className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style={{ animationDelay: "300ms" }} />
-                                {/* Incoming Bubble Tail */}
-                                <svg className="absolute -bottom-[0.5px] -left-[5px] w-[14px] h-[14px] text-[#e9e9eb] fill-current pointer-events-none" viewBox="0 0 14 14">
-                                  <path d="M14,0 C14,7.732 7.732,14 0,14 C4.5,14 8,11 9.5,8 C10.2,6 10.5,3.5 10.5,0 Z" />
-                                </svg>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-
-                        {/* Step 4: Final Enthusiastic Client Response */}
-                        <AnimatePresence>
-                          {chatStep >= 4 && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 12, scale: 0.95 }}
-                              animate={{ opacity: 1, y: 0, scale: 1 }}
-                              transition={{ duration: 0.35, ease: "easeOut" }}
-                              className="flex justify-start pt-0.5"
-                            >
-                              <div className="relative bg-[#e9e9eb] text-zinc-950 px-3 py-1.5 rounded-[18px] rounded-bl-[4px] max-w-[85%] font-normal">
-                                Holy cow that was fast! Our old agency took 4 days just to reply. You guys are unreal.
-                                {/* Incoming Bubble Tail */}
-                                <svg className="absolute -bottom-[0.5px] -left-[5px] w-[14px] h-[14px] text-[#e9e9eb] fill-current pointer-events-none" viewBox="0 0 14 14">
-                                  <path d="M14,0 C14,7.732 7.732,14 0,14 C4.5,14 8,11 9.5,8 C10.2,6 10.5,3.5 10.5,0 Z" />
-                                </svg>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-
-                      {/* iOS Bottom Input Bar */}
-                      <div className="px-3 py-1.5 bg-[#f6f6f6] border-t border-[#e5e5ea] flex items-center gap-1.5">
-                        <div className="w-6 h-6 rounded-full bg-[#e5e5ea] flex items-center justify-center text-zinc-600 shrink-0">
-                          <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                        </div>
-                        
-                        <div className="flex-1 bg-white border border-[#d1d1d6] rounded-full px-2.5 py-1 flex items-center justify-between text-[11px] text-zinc-400 shadow-2xs">
-                          <span>iMessage</span>
-                          <Mic className="w-3 h-3 text-zinc-400" />
-                        </div>
-
-                        <div className="w-6 h-6 rounded-full bg-[#007aff] flex items-center justify-center text-white shrink-0 shadow-2xs">
-                          <ArrowUp className="w-3.5 h-3.5 stroke-[3]" />
-                        </div>
-                      </div>
-
-                      {/* iOS Home Indicator Bar */}
-                      <div className="bg-[#f6f6f6] pb-1.5 pt-0.5 flex justify-center rounded-b-[38px]">
-                        <div className="w-28 h-1 bg-zinc-300 rounded-full" />
-                      </div>
-
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-
-            </div>
-          </div>
-        </section>
-
-        {/* 3. SELECTED WORK (HIGH-CONVERSION SHOWCASE) */}
-        <section id="work" className="py-24 md:py-32 px-6 sm:px-8 border-b border-zinc-200/80 relative">
-          <div className="max-w-7xl mx-auto">
-            {/* Section Heading */}
-            <div className="mb-16">
-              <div className="inline-flex items-center gap-2 text-xs font-mono text-cyan-700 uppercase tracking-widest mb-3 font-semibold">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>{"// 02 HIGH-CONVERSION SHOWCASE"}</span>
-              </div>
-              <h2 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-zinc-950 mb-4">
-                See the Speed.
-              </h2>
-              <p className="text-zinc-600 text-sm sm:text-base max-w-xl font-normal">
-                Edge-to-edge architectures hand-crafted for high-ticket local trades and private clinical practices.
-              </p>
-            </div>
-
-            {/* Showcase Grid (Large, Edge-to-Edge Cards in White Theme) */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10">
-
-              {/* CARD 1: HOME SERVICE TEMPLATE */}
-              <motion.div
-                initial={{ opacity: 0, y: 25 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-                className="group rounded-3xl bg-white border border-zinc-200/90 overflow-hidden flex flex-col justify-between hover:border-cyan-500/60 transition-all duration-300 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-xl"
-              >
-                {/* Visual Header / Mockup Preview */}
-                <div className="relative aspect-[16/10] bg-gradient-to-br from-zinc-50 via-zinc-100 to-zinc-200/80 p-6 sm:p-8 flex flex-col justify-between overflow-hidden border-b border-zinc-200">
-                  {/* Subtle Grid in Mockup */}
-                  <div 
-                    className="absolute inset-0 opacity-15 pointer-events-none"
-                    style={{
-                      backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.2) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 1px, transparent 1px)`,
-                      backgroundSize: "32px 32px"
-                    }}
-                  />
-
-                  {/* Floating Badges */}
-                  <div className="relative z-10 flex items-center justify-between">
-                    <span className="px-3 py-1 rounded-full text-[11px] font-mono uppercase bg-white/95 border border-zinc-300 text-zinc-800 backdrop-blur-md shadow-2xs font-semibold">
-                      {"HOME SERVICE // HVAC & ROOFING"}
-                    </span>
-                    <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-300 backdrop-blur-md font-bold shadow-2xs">
-                      <Zap className="w-3 h-3 text-emerald-600 fill-emerald-600" /> 0.31s First Paint
-                    </span>
-                  </div>
-
-                  {/* Visual Interface Preview Element */}
-                  <div className="relative z-10 my-auto py-4">
-                    <div className="max-w-md mx-auto p-5 rounded-2xl bg-white/95 border border-zinc-300/80 shadow-lg backdrop-blur-md transform group-hover:scale-[1.02] transition-transform duration-300">
-                      <div className="flex items-center justify-between pb-3 border-b border-zinc-100 text-xs font-mono text-zinc-500">
-                        <span className="font-bold text-zinc-800">VANGUARD ROOFING & SOLAR</span>
-                        <span className="text-emerald-700 flex items-center gap-1 font-semibold">
-                          ● Instant Dispatch
-                        </span>
-                      </div>
-                      <div className="mt-3">
-                        <div className="text-lg font-bold text-zinc-950 leading-tight">
-                          24/7 Storm Damage Emergency Response
-                        </div>
-                        <div className="mt-2 flex items-center gap-2">
-                          <span className="text-xs text-zinc-500">Quotes returned in 4 mins · Zero spam</span>
-                        </div>
-                        <div className="mt-4 flex items-center justify-between">
-                          <div className="h-8 px-4 rounded-lg bg-[#00f0ff] text-zinc-950 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
-                            Book Inspection <ArrowRight className="w-3 h-3" />
-                          </div>
-                          <span className="text-xs font-mono text-zinc-600 font-medium">Google Rating 4.9/5 (140+ reviews)</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Bottom Mockup Metric Footnote */}
-                  <div className="relative z-10 flex items-center justify-between text-[11px] font-mono text-zinc-500">
-                    <span>STACK: NEXT.JS 15 + TAILWIND</span>
-                    <span className="text-emerald-700 font-bold">+184% Lead Inquiries</span>
-                  </div>
-                </div>
-
-                {/* Card Details */}
-                <div className="p-8 flex items-center justify-between">
-                  <div>
-                    <h3 className="text-2xl font-bold text-zinc-950 tracking-tight group-hover:text-cyan-700 transition-colors">
-                      Apex Home Services Template
-                    </h3>
-                    <p className="text-xs font-mono text-zinc-500 mt-1">
-                      Engineered for high emergency click-to-call conversion and local SEO domination.
-                    </p>
-                  </div>
-                  <button
-                    onClick={() =>
-                      setActiveModalDemo({
-                        title: "Apex Home Services Template",
-                        category: "HVAC, Plumbing & Roofing",
-                        fcp: "0.31s",
-                        lcp: "0.62s",
-                        tbt: "0ms",
-                        cls: "0.00",
-                        highlights: [
-                          "Click-to-Call Emergency Hero Strip",
-                          "Zip Code Service Area Checker",
-                          "Instant Quote Estimator Form",
-                        ],
-                        sampleName: "Vanguard Roofing & Solar",
-                        tagline: "24/7 Storm Damage Emergency Response",
-                      })
-                    }
-                    className="w-12 h-12 rounded-full border border-zinc-300 flex items-center justify-center text-zinc-700 group-hover:bg-zinc-950 group-hover:text-white group-hover:border-zinc-950 transition-all duration-200 shrink-0 cursor-pointer"
-                    title="Inspect template details"
-                  >
-                    <ArrowUpRight className="w-5 h-5" />
-                  </button>
-                </div>
-              </motion.div>
-
-              {/* CARD 2: HIGH-TICKET MEDICAL & CLINIC TEMPLATE */}
-              <motion.div
-                initial={{ opacity: 0, y: 25 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="group rounded-3xl bg-white border border-zinc-200/90 overflow-hidden flex flex-col justify-between hover:border-cyan-500/60 transition-all duration-300 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-xl"
-              >
-                {/* Visual Header / Mockup Preview */}
-                <div className="relative aspect-[16/10] bg-gradient-to-br from-zinc-50 via-zinc-100 to-zinc-200/80 p-6 sm:p-8 flex flex-col justify-between overflow-hidden border-b border-zinc-200">
-                  {/* Subtle Grid in Mockup */}
-                  <div 
-                    className="absolute inset-0 opacity-15 pointer-events-none"
-                    style={{
-                      backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.2) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 1px, transparent 1px)`,
-                      backgroundSize: "32px 32px"
-                    }}
-                  />
-
-                  {/* Floating Badges */}
-                  <div className="relative z-10 flex items-center justify-between">
-                    <span className="px-3 py-1 rounded-full text-[11px] font-mono uppercase bg-white/95 border border-zinc-300 text-zinc-800 backdrop-blur-md shadow-2xs font-semibold">
-                      {"HEALTHCARE // MEDICAL & CLINIC"}
-                    </span>
-                    <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono text-cyan-800 bg-cyan-50 border border-cyan-300 backdrop-blur-md font-bold shadow-2xs">
-                      <Zap className="w-3 h-3 text-cyan-600 fill-cyan-600" /> 0.28s First Paint
-                    </span>
-                  </div>
-
-                  {/* Visual Interface Preview Element */}
-                  <div className="relative z-10 my-auto py-4">
-                    <div className="max-w-md mx-auto p-5 rounded-2xl bg-white/95 border border-zinc-300/80 shadow-lg backdrop-blur-md transform group-hover:scale-[1.02] transition-transform duration-300">
-                      <div className="flex items-center justify-between pb-3 border-b border-zinc-100 text-xs font-mono text-zinc-500">
-                        <span className="font-bold text-zinc-800">LUMINA AESTHETICS & SURGERY</span>
-                        <span className="text-cyan-700 flex items-center gap-1 font-semibold">
-                          ● HIPAA Verified
-                        </span>
-                      </div>
-                      <div className="mt-3">
-                        <div className="text-lg font-bold text-zinc-950 leading-tight">
-                          Private Consultation & Facial Rejuvenation
-                        </div>
-                        <div className="mt-2 flex items-center gap-2">
-                          <span className="text-xs text-zinc-500">Board-Certified Specialists · VIP Concierge</span>
-                        </div>
-                        <div className="mt-4 flex items-center justify-between">
-                          <div className="h-8 px-4 rounded-lg bg-zinc-950 text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs">
-                            Book VIP Visit <ArrowRight className="w-3 h-3 text-cyan-400" />
-                          </div>
-                          <span className="text-xs font-mono text-zinc-600 font-medium">99.8% Patient Satisfaction</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Bottom Mockup Metric Footnote */}
-                  <div className="relative z-10 flex items-center justify-between text-[11px] font-mono text-zinc-500">
-                    <span>STACK: REACT 19 + CLOUDFLARE EDGE</span>
-                    <span className="text-cyan-700 font-bold">3.2x Consultation Inquiries</span>
-                  </div>
-                </div>
-
-                {/* Card Details */}
-                <div className="p-8 flex items-center justify-between">
-                  <div>
-                    <h3 className="text-2xl font-bold text-zinc-950 tracking-tight group-hover:text-cyan-700 transition-colors">
-                      Lumina Medical Practice Template
-                    </h3>
-                    <p className="text-xs font-mono text-zinc-500 mt-1">
-                      Designed for high-ticket cash procedures, cosmetic clinics, and private medical practices.
-                    </p>
-                  </div>
-                  <button
-                    onClick={() =>
-                      setActiveModalDemo({
-                        title: "Lumina Medical Practice Template",
-                        category: "Aesthetics & Clinical Practice",
-                        fcp: "0.28s",
-                        lcp: "0.58s",
-                        tbt: "0ms",
-                        cls: "0.00",
-                        highlights: [
-                          "HIPAA Compliant Contact Intake",
-                          "Before / After Slider Gallery",
-                          "Direct Doctor Credential Badging",
-                        ],
-                        sampleName: "Lumina Aesthetics & Surgery",
-                        tagline: "Private Consultation & Facial Rejuvenation",
-                      })
-                    }
-                    className="w-12 h-12 rounded-full border border-zinc-300 flex items-center justify-center text-zinc-700 group-hover:bg-zinc-950 group-hover:text-white group-hover:border-zinc-950 transition-all duration-200 shrink-0 cursor-pointer"
-                    title="Inspect template details"
-                  >
-                    <ArrowUpRight className="w-5 h-5" />
-                  </button>
-                </div>
-              </motion.div>
-
-            </div>
-          </div>
-        </section>
-
-        {/* 4. INTERACTIVE CLIENT ROI CALCULATOR SECTION (PULLS FROM SAASFRAME & LAND-BOOK TO CONVERT CLIENTS) */}
-        <section id="roi-calculator" className="py-20 md:py-28 px-6 sm:px-8 border-b border-zinc-200/80 bg-[#f9fafb]">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-14">
-              <div className="inline-flex items-center gap-2 text-xs font-mono text-cyan-700 uppercase tracking-widest mb-3 font-semibold">
-                <Sliders className="w-3.5 h-3.5" />
-                <span>{"// 03 ESTIMATED CLIENT ROI"}</span>
-              </div>
-              <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-zinc-950 mb-3">
-                Calculate Your Real Revenue Lift.
-              </h2>
-              <p className="text-zinc-600 text-sm sm:text-base max-w-xl mx-auto">
-                See how much revenue you are leaving on the table every month from slow mobile load times and bounce rates.
-              </p>
-            </div>
-
-            <div className="card-surface rounded-3xl p-6 sm:p-10">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                {/* Sliders Input Column */}
-                <div className="lg:col-span-7 space-y-7">
-                  {/* Slider 1: Average Customer / Deal Value */}
-                  <div>
-                    <div className="flex justify-between items-baseline mb-2">
-                      <label className="text-xs font-mono uppercase tracking-wider text-zinc-600 font-bold">
-                        Average Customer / Job Value
-                      </label>
-                      <span className="font-mono text-lg font-black text-zinc-950">
-                        ${dealValue.toLocaleString()}
-                      </span>
-                    </div>
-                    <input
-                      type="range"
-                      min={150}
-                      max={5000}
-                      step={50}
-                      value={dealValue}
-                      onChange={(e) => setDealValue(Number(e.target.value))}
-                      className="w-full accent-cyan-600 h-2 bg-zinc-200 rounded-lg cursor-pointer"
-                    />
-                    <div className="flex justify-between text-[11px] font-mono text-zinc-400 mt-1">
-                      <span>$150 (Service call)</span>
-                      <span>$2,500+ (High-ticket contract)</span>
-                    </div>
-                  </div>
-
-                  {/* Slider 2: Monthly Visitors */}
-                  <div>
-                    <div className="flex justify-between items-baseline mb-2">
-                      <label className="text-xs font-mono uppercase tracking-wider text-zinc-600 font-bold">
-                        Monthly Website Visitors
-                      </label>
-                      <span className="font-mono text-lg font-black text-zinc-950">
-                        {monthlyTraffic.toLocaleString()} visits
-                      </span>
-                    </div>
-                    <input
-                      type="range"
-                      min={300}
-                      max={10000}
-                      step={100}
-                      value={monthlyTraffic}
-                      onChange={(e) => setMonthlyTraffic(Number(e.target.value))}
-                      className="w-full accent-cyan-600 h-2 bg-zinc-200 rounded-lg cursor-pointer"
-                    />
-                    <div className="flex justify-between text-[11px] font-mono text-zinc-400 mt-1">
-                      <span>300 (Local contractor)</span>
-                      <span>10,000+ (High-traffic clinic)</span>
-                    </div>
-                  </div>
-
-                  <p className="text-xs font-mono text-zinc-500 leading-relaxed pt-2">
-                    *Based on Google data showing sub-second sites experience a 2.2% - 3.4% median conversion lift over sites with 3+ second mobile load times.
-                  </p>
-                </div>
-
-                {/* Calculated ROI Output Card */}
-                <div className="lg:col-span-5 bg-zinc-950 text-white rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-lg">
-                  <div>
-                    <span className="text-[11px] font-mono uppercase tracking-widest text-cyan-400 font-bold block mb-1">
-                      PROJECTED MONTHLY VALUE
-                    </span>
-                    <div className="text-4xl sm:text-5xl font-black text-white font-mono tracking-tight my-2">
-                      +${estimatedAddedRevenue.toLocaleString()}
-                      <span className="text-xs font-mono text-zinc-400 font-normal">/mo</span>
-                    </div>
-                    <div className="text-xs font-mono text-emerald-400 flex items-center gap-1.5 font-semibold">
-                      <TrendingUp className="w-4 h-4" />
-                      <span>~{estimatedExtraLeads} extra high-intent calls / month</span>
-                    </div>
-                  </div>
-
-                  <div className="mt-8 pt-6 border-t border-zinc-800">
-                    <div className="flex justify-between items-center text-xs font-mono text-zinc-300 mb-4">
-                      <span>Return on $150/mo Plan:</span>
-                      <span className="text-cyan-400 font-bold text-sm">{roiMultiple}x ROI</span>
-                    </div>
-                    <a
-                      href="#prototype"
-                      className="w-full py-3 rounded-full bg-[#00f0ff] hover:bg-[#00d8e6] text-zinc-950 font-bold text-xs font-mono uppercase tracking-wider flex items-center justify-center gap-2 transition-colors active:scale-[0.97]"
-                    >
-                      <span>Claim Your Free Prototype</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 5. PRICING & INVESTMENT SECTION */}
-        <section id="pricing" className="py-24 md:py-32 px-6 sm:px-8 border-b border-zinc-200/80 relative bg-white">
-          <div className="max-w-7xl mx-auto">
-            {/* Section Heading & Plan Toggle */}
-            <div className="text-center max-w-3xl mx-auto mb-16">
-              <div className="inline-flex items-center gap-2 text-xs font-mono text-cyan-700 uppercase tracking-widest mb-3 font-semibold">
-                <Layers className="w-3.5 h-3.5" />
-                <span>{"// 04 TRANSPARENT INVESTMENT"}</span>
-              </div>
-              <h2 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-zinc-950 mb-4">
-                Predictable ROI. <br />
-                No Technical Debt.
-              </h2>
-              <p className="text-zinc-600 text-sm sm:text-base font-normal mb-8">
-                Choose between zero upfront investment with lifetime full-service care, or complete source code ownership.
-              </p>
-
-              {/* Interactive Toggle Switch with Floating Glassmorphism */}
-              <div className="inline-flex items-center p-1.5 rounded-full bg-zinc-100/70 backdrop-blur-lg border border-zinc-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-white/60">
-                <button
-                  type="button"
-                  onClick={() => handleSelectPlan("subscription")}
-                  className={`px-5 py-2 rounded-full text-xs font-mono font-bold transition-all cursor-pointer ${
-                    billingPlan === "subscription"
-                      ? "bg-white/95 backdrop-blur-md text-zinc-950 shadow-xs border border-white/80"
-                      : "text-zinc-600 hover:text-zinc-950"
-                  }`}
-                >
-                  Zero-Upfront Subscription ($150/mo)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSelectPlan("lumpSum")}
-                  className={`px-5 py-2 rounded-full text-xs font-mono font-bold transition-all cursor-pointer ${
-                    billingPlan === "lumpSum"
-                      ? "bg-white/95 backdrop-blur-md text-zinc-950 shadow-xs border border-white/80"
-                      : "text-zinc-600 hover:text-zinc-950"
-                  }`}
-                >
-                  Build & Own Package ($1,200)
-                </button>
-              </div>
-            </div>
-
-            {/* DUAL PRICING CARDS */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-
-              {/* CARD 1: $150/MONTH SUBSCRIPTION */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-                className={`relative rounded-3xl p-8 sm:p-10 flex flex-col justify-between transition-all duration-300 bg-white ${
-                  billingPlan === "subscription"
-                    ? "border-2 border-zinc-950 shadow-[0_12px_40px_rgba(0,0,0,0.08)] scale-[1.01]"
-                    : "card-surface"
-                }`}
-              >
-                {/* Popular Badge */}
-                <div className="flex items-center justify-between mb-8">
-                  <span className="px-3 py-1 rounded-full text-[10px] font-mono tracking-wider uppercase bg-cyan-50 border border-cyan-300 text-cyan-800 font-bold">
-                    {"MOST POPULAR // ZERO RISK"}
-                  </span>
-                  <span className="text-xs font-mono text-zinc-500">12-Month Agreement</span>
-                </div>
-
-                <div>
-                  <h3 className="text-2xl font-bold text-zinc-950 mb-2">Zero-Upfront Monthly</h3>
-                  <p className="text-xs font-mono text-zinc-500 mb-6">
-                    A completely custom Next.js site with zero upfront capital. We handle design, development, hosting, and unlimited edits.
-                  </p>
-
-                  {/* Price Block */}
-                  <div className="flex items-baseline gap-2 mb-8 pb-8 border-b border-zinc-200">
-                    <span className="text-5xl sm:text-6xl font-black text-zinc-950 tracking-tight font-mono">$150</span>
-                    <span className="text-zinc-500 font-mono text-sm">/ month</span>
-                    <span className="ml-auto text-xs font-mono font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-300">
-                      $0 DOWNPAYMENT
-                    </span>
-                  </div>
-
-                  {/* Features List */}
-                  <ul className="space-y-4 text-sm text-zinc-700 mb-10">
-                    <li className="flex items-start gap-3">
-                      <Check className="w-4 h-4 text-cyan-600 shrink-0 mt-0.5" />
-                      <span><strong>$0 upfront build cost</strong> (normally $2,500+ at standard agencies)</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <Check className="w-4 h-4 text-cyan-600 shrink-0 mt-0.5" />
-                      <span>Custom hand-coded Next.js architecture (100% bespoke)</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <Check className="w-4 h-4 text-cyan-600 shrink-0 mt-0.5" />
-                      <span>Ultra-fast global Edge CDN hosting & SSL certificates included</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <Check className="w-4 h-4 text-cyan-600 shrink-0 mt-0.5" />
-                      <span><strong>Unlimited edits</strong> (text changes, photos, special promotions)</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <Check className="w-4 h-4 text-cyan-600 shrink-0 mt-0.5" />
-                      <span>24/7 uptime monitoring & Core Web Vitals guarantees</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <Check className="w-4 h-4 text-cyan-600 shrink-0 mt-0.5" />
-                      <span>Direct phone & email support with your lead engineer</span>
-                    </li>
-                  </ul>
-                </div>
-
+          {/* 3-Column Scrolltide Card Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
+            {filteredShowcase.map((card) => (
+              <article key={card.id} className="group relative">
                 <a
-                  href="#prototype"
-                  onClick={() => handleSelectPlan("subscription")}
-                  className="w-full py-4 rounded-full bg-[#00f0ff] hover:bg-[#00d8e6] text-zinc-950 font-bold text-xs font-mono uppercase tracking-wider flex items-center justify-center gap-2 glow-cyan-btn transition-all active:scale-[0.97]"
+                  href={card.previewUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block cursor-pointer"
                 >
-                  <span>Select $150/Mo Plan</span>
-                  <ArrowRight className="w-4 h-4" />
-                </a>
-              </motion.div>
-
-              {/* CARD 2: $1,200 BUILD + $50/MONTH */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className={`relative rounded-3xl p-8 sm:p-10 flex flex-col justify-between transition-all duration-300 bg-white ${
-                  billingPlan === "lumpSum"
-                    ? "border-2 border-zinc-950 shadow-[0_12px_40px_rgba(0,0,0,0.08)] scale-[1.01]"
-                    : "card-surface"
-                }`}
-              >
-                {/* Ownership Badge */}
-                <div className="flex items-center justify-between mb-8">
-                  <span className="px-3 py-1 rounded-full text-[10px] font-mono tracking-wider uppercase bg-zinc-100 border border-zinc-300 text-zinc-800 font-bold">
-                    MAXIMUM LONG-TERM ROI
-                  </span>
-                  <span className="text-xs font-mono text-zinc-500">Full Code Ownership</span>
-                </div>
-
-                <div>
-                  <h3 className="text-2xl font-bold text-zinc-950 mb-2">Build & Own Package</h3>
-                  <p className="text-xs font-mono text-zinc-500 mb-6">
-                    Own 100% of your source code and design assets outright with minimal ongoing cloud overhead.
-                  </p>
-
-                  {/* Price Block */}
-                  <div className="flex items-baseline gap-2 mb-8 pb-8 border-b border-zinc-200">
-                    <span className="text-5xl sm:text-6xl font-black text-zinc-950 tracking-tight font-mono">$1,200</span>
-                    <span className="text-zinc-500 font-mono text-sm">build</span>
-                    <span className="text-zinc-400 font-mono text-sm">+ $50/mo care</span>
-                  </div>
-
-                  {/* Features List */}
-                  <ul className="space-y-4 text-sm text-zinc-700 mb-10">
-                    <li className="flex items-start gap-3">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                      <span><strong>Complete source code ownership</strong> (full GitHub repository transfer)</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>Custom hand-crafted Next.js build designed exclusively for you</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>Guaranteed 98+ Google PageSpeed mobile benchmarks</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>Managed Cloudflare Edge deployment & SSL included</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>Includes 1 hour of dedicated content edits per month</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>Freedom to self-host or transfer anywhere at zero penalty</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <a
-                  href="#prototype"
-                  onClick={() => handleSelectPlan("lumpSum")}
-                  className="w-full py-4 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs font-mono uppercase tracking-wider flex items-center justify-center gap-2 shadow-xs transition-all active:scale-[0.97]"
-                >
-                  <span>Select Build & Own ($1,200)</span>
-                  <ArrowRight className="w-4 h-4" />
-                </a>
-              </motion.div>
-
-            </div>
-
-            {/* Performance Guarantee Callout */}
-            <div className="mt-12 p-6 rounded-2xl bg-white border border-zinc-200/90 max-w-3xl mx-auto flex items-center gap-4 text-xs font-mono text-zinc-600 shadow-2xs">
-              <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-300 flex items-center justify-center text-emerald-700 shrink-0">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <p>
-                <strong className="text-zinc-900 font-bold">The 1.0-Second Guarantee:</strong> If your new website scores below 95 on Google Mobile PageSpeed or takes longer than 1.0 second to load, we refund every cent of your initial month.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* 6. FOOTER / PROTOTYPE REQUEST INTAKE */}
-        <footer id="prototype" className="pt-24 pb-16 px-6 sm:px-8 relative overflow-hidden bg-white">
-          <div className="max-w-7xl mx-auto">
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 sm:gap-16 pb-20 border-b border-zinc-200">
-              
-              {/* Left Column: Direct Agency Pitch */}
-              <div className="lg:col-span-6 flex flex-col justify-between">
-                <div>
-                  <div className="inline-flex items-center gap-2 text-xs font-mono text-cyan-700 uppercase tracking-widest mb-4 font-semibold">
-                    <Send className="w-3.5 h-3.5" />
-                    <span>{"// 05 HIGH-SPEED ENGAGEMENT"}</span>
-                  </div>
-
-                  <h2 className="text-4xl sm:text-6xl font-black tracking-tight text-zinc-950 leading-[0.98] mb-6">
-                    Reserve Your Free Custom Prototype.
-                  </h2>
-
-                  <p className="text-zinc-600 text-base sm:text-lg leading-relaxed mb-8">
-                    Send me your current business URL or project details. I will hand-code a working Next.js demo showing your exact branding loaded in under 300 milliseconds.
-                  </p>
-
-                  {/* Guarantee Checkpoints */}
-                  <div className="space-y-4 mb-10 text-xs font-mono text-zinc-700">
-                    <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-800">
-                        <Check className="w-3 h-3 stroke-[3]" />
-                      </div>
-                      <span>No payment info required · 100% free demonstration</span>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-800">
-                        <Check className="w-3 h-3 stroke-[3]" />
-                      </div>
-                      <span>Live Google PageSpeed audit included with analysis</span>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-800">
-                        <Check className="w-3 h-3 stroke-[3]" />
-                      </div>
-                      <span>Ready to review within 24 business hours</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Direct Engineer Contact */}
-                <div className="p-5 rounded-2xl bg-zinc-50 border border-zinc-200 text-xs font-mono">
-                  <div className="text-zinc-400 uppercase tracking-wider mb-1">Direct Studio Line</div>
-                  <div className="text-sm font-bold text-zinc-950 font-sans mb-1">
-                    farukolawale509@gmail.com
-                  </div>
-                  <div className="text-zinc-500">Zero offshore subcontractors. Code you can inspect.</div>
-                </div>
-              </div>
-
-              {/* Right Column: Minimalist Contact Form with Bottom-Border-Only Inputs */}
-              <div className="lg:col-span-6">
-                <div className="rounded-3xl bg-white border border-zinc-200/90 p-8 sm:p-12 shadow-[0_12px_45px_rgba(0,0,0,0.06)]">
-                  
-                  <div className="flex items-center justify-between pb-6 mb-8 border-b border-zinc-200">
-                    <span className="font-mono text-xs uppercase tracking-widest text-zinc-500 font-bold">
-                      {"REQUEST INTAKE // 05"}
-                    </span>
-                    <span className="font-mono text-xs text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-300 font-bold">
-                      24H PROTOTYPE SLA
-                    </span>
-                  </div>
-
-                  {formSubmitted ? (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="py-12 text-center flex flex-col items-center"
-                    >
-                      <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-300 flex items-center justify-center text-emerald-600 mb-6">
-                        <CheckCircle2 className="w-8 h-8" />
-                      </div>
-                      <h3 className="text-2xl font-bold text-zinc-950 mb-2">Prototype Request Received.</h3>
-                      <p className="text-zinc-600 text-sm max-w-sm font-mono mb-8">
-                        I am analyzing <span className="text-cyan-700 font-semibold">{formData.website || "your current website"}</span>. Expect a live, private Next.js staging link in your inbox shortly.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => setFormSubmitted(false)}
-                        className="text-xs font-mono uppercase tracking-wider text-zinc-600 hover:text-zinc-950 underline cursor-pointer"
-                      >
-                        Submit another request
-                      </button>
-                    </motion.div>
-                  ) : (
-                    <form onSubmit={handleSubmitForm} className="space-y-8">
-                      {/* Anti-spam honeypot */}
-                      <input
-                        type="text"
-                        name="website_verify_hp"
-                        value={honeypot}
-                        onChange={(e) => setHoneypot(e.target.value)}
-                        tabIndex={-1}
-                        autoComplete="off"
-                        className="hidden absolute -left-[9999px]"
+                  {/* Card Container with Scrolltide Hover Dynamics */}
+                  <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0b0d11] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1.5 group-hover:border-white/20 group-hover:shadow-[0_20px_60px_-18px_rgba(70,183,255,0.4)]">
+                    {/* Visual Media Canvas with Scale on Hover */}
+                    <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
+                      <div
+                        className="w-full h-full bg-cover bg-center transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
+                        style={{ backgroundImage: `url('${card.img}')` }}
                       />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0b0d11] via-[#0b0d11]/30 to-transparent" />
 
-                      {/* Error feedback banner */}
-                      {errorMessage && (
-                        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-300 text-rose-800 text-xs font-mono flex items-center gap-2.5">
-                          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                          <span>{errorMessage}</span>
+                      {/* Top Niche Tag */}
+                      <div className="absolute top-3 left-3 z-10">
+                        <span className="text-[10px] font-mono uppercase tracking-wider font-bold bg-[#07080a]/80 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/15 text-[#f5f5f3]">
+                          {card.niche}
+                        </span>
+                      </div>
+
+                      {/* Card Glow Border */}
+                      <span className="card-glow z-[5]" aria-hidden="true" />
+
+                      {/* Floating "Preview Prototype →" Pill sliding up on hover */}
+                      <div className="absolute inset-x-0 bottom-0 z-20 flex items-end p-3.5">
+                        <span className="translate-y-2 rounded-full bg-[#07080a]/85 px-3.5 py-1.5 text-xs font-semibold text-[#f5f5f3] opacity-0 backdrop-blur-md border border-white/20 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 flex items-center gap-1.5 shadow-lg">
+                          <span>Launch Live Prototype</span>
+                          <ArrowUpRight className="w-3.5 h-3.5 text-[#46b7ff]" />
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Card Body Details */}
+                    <div className="p-4 sm:p-5">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div>
+                          <h3 className="text-base font-semibold tracking-tight text-[#f5f5f3] group-hover:text-white transition-colors">
+                            {card.title}
+                          </h3>
+                          <p className="text-xs font-mono text-[#5c636a] mt-0.5">
+                            {card.categoryLabel}
+                          </p>
                         </div>
-                      )}
 
-                      {/* Name Field */}
-                      <div className="relative">
-                        <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-500 font-bold mb-2">
-                          Your Name or Business *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          placeholder="e.g. Marcus Vance (Apex Plumbing)"
-                          className="w-full bg-transparent border-b border-zinc-300 focus:border-cyan-600 text-zinc-950 text-base py-3 outline-none transition-colors placeholder:text-zinc-400 font-sans"
-                        />
-                      </div>
-
-                      {/* Email Field */}
-                      <div className="relative">
-                        <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-500 font-bold mb-2">
-                          Direct Email *
-                        </label>
-                        <input
-                          type="email"
-                          required
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          placeholder="marcus@apexplumbing.com"
-                          className="w-full bg-transparent border-b border-zinc-300 focus:border-cyan-600 text-zinc-950 text-base py-3 outline-none transition-colors placeholder:text-zinc-400 font-sans"
-                        />
-                      </div>
-
-                      {/* Website Field */}
-                      <div className="relative">
-                        <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-500 font-bold mb-2">
-                          Current Website URL (or &apos;New Build&apos;)
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.website}
-                          onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                          placeholder="https://apexplumbing.com"
-                          className="w-full bg-transparent border-b border-zinc-300 focus:border-cyan-600 text-zinc-950 text-base py-3 outline-none transition-colors placeholder:text-zinc-400 font-sans"
-                        />
-                      </div>
-
-                      {/* Selected Tier Preference */}
-                      <div className="relative">
-                        <label className="block text-[11px] font-mono uppercase tracking-wider text-zinc-500 font-bold mb-2">
-                          Target Package
-                        </label>
-                        <select
-                          value={formData.selectedTier}
-                          onChange={(e) => setFormData({ ...formData, selectedTier: e.target.value })}
-                          className="w-full bg-white border-b border-zinc-300 focus:border-cyan-600 text-zinc-800 text-sm py-3 outline-none transition-colors font-mono cursor-pointer"
+                        <span
+                          className={`inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase border ${
+                            card.badgeColor === "emerald"
+                              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+                              : card.badgeColor === "rose"
+                              ? "border-rose-500/40 bg-rose-500/10 text-rose-400"
+                              : "border-[#46b7ff]/40 bg-[#46b7ff]/10 text-[#8bf3e6]"
+                          }`}
                         >
-                          <option value="Zero-Upfront Subscription ($150/mo)">
-                            Zero-Upfront Subscription ($150/month)
-                          </option>
-                          <option value="Full Build & Care ($1,200 + $50/mo)">
-                            Lump Sum Build & Own ($1,200 + $50/month)
-                          </option>
-                          <option value="Need Advice on Best Option">
-                            Need advice on what fits best
-                          </option>
-                        </select>
+                          {card.badge}
+                        </span>
                       </div>
 
-                      {/* Submit Button */}
-                      <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="group w-full py-4 rounded-full bg-zinc-950 text-white font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-3 transition-all duration-300 hover:bg-[#00f0ff] hover:text-zinc-950 hover:shadow-[0_4px_25px_rgba(0,240,255,0.45)] cursor-pointer active:scale-[0.97] disabled:opacity-50"
-                      >
-                        {isSubmitting ? (
-                          <span className="flex items-center gap-2">
-                            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            Compiling Prototype Ticket...
-                          </span>
-                        ) : (
-                          <>
-                            <span>Get My Free Prototype</span>
-                            <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                          </>
-                        )}
-                      </button>
-
-                      <div className="flex items-center justify-center gap-4 text-[11px] font-mono text-zinc-500 text-center pt-2">
-                        <span>● No Credit Card Required</span>
-                        <span>● Free Performance Audit</span>
-                        <span>● 100% Confidential</span>
-                      </div>
-                    </form>
-                  )}
-
-                </div>
-              </div>
-
-            </div>
-
-            {/* Bottom Colophon & Studio Status */}
-            <div className="pt-10 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs font-mono text-zinc-500">
-              <div className="flex items-center gap-3">
-                <span className="font-bold text-zinc-950 tracking-tight font-sans">SPEEDCRAFT {"//"} STUDIO</span>
-                <span>—</span>
-                <span>© {new Date().getFullYear()} Hand-Coded Architecture.</span>
-              </div>
-
-              <div className="flex items-center gap-6">
-                <span className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span className="text-zinc-700 font-semibold">Available for 2 Local Clients Q4</span>
-                </span>
-                <a href="#" className="hover:text-zinc-950 transition-colors">
-                  Back to Top ↑
-                </a>
-              </div>
-            </div>
-
-          </div>
-        </footer>
-
-      </main>
-
-      {/* TEMPLATE DETAIL DEMO MODAL WITH STRATEGIC GLASSMORPHISM */}
-      <AnimatePresence>
-        {activeModalDemo && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-zinc-950/40 backdrop-blur-md transition-all">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 12 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 12 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              className="relative w-full max-w-4xl max-h-[90vh] bg-white/90 backdrop-blur-2xl rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.25)] border border-white/80 ring-1 ring-zinc-900/10 flex flex-col overflow-hidden"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Modal Top Bar */}
-              <div className="px-6 py-4 border-b border-zinc-200/70 flex items-center justify-between bg-white/60 backdrop-blur-md">
-                <div className="flex items-center gap-3">
-                  <span className="w-3 h-3 rounded-full bg-rose-400 inline-block" />
-                  <span className="w-3 h-3 rounded-full bg-amber-400 inline-block" />
-                  <span className="w-3 h-3 rounded-full bg-emerald-400 inline-block" />
-                  <span className="h-4 w-px bg-zinc-300 mx-1" />
-                  <span className="text-xs sm:text-sm font-bold text-zinc-900 font-mono">
-                    {activeModalDemo.title} — Technical Audit
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  {/* Viewport switch */}
-                  <div className="hidden sm:flex items-center bg-zinc-100/80 backdrop-blur-md border border-zinc-200/60 p-0.5 rounded-lg text-xs font-mono">
-                    <button
-                      onClick={() => setModalDeviceView("desktop")}
-                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-all ${
-                        modalDeviceView === "desktop"
-                          ? "bg-white text-zinc-950 shadow-xs font-bold border border-white/80"
-                          : "text-zinc-600 hover:text-zinc-950"
-                      }`}
-                    >
-                      <Monitor className="w-3 h-3" />
-                      <span>Desktop</span>
-                    </button>
-                    <button
-                      onClick={() => setModalDeviceView("mobile")}
-                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-all ${
-                        modalDeviceView === "mobile"
-                          ? "bg-white text-zinc-950 shadow-xs font-bold border border-white/80"
-                          : "text-zinc-600 hover:text-zinc-950"
-                      }`}
-                    >
-                      <Smartphone className="w-3 h-3" />
-                      <span>Mobile</span>
-                    </button>
-                  </div>
-
-                  <button
-                    onClick={() => setActiveModalDemo(null)}
-                    className="p-1.5 text-zinc-400 hover:text-zinc-900 rounded-lg hover:bg-zinc-200/60 transition-colors cursor-pointer"
-                    aria-label="Close modal"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Modal Body */}
-              <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6">
-                {/* Core Web Vitals Audit */}
-                <div className="p-5 rounded-2xl bg-zinc-950 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center justify-center w-14 h-14 rounded-full bg-emerald-500/20 border-2 border-emerald-400 text-emerald-300 font-black text-xl">
-                      100
-                    </div>
-                    <div>
-                      <div className="text-xs uppercase font-mono font-bold tracking-widest text-emerald-400">
-                        Google PageSpeed Verified
-                      </div>
-                      <div className="text-base font-bold text-white">
-                        100/100 Core Web Vitals Score
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center w-full sm:w-auto font-mono">
-                    <div className="bg-zinc-900 px-3 py-2 rounded-xl border border-zinc-800">
-                      <div className="text-[10px] text-zinc-400">FCP</div>
-                      <div className="text-sm font-bold text-emerald-400">{activeModalDemo.fcp}</div>
-                    </div>
-                    <div className="bg-zinc-900 px-3 py-2 rounded-xl border border-zinc-800">
-                      <div className="text-[10px] text-zinc-400">LCP</div>
-                      <div className="text-sm font-bold text-emerald-400">{activeModalDemo.lcp}</div>
-                    </div>
-                    <div className="bg-zinc-900 px-3 py-2 rounded-xl border border-zinc-800">
-                      <div className="text-[10px] text-zinc-400">TBT</div>
-                      <div className="text-sm font-bold text-emerald-400">{activeModalDemo.tbt}</div>
-                    </div>
-                    <div className="bg-zinc-900 px-3 py-2 rounded-xl border border-zinc-800">
-                      <div className="text-[10px] text-zinc-400">CLS</div>
-                      <div className="text-sm font-bold text-emerald-400">{activeModalDemo.cls}</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Simulated Device Frame Preview */}
-                <div className="flex justify-center bg-zinc-100 p-6 sm:p-10 rounded-2xl border border-zinc-200">
-                  <div
-                    className={`transition-all duration-300 overflow-hidden bg-white shadow-xl border border-zinc-300 ${
-                      modalDeviceView === "mobile"
-                        ? "w-[320px] max-w-full rounded-3xl border-4 border-zinc-900 p-4"
-                        : "w-full rounded-xl p-6"
-                    }`}
-                  >
-                    <div className="border-b border-zinc-200 pb-3 flex items-center justify-between text-xs font-mono text-zinc-500">
-                      <span className="font-bold text-zinc-900">{activeModalDemo.sampleName}</span>
-                      <span className="text-emerald-600 font-semibold">● 0.28s Load</span>
-                    </div>
-                    <div className="py-6">
-                      <h4 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight">
-                        {activeModalDemo.tagline}
-                      </h4>
-                      <p className="text-zinc-600 text-xs sm:text-sm mt-2">
-                        Optimized for immediate tap-to-call conversion, local search ranking, and instant mobile responsiveness.
+                      <p className="text-xs text-[#9ba1a6] leading-relaxed line-clamp-2 mb-3">
+                        {card.description}
                       </p>
-                      <div className="mt-5 flex gap-3">
-                        <div className="px-4 py-2 rounded-lg bg-[#00f0ff] text-zinc-950 font-bold text-xs">
-                          Request Instant Quote
-                        </div>
-                        <div className="px-4 py-2 rounded-lg border border-zinc-300 text-zinc-700 text-xs font-mono">
-                          View Services
-                        </div>
+
+                      <div className="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-[#5c636a]">
+                        <span className="text-[#8bf3e6] font-semibold">{card.stats}</span>
+                        <span className="group-hover:text-[#f5f5f3] transition-colors flex items-center gap-1">
+                          <span>Inspect Prototype</span>
+                          <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                        </span>
                       </div>
                     </div>
                   </div>
-                </div>
+                </a>
+              </article>
+            ))}
 
-                {/* Highlights */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {activeModalDemo.highlights.map((h, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-2.5 p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 text-xs font-mono text-zinc-800"
-                    >
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>{h}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            {/* Custom Studio Card (Direct Scrolltide Mirror) */}
+            <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#11151c] to-[#0b0d11] p-6 shadow-xl">
+              <div className="grain absolute inset-0 opacity-40" />
+              <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[#46b7ff] opacity-20 blur-3xl" />
 
-              {/* Modal Footer */}
-              <div className="px-6 py-4 border-t border-zinc-200 bg-zinc-50 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <p className="text-xs text-zinc-500 text-center sm:text-left font-mono">
-                  Want this exact high-speed architecture customized for your business?
+              <div className="relative">
+                <p className="font-mono text-[11px] uppercase tracking-wider text-[#8bf3e6] font-bold">
+                  The Custom Studio
                 </p>
-                <div className="flex items-center gap-3 w-full sm:w-auto">
-                  <button
-                    onClick={() => setActiveModalDemo(null)}
-                    className="flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs font-mono font-semibold text-zinc-600 hover:text-zinc-950 border border-zinc-300 hover:bg-zinc-100 transition-colors cursor-pointer"
-                  >
-                    Close
-                  </button>
-                  <a
-                    href="#prototype"
-                    onClick={() => setActiveModalDemo(null)}
-                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2 rounded-xl text-xs font-mono font-bold text-zinc-950 bg-[#00f0ff] hover:bg-[#00d2e0] shadow-sm transition-all"
-                  >
-                    <span>Request Free Prototype</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </a>
+                <h3 className="mt-3 font-display text-2xl font-bold leading-tight text-[#f5f5f3]">
+                  Want a bespoke prototype engineered for your exact business?
+                </h3>
+                <p className="mt-2 text-xs leading-relaxed text-[#9ba1a6]">
+                  We scrape your current slow site, identify its conversion leakages, and
+                  engineer a bespoke Next.js prototype with zero upfront risk.
+                </p>
+              </div>
+
+              <a
+                href="#prototype-request"
+                className="relative mt-6 inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#46b7ff] hover:text-white transition-colors"
+              >
+                <span>Request Custom Build</span>
+                <span className="transition group-hover:translate-x-0.5">→</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ──────────────────────────────────────────────────────────────────────
+          6. NARRATIVE FEATURE BAND 01: SUB-SECOND PERFORMANCE
+          Interactive Speed Benchmark Simulator in obsidian dark styling
+      ────────────────────────────────────────────────────────────────────── */}
+      <section id="benchmark" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="lg:col-span-5">
+            <span className="font-mono text-xs uppercase tracking-widest text-[#8bf3e6] font-bold block mb-2">
+              Performance Architecture
+            </span>
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#f5f5f3] leading-tight">
+              Sub-second speed behind every archetype.
+            </h2>
+            <p className="mt-4 text-sm sm:text-base text-[#9ba1a6] leading-relaxed">
+              Google data proves that 53% of mobile visitors abandon a local site if it takes
+              longer than 3 seconds to load. Generic WordPress builds with 40 active plugins
+              crawl at 4.8 seconds. Speedcraft engines execute in 0.28 seconds.
+            </p>
+
+            <div className="mt-6 space-y-3 font-mono text-xs text-[#9ba1a6]">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Zero Bloated WordPress Themes or Elementor Scripts</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Edge Cached with Next.js 15 Turbopack Engine</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Google Lighthouse 100/100 Core Web Vitals Contract</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Interactive Benchmark Console */}
+          <div className="lg:col-span-7">
+            <div className="rounded-2xl border border-white/10 bg-[#0b0d11] p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+              <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
+                <div className="flex items-center gap-2 text-xs font-mono text-[#9ba1a6]">
+                  <Activity className="w-4 h-4 text-[#46b7ff]" />
+                  <span>Head-to-Head Latency Telemetry</span>
+                </div>
+                <button
+                  onClick={handleRunSpeedBenchmark}
+                  disabled={isSimulating}
+                  className="px-3.5 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-[#f5f5f3] text-[#07080a] hover:bg-white transition cursor-pointer shadow-sm"
+                >
+                  {isSimulating ? "Benchmarking..." : "Re-run Test ⚡"}
+                </button>
+              </div>
+
+              {/* Next.js Benchmark Metric */}
+              <div className="space-y-2 mb-6">
+                <div className="flex justify-between text-xs font-mono">
+                  <span className="text-[#f5f5f3] font-bold">Speedcraft Next.js 15 Architecture</span>
+                  <span className="text-emerald-400 font-bold">0.28s TTI (100/100)</span>
+                </div>
+                <div className="h-3 w-full bg-white/5 rounded-full overflow-hidden p-0.5 border border-white/10">
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-emerald-500 to-[#8bf3e6] rounded-full"
+                    style={{ width: `${speedProgress}%` }}
+                    transition={{ duration: 0.3 }}
+                  />
                 </div>
               </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
 
+              {/* Standard WordPress Metric */}
+              <div className="space-y-2 mb-8">
+                <div className="flex justify-between text-xs font-mono">
+                  <span className="text-[#5c636a]">Typical WordPress Agency Build (38 Plugins)</span>
+                  <span className="text-rose-400 font-bold">4.82s TTI (24/100)</span>
+                </div>
+                <div className="h-3 w-full bg-white/5 rounded-full overflow-hidden p-0.5 border border-white/10">
+                  <div
+                    className="h-full bg-rose-500/80 rounded-full transition-all duration-300"
+                    style={{ width: `${wpProgress}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Metric Breakdown Badges */}
+              <div className="grid grid-cols-3 gap-3 pt-4 border-t border-white/10 text-center font-mono">
+                <div className="p-3 rounded-xl bg-[#11151c]/60 border border-white/5">
+                  <div className="text-xl sm:text-2xl font-bold text-emerald-400">0.28s</div>
+                  <div className="text-[10px] text-[#5c636a] uppercase">First Contentful Paint</div>
+                </div>
+                <div className="p-3 rounded-xl bg-[#11151c]/60 border border-white/5">
+                  <div className="text-xl sm:text-2xl font-bold text-emerald-400">0 ms</div>
+                  <div className="text-[10px] text-[#5c636a] uppercase">Total Blocking Time</div>
+                </div>
+                <div className="p-3 rounded-xl bg-[#11151c]/60 border border-white/5">
+                  <div className="text-xl sm:text-2xl font-bold text-emerald-400">0.000</div>
+                  <div className="text-[10px] text-[#5c636a] uppercase">Cumulative Layout Shift</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ──────────────────────────────────────────────────────────────────────
+          7. NARRATIVE FEATURE BAND 02: ROI CALCULATOR
+          Interactive ROI revenue projection slider in dark obsidian theme
+      ────────────────────────────────────────────────────────────────────── */}
+      <section id="roi" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/10">
+        <div className="rounded-3xl border border-white/10 bg-[#0b0d11] p-8 sm:p-12 relative overflow-hidden shadow-2xl">
+          <div className="grain absolute inset-0 opacity-20" />
+          <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-[#46b7ff] opacity-10 blur-3xl pointer-events-none" />
+
+          <div className="relative z-10 max-w-3xl mb-10">
+            <span className="font-mono text-xs uppercase tracking-widest text-[#8bf3e6] font-bold block mb-2">
+              Conversion Economics
+            </span>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#f5f5f3]">
+              The math behind sub-second speed.
+            </h2>
+            <p className="mt-3 text-sm sm:text-base text-[#9ba1a6] leading-relaxed">
+              Every 0.1s improvement in mobile load time increases conversion rate by 2.4%.
+              Calculate how many calls and extra monthly revenue you gain simply by fixing your slow site.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+            {/* Left Controls */}
+            <div className="lg:col-span-7 space-y-6">
+              {/* Slider 1: Average Customer / Deal Value */}
+              <div>
+                <div className="flex justify-between text-xs font-mono mb-2">
+                  <span className="text-[#9ba1a6] uppercase">Average Customer Ticket / Case Value</span>
+                  <span className="text-[#f5f5f3] font-bold text-base">${dealValue.toLocaleString()}</span>
+                </div>
+                <input
+                  type="range"
+                  min="200"
+                  max="5000"
+                  step="50"
+                  value={dealValue}
+                  onChange={(e) => setDealValue(Number(e.target.value))}
+                  className="w-full accent-[#46b7ff] bg-white/10 h-2 rounded-lg cursor-pointer"
+                />
+              </div>
+
+              {/* Slider 2: Monthly Website Visitors */}
+              <div>
+                <div className="flex justify-between text-xs font-mono mb-2">
+                  <span className="text-[#9ba1a6] uppercase">Estimated Monthly Mobile Visitors</span>
+                  <span className="text-[#f5f5f3] font-bold text-base">{monthlyTraffic.toLocaleString()}</span>
+                </div>
+                <input
+                  type="range"
+                  min="300"
+                  max="10000"
+                  step="100"
+                  value={monthlyTraffic}
+                  onChange={(e) => setMonthlyTraffic(Number(e.target.value))}
+                  className="w-full accent-[#46b7ff] bg-white/10 h-2 rounded-lg cursor-pointer"
+                />
+              </div>
+            </div>
+
+            {/* Right Projected Output Card */}
+            <div className="lg:col-span-5 bg-[#11151c] border border-white/10 rounded-2xl p-6 text-center shadow-xl">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-[#9ba1a6] block mb-1">
+                Projected New Monthly Inbound Revenue
+              </span>
+              <div className="font-display text-4xl sm:text-5xl font-extrabold text-[#46b7ff] tracking-tight mb-2">
+                +${estimatedAddedRevenue.toLocaleString()}
+                <span className="text-sm font-mono font-normal text-[#9ba1a6]">/mo</span>
+              </div>
+              <p className="text-xs text-[#9ba1a6] mb-4">
+                Based on <strong className="text-white">+{estimatedExtraLeads} extra clients/mo</strong> from recovered mobile bounces.
+              </p>
+
+              <div className="pt-4 border-t border-white/10 flex items-center justify-around font-mono text-xs">
+                <div>
+                  <div className="text-lg font-bold text-emerald-400">{roiMultiple}x</div>
+                  <div className="text-[10px] text-[#5c636a] uppercase">Monthly ROI</div>
+                </div>
+                <div>
+                  <div className="text-lg font-bold text-[#f5f5f3]">100%</div>
+                  <div className="text-[10px] text-[#5c636a] uppercase">Guaranteed Vitals</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ──────────────────────────────────────────────────────────────────────
+          8. 3-STEP PIPELINE: COPY, PASTE, LAUNCH (Scrolltide Inspiration)
+      ────────────────────────────────────────────────────────────────────── */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/10">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <span className="font-mono text-xs uppercase tracking-widest text-[#8bf3e6] font-bold block mb-2">
+            Execution Blueprint
+          </span>
+          <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#f5f5f3]">
+            Audit, synthesize, launch.
+          </h2>
+          <p className="mt-2 text-sm text-[#9ba1a6]">
+            Three steps from your current sluggish site to an unstoppable conversion engine.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="rounded-2xl border border-white/10 bg-[#0b0d11] p-6 relative">
+            <div className="w-10 h-10 rounded-xl bg-[#46b7ff]/10 border border-[#46b7ff]/30 flex items-center justify-center text-[#46b7ff] font-mono font-bold text-sm mb-4">
+              01
+            </div>
+            <h3 className="font-display text-lg font-bold text-[#f5f5f3] mb-2">
+              Performance & CRO Audit
+            </h3>
+            <p className="text-xs text-[#9ba1a6] leading-relaxed">
+              We run simulated mobile load diagnostics, extract your core offering, and locate
+              every friction point leaking phone calls and form submissions.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-[#0b0d11] p-6 relative">
+            <div className="w-10 h-10 rounded-xl bg-[#46b7ff]/10 border border-[#46b7ff]/30 flex items-center justify-center text-[#46b7ff] font-mono font-bold text-sm mb-4">
+              02
+            </div>
+            <h3 className="font-display text-lg font-bold text-[#f5f5f3] mb-2">
+              Archetype Synthesis
+            </h3>
+            <p className="text-xs text-[#9ba1a6] leading-relaxed">
+              Your business is mapped into one of our high-converting archetypes: UrgentService,
+              AestheticBooking, or ProfessionalTrust with customized interactive motion.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-[#0b0d11] p-6 relative">
+            <div className="w-10 h-10 rounded-xl bg-[#46b7ff]/10 border border-[#46b7ff]/30 flex items-center justify-center text-[#46b7ff] font-mono font-bold text-sm mb-4">
+              03
+            </div>
+            <h3 className="font-display text-lg font-bold text-[#f5f5f3] mb-2">
+              Domain Launch & Zero-Risk Care
+            </h3>
+            <p className="text-xs text-[#9ba1a6] leading-relaxed">
+              We connect your existing domain with zero downtime. Enjoy sub-second speed,
+              unlimited content edits, and guaranteed Core Web Vitals maintenance.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ──────────────────────────────────────────────────────────────────────
+          9. TRANSPARENT PRICING ("Ride the tide")
+          Dark obsidian cards with bone pill CTAs
+      ────────────────────────────────────────────────────────────────────── */}
+      <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto border-t border-white/10">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <span className="font-mono text-xs uppercase tracking-widest text-[#8bf3e6] font-bold block mb-2">
+            Predictable Investment
+          </span>
+          <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#f5f5f3]">
+            Simple, honest pricing.
+          </h2>
+          <p className="mt-2 text-sm text-[#9ba1a6]">
+            No $5,000 surprises. No monthly maintenance lock-ins. Choose how you want to invest.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+          {/* Plan 1: Zero-Upfront Monthly Subscription */}
+          <div className="rounded-3xl border border-[#46b7ff]/40 bg-[#0b0d11] p-8 sm:p-10 relative flex flex-col justify-between shadow-2xl shadow-[#46b7ff]/10">
+            <div className="absolute top-5 right-5">
+              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#46b7ff] bg-[#46b7ff]/10 border border-[#46b7ff]/30 px-3 py-1 rounded-full">
+                Most Popular
+              </span>
+            </div>
+
+            <div>
+              <h3 className="font-display text-2xl font-bold text-[#f5f5f3]">
+                Zero-Upfront Subscription
+              </h3>
+              <p className="text-xs text-[#9ba1a6] mt-1 mb-6">
+                Complete custom build with zero upfront design cost.
+              </p>
+
+              <div className="flex items-baseline gap-1 mb-6 font-display">
+                <span className="text-5xl font-extrabold text-[#f5f5f3]">$150</span>
+                <span className="text-sm font-mono text-[#9ba1a6]">/month</span>
+              </div>
+
+              <ul className="space-y-3 text-xs text-[#9ba1a6] mb-8 font-mono">
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-[#46b7ff] shrink-0" />
+                  <span>$0 Upfront Design & Engineering</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-[#46b7ff] shrink-0" />
+                  <span>Next.js 15 Custom Code (No WordPress)</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-[#46b7ff] shrink-0" />
+                  <span>Guaranteed 100/100 Google Core Web Vitals</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-[#46b7ff] shrink-0" />
+                  <span>Ultra-Fast Edge Hosting & SSL Included</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-[#46b7ff] shrink-0" />
+                  <span>Unlimited Content & Text Edits</span>
+                </li>
+              </ul>
+            </div>
+
+            <a
+              href="#prototype-request"
+              onClick={() =>
+                setFormData((p) => ({
+                  ...p,
+                  selectedTier: "Zero-Upfront Subscription ($150/mo)",
+                }))
+              }
+              className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-[#f5f5f3] hover:bg-white text-[#07080a] py-3.5 text-xs font-mono font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-lg"
+            >
+              <span>Start With $0 Down →</span>
+            </a>
+          </div>
+
+          {/* Plan 2: Build & Own */}
+          <div className="rounded-3xl border border-white/10 bg-[#0b0d11] p-8 sm:p-10 relative flex flex-col justify-between">
+            <div>
+              <h3 className="font-display text-2xl font-bold text-[#f5f5f3]">
+                Build & Full Ownership
+              </h3>
+              <p className="text-xs text-[#9ba1a6] mt-1 mb-6">
+                Pay once. Own 100% of the repository and code.
+              </p>
+
+              <div className="flex items-baseline gap-1 mb-6 font-display">
+                <span className="text-5xl font-extrabold text-[#f5f5f3]">$1,200</span>
+                <span className="text-sm font-mono text-[#9ba1a6]">one-time</span>
+              </div>
+
+              <ul className="space-y-3 text-xs text-[#9ba1a6] mb-8 font-mono">
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-[#8bf3e6] shrink-0" />
+                  <span>Full GitHub Source Code Transfer</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-[#8bf3e6] shrink-0" />
+                  <span>100% Client Ownership (No Lock-In)</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-[#8bf3e6] shrink-0" />
+                  <span>Guaranteed 100/100 Google PageSpeed</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-[#8bf3e6] shrink-0" />
+                  <span>Optional $50/mo Care & Security Plan</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-[#8bf3e6] shrink-0" />
+                  <span>Self-Host Anywhere (Vercel, AWS, Cloudflare)</span>
+                </li>
+              </ul>
+            </div>
+
+            <a
+              href="#prototype-request"
+              onClick={() =>
+                setFormData((p) => ({
+                  ...p,
+                  selectedTier: "Build & Full Ownership ($1,200 one-time)",
+                }))
+              }
+              className="w-full inline-flex items-center justify-center gap-2 rounded-full border border-white/20 hover:border-white/40 text-[#f5f5f3] hover:bg-white/5 py-3.5 text-xs font-mono font-bold uppercase tracking-wider transition-all"
+            >
+              <span>Claim Ownership Build →</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ──────────────────────────────────────────────────────────────────────
+          10. INTERACTIVE PROTOTYPE REQUEST FORM (Scrolltide Intake)
+          Dark glassmorphic card with 256-bit encryption indicator
+      ────────────────────────────────────────────────────────────────────── */}
+      <section id="prototype-request" className="py-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto border-t border-white/10">
+        <div className="rounded-3xl border border-white/10 bg-[#0b0d11] p-8 sm:p-12 shadow-2xl relative overflow-hidden">
+          <div className="grain absolute inset-0 opacity-20" />
+          <div className="absolute top-0 left-0 w-80 h-80 rounded-full bg-[#46b7ff] opacity-10 blur-3xl pointer-events-none" />
+
+          <div className="relative z-10 text-center max-w-2xl mx-auto mb-10">
+            <span className="font-mono text-xs uppercase tracking-widest text-[#8bf3e6] font-bold block mb-2">
+              Free Live Prototype
+            </span>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#f5f5f3]">
+              Request your custom sub-second prototype.
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-[#9ba1a6]">
+              Give us your business name or URL. We will construct a live prototype
+              showing your exact niche archetype running at 0.28s. Zero financial obligation.
+            </p>
+          </div>
+
+          {formSubmitted ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="relative z-10 py-10 text-center space-y-4"
+            >
+              <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto shadow-inner">
+                <Check className="w-8 h-8 stroke-[3]" />
+              </div>
+              <h3 className="font-display text-2xl font-bold text-[#f5f5f3]">
+                Prototype Request Received
+              </h3>
+              <p className="text-xs text-[#9ba1a6] max-w-md mx-auto">
+                Thank you, {formData.name || "valued partner"}. Our engineering team is generating
+                your custom prototype. We will dispatch the private preview URL to{" "}
+                <strong className="text-white">{formData.email}</strong> within 4 business hours.
+              </p>
+            </motion.div>
+          ) : (
+            <form onSubmit={handleSubmitForm} className="relative z-10 space-y-4 max-w-xl mx-auto">
+              {/* Honeypot anti-spam */}
+              <input
+                type="text"
+                name="company_title_check"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                className="hidden"
+                tabIndex={-1}
+                autoComplete="off"
+              />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[11px] font-mono font-bold uppercase tracking-wider text-[#9ba1a6] mb-1">
+                    Your Name <span className="text-[#46b7ff]">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Alex Morgan"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-4 py-2.5 text-sm bg-[#11151c] border border-white/10 rounded-xl text-[#f5f5f3] placeholder-[#5c636a] focus:outline-none focus:border-[#46b7ff] transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-mono font-bold uppercase tracking-wider text-[#9ba1a6] mb-1">
+                    Work Email <span className="text-[#46b7ff]">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="alex@company.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-4 py-2.5 text-sm bg-[#11151c] border border-white/10 rounded-xl text-[#f5f5f3] placeholder-[#5c636a] focus:outline-none focus:border-[#46b7ff] transition"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-mono font-bold uppercase tracking-wider text-[#9ba1a6] mb-1">
+                  Current Website URL (Or Business Name)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. www.apexplumbingdallas.com"
+                  value={formData.website}
+                  onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                  className="w-full px-4 py-2.5 text-sm bg-[#11151c] border border-white/10 rounded-xl text-[#f5f5f3] placeholder-[#5c636a] focus:outline-none focus:border-[#46b7ff] transition"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-mono font-bold uppercase tracking-wider text-[#9ba1a6] mb-1">
+                  Specific Pain Points or Desired Archetype
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="e.g. Need high-converting mobile phone call flow, currently failing PageSpeed..."
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  className="w-full px-4 py-2.5 text-sm bg-[#11151c] border border-white/10 rounded-xl text-[#f5f5f3] placeholder-[#5c636a] focus:outline-none focus:border-[#46b7ff] transition resize-none"
+                />
+              </div>
+
+              {errorMessage && (
+                <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono">
+                  {errorMessage}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-[#f5f5f3] hover:bg-white text-[#07080a] py-3.5 px-6 text-sm font-mono font-bold uppercase tracking-wider transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl cursor-pointer"
+              >
+                <Sparkles className="w-4 h-4 text-[#46b7ff]" />
+                <span>{isSubmitting ? "Generating Blueprint..." : "Generate My Custom Prototype →"}</span>
+              </button>
+
+              <div className="flex items-center justify-center gap-2 text-[11px] font-mono text-[#5c636a] pt-1">
+                <Lock className="w-3.5 h-3.5 text-[#46b7ff]" />
+                <span>Zero Obligation • 100% Confidential Architecture Review</span>
+              </div>
+            </form>
+          )}
+        </div>
+      </section>
+
+      {/* ──────────────────────────────────────────────────────────────────────
+          11. MINIMALIST EDITORIAL FOOTER (Scrolltide Inspiration)
+      ────────────────────────────────────────────────────────────────────── */}
+      <footer className="border-t border-white/10 bg-[#07080a] py-12 px-4 sm:px-6 lg:px-8 text-xs text-[#5c636a] font-mono">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+          <div className="flex items-center gap-3">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[#f5f5f3] font-display font-semibold text-sm">
+              SPEEDCRAFT STUDIO
+            </span>
+            <span>•</span>
+            <span className="text-[#9ba1a6]">All Systems Operational (99.99% Uptime)</span>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-6 text-[#9ba1a6]">
+            <a href="#library" className="hover:text-white transition">Archetypes</a>
+            <a href="#benchmark" className="hover:text-white transition">Speed Engine</a>
+            <a href="#pricing" className="hover:text-white transition">Pricing</a>
+            <a href="/qa-gallery" className="hover:text-white transition text-[#8bf3e6]">QA Gallery</a>
+          </div>
+
+          <div className="text-[#5c636a]">
+            © {new Date().getFullYear()} Speedcraft Studio. Sub-second engineering.
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
