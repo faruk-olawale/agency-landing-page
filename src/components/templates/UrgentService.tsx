@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import type { TemplateProps } from "@/lib/archetypeMap";
 import {
   getArchetypePrimaryColor,
@@ -25,6 +26,8 @@ import {
   MapPin,
   Calendar,
   Lock,
+  Droplets,
+  Flame,
 } from "lucide-react";
 
 /**
@@ -46,10 +49,10 @@ function formatIndustryNoun(industry: string = ""): string {
 function getHeroBackground(industry: string = ""): string {
   const norm = (industry || "").toLowerCase();
   if (norm.includes("plumb")) {
-    return "https://images.unsplash.com/photo-1581244277943-fe4a9c777189?auto=format&fit=crop&w=2000&q=80";
+    return "/images/plumber-hero.jpg";
   }
   if (norm.includes("hvac") || norm.includes("air") || norm.includes("heat")) {
-    return "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=2000&q=80";
+    return "/images/hvac-hero.jpg";
   }
   if (norm.includes("roof")) {
     return "https://images.unsplash.com/photo-1632759145351-1d592919f522?auto=format&fit=crop&w=2000&q=80";
@@ -57,7 +60,7 @@ function getHeroBackground(industry: string = ""): string {
   if (norm.includes("electr")) {
     return "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=2000&q=80";
   }
-  return "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=2000&q=80";
+  return "/images/plumber-hero.jpg";
 }
 
 /**
@@ -153,13 +156,121 @@ function getCoreServices(industryNoun: string) {
   ];
 }
 
+interface EmergencyScenario {
+  id: string;
+  label: string;
+  shortTag: string;
+  icon: React.ComponentType<{ className?: string }>;
+  problemSummary: string;
+  actionTaken: string;
+  truckEquipment: string;
+  arrivalSla: string;
+  pricingNote: string;
+}
+
+function getEmergencyScenarios(industryNoun: string): EmergencyScenario[] {
+  const norm = industryNoun.toLowerCase();
+
+  if (norm.includes("hvac") || norm.includes("air") || norm.includes("heat")) {
+    return [
+      {
+        id: "ac-breakdown",
+        label: "AC System Failure",
+        shortTag: "Cooling Down",
+        icon: Zap,
+        problemSummary: "Unit blowing warm air, frozen evaporator coils, or complete electrical shutoff.",
+        actionTaken: "Electronic refrigerant pressure test, dual-run capacitor diagnostic, same-day defrost.",
+        truckEquipment: "Digital manifold gauges, dual-run capacitors, R410A & R32 stock on van.",
+        arrivalSla: "Priority dispatch < 30 mins",
+        pricingNote: "Fixed diagnosis fee waived with repair",
+      },
+      {
+        id: "heating-outage",
+        label: "Furnace / Heating",
+        shortTag: "Heat Restored",
+        icon: Flame,
+        problemSummary: "Furnace blowing cold air, ignition lockout, or pilot light continuously blowing out.",
+        actionTaken: "Heat exchanger safety inspection, flame sensor cleaning, pressure switch calibration.",
+        truckEquipment: "Multimeter diagnostics, universal hot surface igniters, inducer motors.",
+        arrivalSla: "Priority dispatch < 30 mins",
+        pricingNote: "Safety certified carbon-monoxide test included",
+      },
+      {
+        id: "freon-leak",
+        label: "Refrigerant Leak",
+        shortTag: "Leak Sealing",
+        icon: Droplets,
+        problemSummary: "Hissing sounds from lines, ice buildup on copper tubes, declining cooling capacity.",
+        actionTaken: "Nitrogen pressure leak detection, ultrasonic sniff test, line repair & vacuum recharge.",
+        truckEquipment: "Nitrogen purge kit, micron vacuum recovery pump, oxy-acetylene braze setup.",
+        arrivalSla: "Arrives in < 45 mins",
+        pricingNote: "EPA-certified handling & pressure test guarantee",
+      },
+      {
+        id: "thermostat-wiring",
+        label: "Thermostat / Wiring",
+        shortTag: "Controls Fix",
+        icon: Wrench,
+        problemSummary: "Thermostat blank, short-cycling every 3 minutes, or high-limit safety trip.",
+        actionTaken: "Low-voltage 24V transformer check, smart thermostat rewiring, control relay swap.",
+        truckEquipment: "Smart thermostats (Nest/Ecobee), 24V step-down transformers, diagnostic meters.",
+        arrivalSla: "Arrives in < 35 mins",
+        pricingNote: "Upfront transparent pricing",
+      },
+    ];
+  }
+
+  // Default to plumbing (Burst pipe, Hot water, Blocked drain, Gas leak)
+  return [
+    {
+      id: "burst-pipe",
+      label: "Burst Pipe",
+      shortTag: "Flood Control",
+      icon: Droplets,
+      problemSummary: "Active water leak or ruptured pipe causing immediate ceiling/floor flooding.",
+      actionTaken: "Rapid non-invasive acoustic leak pinpointing, zero wall demolition, pipe freezing & press repair.",
+      truckEquipment: "Ridgid acoustic leak locator, pipe freezing clamps, commercial copper press kit.",
+      arrivalSla: "Emergency dispatch < 25 mins",
+      pricingNote: "Fixed upfront rate approved before work starts",
+    },
+    {
+      id: "hot-water",
+      label: "No Hot Water",
+      shortTag: "Same-Day Restore",
+      icon: Flame,
+      problemSummary: "Cold showers, tank leaking from base, or pilot thermocouple failure.",
+      actionTaken: "Thermostat/element diagnostics, tempering valve check, same-day emergency tank swap if needed.",
+      truckEquipment: "Van stocked with Rheem & Rinnai elements, relief valves, and replacement tanks.",
+      arrivalSla: "Technician on-site < 30 mins",
+      pricingNote: "Complete parts & labor warranty included",
+    },
+    {
+      id: "blocked-drain",
+      label: "Blocked Drain",
+      shortTag: "Instant Clear",
+      icon: AlertTriangle,
+      problemSummary: "Overflowing toilet, gurgling kitchen sinks, or foul sewer odors backing up into home.",
+      actionTaken: "5,000 PSI high-pressure water jetting to pulverize tree roots and grease blockages.",
+      truckEquipment: "5,000 PSI hydro-jetter + Ridgid fiber-optic color CCTV inspection camera.",
+      arrivalSla: "Arrives in < 30 mins",
+      pricingNote: "Free CCTV camera recording footage included",
+    },
+    {
+      id: "gas-leak",
+      label: "Gas Odor / Leak",
+      shortTag: "Code 1 Priority",
+      icon: Zap,
+      problemSummary: "Rotten egg smell, gas meter ticking rapidly, or suspect cooktop/heater connection.",
+      actionTaken: "Immediate line shutoff isolation, digital manometer pressure drop test, compliant re-piping.",
+      truckEquipment: "Calibrated electronic gas sniffer, digital manometer, safety isolation tools.",
+      arrivalSla: "Immediate response < 20 mins",
+      pricingNote: "Licensed Master Gasfitter compliance certificate",
+    },
+  ];
+}
+
 export function UrgentService({ clientData }: TemplateProps) {
-  const [leadFormSubmitted, setLeadFormSubmitted] = useState(false);
-  const [formData, setFormData] = useState({
-    issueType: "Burst Pipe / Active Leak",
-    address: "",
-    phone: "",
-  });
+  const [activeScenarioIndex, setActiveScenarioIndex] = useState(0);
 
   const companyName = clientData.name || clientData.company || "Elite Emergency Plumbing";
   const rawIndustry = clientData.industry || clientData.niche || "plumber";
@@ -179,73 +290,50 @@ export function UrgentService({ clientData }: TemplateProps) {
     getArchetypeSecondaryColor(rawIndustry, "UrgentService");
 
   const coreServices = getCoreServices(industryNoun);
-
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLeadFormSubmitted(true);
-  };
+  const emergencyScenarios = getEmergencyScenarios(industryNoun);
+  const activeScenario = emergencyScenarios[activeScenarioIndex] || emergencyScenarios[0];
+  const heroBackground = getHeroBackground(rawIndustry);
 
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-sky-100 selection:text-sky-900 pb-16 sm:pb-0">
       {/* ──────────────────────────────────────────────────────────────────────
-          1. TOP UTILITY BAR (Clean, high-trust emergency indicator)
-      ────────────────────────────────────────────────────────────────────── */}
-      <aside
-        role="region"
-        aria-label="Emergency Dispatch Status"
-        className="bg-slate-950 text-white px-4 py-2 border-b border-slate-800 text-xs"
-      >
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span className="font-semibold text-slate-200">
-              24/7 Emergency Dispatch Active in {city}
-            </span>
-            <span className="hidden md:inline text-slate-500">•</span>
-            <span className="hidden md:inline text-slate-400">
-              Average On-Site Arrival: Under 30 Mins
-            </span>
-          </div>
-
-          <a
-            href={`tel:${cleanPhone}`}
-            className="flex items-center gap-1.5 font-bold text-white hover:text-sky-300 transition-colors"
-          >
-            <Phone className="w-3.5 h-3.5" />
-            <span>Emergency Hotline: {phone}</span>
-          </a>
-        </div>
-      </aside>
-
-      {/* ──────────────────────────────────────────────────────────────────────
-          2. MAIN HEADER (Clean, bright, corporate trust)
+          1. SINGLE HIGH-CONVERSION HEADER (Streamlined for Desktop & Mobile)
       ────────────────────────────────────────────────────────────────────── */}
       <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
           {/* Logo / Company Identity */}
-          <div className="flex items-center gap-3.5">
+          <div className="flex items-center gap-3">
             <div
-              className="w-11 h-11 rounded-xl flex items-center justify-center text-white shadow-sm shrink-0"
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-white shadow-sm shrink-0"
               style={{ backgroundColor: primaryColor }}
             >
-              <Wrench className="w-6 h-6" />
+              <Wrench className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
-              <span className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 block leading-tight">
-                {companyName}
-              </span>
-              <span className="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
+              <div className="flex items-center gap-2">
+                <span className="text-lg sm:text-2xl font-black tracking-tight text-slate-900 block leading-tight">
+                  {companyName}
+                </span>
+                <span className="sm:hidden inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  24/7
+                </span>
+              </div>
+              <span className="text-xs text-slate-500 hidden sm:flex items-center gap-1.5 font-medium mt-0.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
+                <span>On-Duty in {city}</span>
+                <span className="text-slate-300">•</span>
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                Licensed & Insured Master {industryNoun} • {city}
+                <span>Licensed Master {industryNoun}</span>
               </span>
             </div>
           </div>
 
           {/* Right Action: Call Button */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <div className="hidden lg:flex flex-col text-right">
               <span className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">
-                Direct On-Duty Tradesmen
+                Direct Emergency Line
               </span>
               <span className="text-xs font-semibold text-slate-700">
                 Zero Callout Surcharge
@@ -255,61 +343,70 @@ export function UrgentService({ clientData }: TemplateProps) {
             <a
               href={`tel:${cleanPhone}`}
               id="header-call-btn"
-              className="inline-flex items-center gap-2 text-white font-bold px-5 py-3 rounded-xl shadow-sm transition-all hover:brightness-110 active:scale-98 text-sm sm:text-base"
+              className="inline-flex items-center gap-2 text-white font-extrabold px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl shadow-sm transition-all hover:brightness-110 active:scale-95 text-xs sm:text-sm"
               style={{ backgroundColor: primaryColor }}
             >
-              <Phone className="w-4 h-4" />
-              <span>{phone}</span>
+              <Phone className="w-4 h-4 animate-pulse" />
+              <span className="hidden xs:inline">{phone}</span>
+              <span className="xs:hidden">Call Now</span>
             </a>
           </div>
         </div>
       </header>
 
       {/* ──────────────────────────────────────────────────────────────────────
-          3. HERO SECTION (Split Layout: Authority Left, Instant Dispatch Right)
+          2. HERO SECTION (Visual Showcase + Interactive Diagnostic Explorer)
       ────────────────────────────────────────────────────────────────────── */}
-      <section className="relative bg-gradient-to-b from-slate-50 to-white py-14 sm:py-20 px-4 sm:px-6 lg:px-8 border-b border-slate-200">
+      <section className="relative bg-gradient-to-b from-slate-50 via-white to-slate-50 py-10 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 border-b border-slate-200 overflow-hidden">
+        {/* Soft Ambient Background Glow */}
+        <div
+          className="absolute -top-24 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-10 pointer-events-none"
+          style={{ backgroundColor: primaryColor }}
+        />
+
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* ── Left Column: Authority & Fast Phone Dispatch ──────────── */}
-            <div className="lg:col-span-7 space-y-6 text-left">
+            <div className="lg:col-span-6 space-y-6 text-left">
               {/* Availability Pill */}
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-xs text-xs font-semibold text-slate-700">
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span>On-Duty Technicians Ready in {city}</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>On-Duty Master {industryNoun} in {city}</span>
                 <span className="text-slate-300">•</span>
-                <span className="text-slate-500">Fast 30-Min Arrival</span>
+                <span className="text-emerald-700 font-bold">Fast 25-Min Arrival</span>
               </div>
 
               {/* Primary Headline */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.12]">
-                Emergency {industryNoun} in {city} — Fast, Reliable & Guaranteed.
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.12]">
+                Emergency {industryNoun} in {city} —{" "}
+                <span className="block" style={{ color: primaryColor }}>
+                  Fast, Guaranteed & Fixed Price.
+                </span>
               </h1>
 
               {/* Subheadline */}
-              <p className="text-lg text-slate-600 leading-relaxed max-w-2xl">
-                Burst pipes, blocked drains, or no hot water? Our certified master tradesmen
-                arrive fully equipped in under 30 minutes with upfront flat-rate pricing.
-                Zero hidden callout fees.
+              <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl">
+                Burst pipes, blocked drains, or no hot water? Our certified master tradesmen arrive
+                fully equipped in mobile workshops with upfront flat-rate pricing. Zero hidden callout fees.
               </p>
 
-              {/* Trust Value Props */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 py-2">
-                <div className="flex items-center gap-2.5 text-xs sm:text-sm font-semibold text-slate-800">
+              {/* Visual Trust Value Props */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 py-1">
+                <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-800 bg-white sm:bg-transparent p-2.5 sm:p-0 rounded-lg border sm:border-0 border-slate-200 shadow-2xs sm:shadow-none">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>30-Min Arrival Window</span>
+                  <span>25-Min Arrival Window</span>
                 </div>
-                <div className="flex items-center gap-2.5 text-xs sm:text-sm font-semibold text-slate-800">
+                <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-800 bg-white sm:bg-transparent p-2.5 sm:p-0 rounded-lg border sm:border-0 border-slate-200 shadow-2xs sm:shadow-none">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>Upfront Fixed Quotes</span>
                 </div>
-                <div className="flex items-center gap-2.5 text-xs sm:text-sm font-semibold text-slate-800">
+                <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-800 bg-white sm:bg-transparent p-2.5 sm:p-0 rounded-lg border sm:border-0 border-slate-200 shadow-2xs sm:shadow-none">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>$20M Insured Work</span>
                 </div>
               </div>
 
-              {/* Big Direct Call Action */}
+              {/* Direct Call CTA Box */}
               <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
                 <a
                   href={`tel:${cleanPhone}`}
@@ -317,114 +414,180 @@ export function UrgentService({ clientData }: TemplateProps) {
                   className="inline-flex items-center justify-center gap-3 text-white font-extrabold px-8 py-4 rounded-xl text-lg sm:text-xl shadow-lg transition-all hover:brightness-110 active:scale-98"
                   style={{ backgroundColor: primaryColor }}
                 >
-                  <Phone className="w-6 h-6" />
+                  <Phone className="w-6 h-6 animate-pulse" />
                   <span>Call Now: {phone}</span>
                 </a>
 
                 <div className="text-xs text-slate-500 flex flex-col justify-center">
-                  <span className="font-bold text-slate-800">24/7 Live Emergency Line</span>
+                  <span className="font-bold text-slate-800 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+                    24/7 Live Emergency Line
+                  </span>
                   <span>Speak directly to an on-duty technician</span>
                 </div>
               </div>
             </div>
 
-            {/* ── Right Column: Instant Dispatch Card ───────────────────── */}
-            <div className="lg:col-span-5">
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-xl p-6 sm:p-8">
-                <div className="mb-6 pb-4 border-b border-slate-100">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-sky-700 bg-sky-50 px-2.5 py-1 rounded-md inline-block mb-1.5">
-                    Priority Online Request
-                  </span>
-                  <h2 className="text-2xl font-bold text-slate-900">
-                    Request Immediate Dispatch
-                  </h2>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Need urgent service? Submit below or call us for instant response.
-                  </p>
-                </div>
+            {/* ── Right Column: Authentic Image + Interactive Scenario Explorer ── */}
+            <div className="lg:col-span-6">
+              <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xl overflow-hidden">
+                {/* 1. Visual Photography Canvas */}
+                <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] overflow-hidden bg-slate-900 group">
+                  <Image
+                    src={heroBackground}
+                    alt={`${companyName} Licensed Master ${industryNoun}`}
+                    fill
+                    priority
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                  {/* Subtle vignette gradient for badge legibility */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/20" />
 
-                {leadFormSubmitted ? (
-                  <div className="py-8 text-center space-y-3">
-                    <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
-                      <Check className="w-8 h-8 stroke-[3]" />
+                  {/* Top Floating Glass Badges */}
+                  <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
+                    <div className="bg-slate-900/80 backdrop-blur-md border border-white/20 text-white text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
+                      <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                      <span>4.9 / 5 Rating • 520+ Reviews</span>
                     </div>
-                    <h3 className="text-xl font-bold text-slate-900">
-                      Dispatch Request Logged
-                    </h3>
-                    <p className="text-xs text-slate-600 max-w-xs mx-auto leading-relaxed">
-                      Thank you. Your request has been sent directly to our on-duty {city} team.
-                      We will call you at <strong className="text-slate-800">{formData.phone}</strong> in under 5 minutes to confirm our technician&apos;s arrival.
-                    </p>
-                    <div className="pt-2">
-                      <a
-                        href={`tel:${cleanPhone}`}
-                        className="inline-flex items-center gap-2 text-xs font-bold text-sky-700 hover:underline"
-                      >
-                        <Phone className="w-3.5 h-3.5" />
-                        <span>Need faster help? Tap to call now</span>
-                      </a>
+                    <div className="bg-emerald-500/90 backdrop-blur-md text-white text-[11px] sm:text-xs font-bold px-2.5 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                      <span>Live in {city}</span>
                     </div>
                   </div>
-                ) : (
-                  <form onSubmit={handleFormSubmit} className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        What is your emergency?
-                      </label>
-                      <select
-                        value={formData.issueType}
-                        onChange={(e) => setFormData({ ...formData, issueType: e.target.value })}
-                        className="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500"
-                      >
-                        <option>Burst Pipe / Flooding Leak</option>
-                        <option>Blocked Drain / Toilet Overflow</option>
-                        <option>No Hot Water / Tank Leak</option>
-                        <option>Gas Leak / Odor</option>
-                        <option>General Urgent Repair</option>
-                      </select>
-                    </div>
 
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        Street Address or Suburb in {city} <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. 14 Elm Street or Suburb"
-                        value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        className="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500"
-                      />
+                  {/* Bottom Image Caption */}
+                  <div className="absolute bottom-3 left-3 right-3 pointer-events-none">
+                    <div className="bg-slate-900/85 backdrop-blur-md border border-white/10 text-white px-3.5 py-2 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Wrench className="w-4 h-4 text-sky-400" />
+                        <span className="text-xs font-semibold text-slate-200">
+                          Equipped Service Van On Standby
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-bold text-emerald-400">
+                        Zero Travel Charge
+                      </span>
                     </div>
+                  </div>
+                </div>
 
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        Your Phone Number <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="tel"
-                        required
-                        placeholder="e.g. (04) 555-0199"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500"
-                      />
-                    </div>
+                {/* 2. Interactive Scenario Explorer Tabs */}
+                <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-200">
+                  <div className="flex items-center justify-between mb-2.5">
+                    <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
+                      Emergency Diagnostic Protocol:
+                    </span>
+                    <span className="text-[11px] font-medium text-slate-400 hidden sm:inline">
+                      Tap issue to inspect truck gear & SLA
+                    </span>
+                  </div>
 
-                    <button
-                      type="submit"
-                      className="w-full py-3.5 px-4 rounded-xl font-bold text-white text-sm shadow-md transition-all hover:brightness-110 active:scale-98 cursor-pointer mt-2"
-                      style={{ backgroundColor: primaryColor }}
+                  {/* 4 Interactive Selector Chips */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {emergencyScenarios.map((sc, idx) => {
+                      const IconComponent = sc.icon;
+                      const isActive = idx === activeScenarioIndex;
+                      return (
+                        <button
+                          key={sc.id}
+                          onClick={() => setActiveScenarioIndex(idx)}
+                          type="button"
+                          className={`flex items-center gap-2 p-2.5 rounded-xl text-left transition-all cursor-pointer ${
+                            isActive
+                              ? "bg-white text-slate-900 shadow-md border-2 font-bold ring-2 ring-slate-900/5"
+                              : "bg-white/60 hover:bg-white text-slate-600 border border-slate-200/80 font-medium"
+                          }`}
+                          style={{
+                            borderColor: isActive ? primaryColor : undefined,
+                          }}
+                        >
+                          <div
+                            className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-white"
+                            style={{
+                              backgroundColor: isActive ? primaryColor : "#94a3b8",
+                            }}
+                          >
+                            <IconComponent className="w-4 h-4" />
+                          </div>
+                          <span className="text-xs truncate">{sc.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 3. Active Scenario Detailed Visual Card */}
+                <div className="p-5 sm:p-6 bg-white">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeScenario.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.18 }}
+                      className="space-y-4"
                     >
-                      Request Rapid Technician Dispatch
-                    </button>
+                      {/* Scenario Summary */}
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md text-white"
+                              style={{ backgroundColor: primaryColor }}
+                            >
+                              {activeScenario.shortTag}
+                            </span>
+                            <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                              {activeScenario.arrivalSla}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                            {activeScenario.problemSummary}
+                          </p>
+                        </div>
+                      </div>
 
-                    <p className="text-[11px] text-center text-slate-400">
-                      Zero upfront payment. All quotes approved in writing before work starts.
-                    </p>
-                  </form>
-                )}
+                      {/* Equipment & Action Breakdown */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                        <div className="bg-slate-50 border border-slate-100 rounded-xl p-3">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                            Technician Immediate Action:
+                          </span>
+                          <p className="text-xs font-semibold text-slate-800 leading-tight">
+                            {activeScenario.actionTaken}
+                          </p>
+                        </div>
+
+                        <div className="bg-slate-50 border border-slate-100 rounded-xl p-3">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                            Truck Equipment Dispatched:
+                          </span>
+                          <p className="text-xs font-semibold text-slate-800 leading-tight">
+                            {activeScenario.truckEquipment}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Pricing Guarantee & Direct Dispatch Call */}
+                      <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100">
+                        <div className="text-[11px] text-slate-500 text-left w-full sm:w-auto">
+                          <span className="font-bold text-slate-700">Guarantee: </span>
+                          <span>{activeScenario.pricingNote}</span>
+                        </div>
+
+                        <a
+                          href={`tel:${cleanPhone}`}
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl font-bold text-white text-xs shadow-sm hover:brightness-110 active:scale-95 transition-all shrink-0"
+                          style={{ backgroundColor: primaryColor }}
+                        >
+                          <Phone className="w-3.5 h-3.5" />
+                          <span>Dispatch Tech for {activeScenario.label}</span>
+                        </a>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
           </div>
