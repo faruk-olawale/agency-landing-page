@@ -6,6 +6,7 @@ import { UrgentService } from "@/components/templates/UrgentService";
 import { ProfessionalTrust } from "@/components/templates/ProfessionalTrust";
 import { AestheticBooking } from "@/components/templates/AestheticBooking";
 import { GenericTemplate } from "@/components/templates/GenericTemplate";
+import { ScrolltidePreviewShell } from "@/components/preview/ScrolltidePreviewShell";
 import rawLeadsData from "../../../../leads/global_leads_audit.json";
 
 interface LeadRecord {
@@ -218,19 +219,35 @@ export default async function PreviewPage({ params, searchParams }: PageProps) {
   // 3. Pass it to getArchetype(industry)
   const archetype = getArchetype(normalizedIndustry);
 
-  // 4. Use a switch statement on the returned archetype to render and return the correct template
+  // Check if raw mode is requested
+  const rawParam = getQueryValue(query.raw) || getQueryValue(query.mode);
+  const isRaw = rawParam === "true" || rawParam === "raw" || rawParam === "1";
+
+  // 4. Render the archetype template
+  let renderedTemplate: React.ReactNode;
   switch (archetype) {
     case "UrgentService":
-      return <UrgentService clientData={lead} />;
-
+      renderedTemplate = <UrgentService clientData={lead} />;
+      break;
     case "ProfessionalTrust":
-      return <ProfessionalTrust clientData={lead} />;
-
+      renderedTemplate = <ProfessionalTrust clientData={lead} />;
+      break;
     case "AestheticBooking":
-      return <AestheticBooking clientData={lead} />;
-
+      renderedTemplate = <AestheticBooking clientData={lead} />;
+      break;
     case "Generic":
     default:
-      return <GenericTemplate clientData={lead} />;
+      renderedTemplate = <GenericTemplate clientData={lead} />;
+      break;
   }
+
+  if (isRaw) {
+    return renderedTemplate;
+  }
+
+  return (
+    <ScrolltidePreviewShell lead={lead} archetype={archetype} slug={slug}>
+      {renderedTemplate}
+    </ScrolltidePreviewShell>
+  );
 }
