@@ -124,27 +124,53 @@ export function getArchetype(industry: string = ""): Archetype {
 }
 
 /**
- * Returns a high-converting default primary brand color for each industry and archetype
+ * Returns a high-converting default primary brand color for each industry and archetype.
+ * Plumbers use a high-trust Cobalt / Ocean Blue (#0284C7) representing clean water & certified craftsmanship.
  */
 export function getArchetypePrimaryColor(
   industry: string = "",
   archetype?: Archetype
 ): string {
   const norm = (industry || "").toLowerCase().trim();
-  if (norm.includes("plumb")) return "#DC2626";
-  if (norm.includes("hvac") || norm.includes("air") || norm.includes("heat")) return "#EA580C";
-  if (norm.includes("roof")) return "#D97706";
-  if (norm.includes("electr")) return "#EAB308";
-  if (norm.includes("mechanic") || norm.includes("auto")) return "#F97316";
-  if (norm.includes("law") || norm.includes("legal") || norm.includes("attorney")) return "#1E3A8A";
-  if (norm.includes("cpa") || norm.includes("account") || norm.includes("tax")) return "#0F766E";
-  if (norm.includes("dent") || norm.includes("ortho") || norm.includes("smile")) return "#0284C7";
-  if (norm.includes("medspa") || norm.includes("spa") || norm.includes("aesthetic")) return "#BE185D";
+  if (norm.includes("plumb")) return "#0284C7"; // High-trust Cobalt/Ocean Blue for plumbing
+  if (norm.includes("hvac") || norm.includes("air") || norm.includes("heat")) return "#EA580C"; // Climate Orange
+  if (norm.includes("roof")) return "#D97706"; // Architectural Terracotta Amber
+  if (norm.includes("electr")) return "#EAB308"; // High-Voltage Electric Amber
+  if (norm.includes("mechanic") || norm.includes("auto")) return "#F97316"; // Performance Mechanical Orange
+  if (norm.includes("law") || norm.includes("legal") || norm.includes("attorney")) return "#1E3A8A"; // Executive Navy
+  if (norm.includes("cpa") || norm.includes("account") || norm.includes("tax")) return "#0F766E"; // Fiduciary Teal
+  if (norm.includes("dent") || norm.includes("ortho") || norm.includes("smile")) return "#0284C7"; // Clinical Porcelain Blue
+  if (norm.includes("medspa") || norm.includes("spa") || norm.includes("aesthetic")) return "#BE185D"; // Luxury Rose Gold
 
   const arch = archetype || getArchetype(industry);
-  if (arch === "UrgentService") return "#DC2626";
+  if (arch === "UrgentService") return "#0284C7";
   if (arch === "ProfessionalTrust") return "#1E3A8A";
   if (arch === "AestheticBooking") return "#BE185D";
   return "#4F46E5";
+}
+
+/**
+ * Returns a cohesive secondary brand color for each industry and archetype.
+ */
+export function getArchetypeSecondaryColor(
+  industry: string = "",
+  archetype?: Archetype
+): string {
+  const norm = (industry || "").toLowerCase().trim();
+  if (norm.includes("plumb")) return "#0C4A6E"; // Deep Marine Navy
+  if (norm.includes("hvac") || norm.includes("air") || norm.includes("heat")) return "#7C2D12"; // Deep Ember
+  if (norm.includes("roof")) return "#78350F"; // Deep Bronze Slate
+  if (norm.includes("electr")) return "#713F12"; // Deep Amber Slate
+  if (norm.includes("mechanic") || norm.includes("auto")) return "#7C2D12"; // Deep Engine Iron
+  if (norm.includes("law") || norm.includes("legal") || norm.includes("attorney")) return "#0F172A"; // Slate 900
+  if (norm.includes("cpa") || norm.includes("account") || norm.includes("tax")) return "#134E4A"; // Deep Teal
+  if (norm.includes("dent") || norm.includes("ortho") || norm.includes("smile")) return "#0C4A6E"; // Deep Sky
+  if (norm.includes("medspa") || norm.includes("spa") || norm.includes("aesthetic")) return "#FDF2F8"; // Quartz Rose
+
+  const arch = archetype || getArchetype(industry);
+  if (arch === "UrgentService") return "#0C4A6E";
+  if (arch === "ProfessionalTrust") return "#0F172A";
+  if (arch === "AestheticBooking") return "#FDF2F8";
+  return "#1E1B4B";
 }
 

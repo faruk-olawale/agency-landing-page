@@ -61,9 +61,14 @@ export function LiveDispatchSimulation({
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider font-bold mb-3 border bg-red-950/40 border-red-500/30 text-red-400 shadow-sm"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider font-bold mb-3 border shadow-sm"
+            style={{
+              backgroundColor: `${primaryColor}18`,
+              borderColor: `${primaryColor}35`,
+              color: primaryColor,
+            }}
           >
-            <Radio className="w-3.5 h-3.5 animate-pulse text-red-400" />
+            <Radio className="w-3.5 h-3.5 animate-pulse" style={{ color: primaryColor }} />
             <span>Active GPS Dispatch Engine</span>
           </motion.div>
 

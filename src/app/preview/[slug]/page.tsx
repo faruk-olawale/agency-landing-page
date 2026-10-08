@@ -1,12 +1,15 @@
 import React from "react";
 import type { Metadata } from "next";
-import { getArchetype, getArchetypePrimaryColor } from "@/lib/archetypeMap";
+import {
+  getArchetype,
+  getArchetypePrimaryColor,
+  getArchetypeSecondaryColor,
+} from "@/lib/archetypeMap";
 import type { ClientData } from "@/lib/archetypeMap";
 import { UrgentService } from "@/components/templates/UrgentService";
 import { ProfessionalTrust } from "@/components/templates/ProfessionalTrust";
 import { AestheticBooking } from "@/components/templates/AestheticBooking";
 import { GenericTemplate } from "@/components/templates/GenericTemplate";
-import { ScrolltidePreviewShell } from "@/components/preview/ScrolltidePreviewShell";
 import rawLeadsData from "../../../../leads/global_leads_audit.json";
 
 interface LeadRecord {
@@ -152,7 +155,9 @@ function fetchLeadData(
   const primaryColor =
     getQueryValue(query?.primaryColor) ||
     getArchetypePrimaryColor(rawIndustry, getArchetype(rawIndustry));
-  const secondaryColor = getQueryValue(query?.secondaryColor);
+  const secondaryColor =
+    getQueryValue(query?.secondaryColor) ||
+    getArchetypeSecondaryColor(rawIndustry, getArchetype(rawIndustry));
   const accentColor = getQueryValue(query?.accentColor);
 
   return {
@@ -219,35 +224,19 @@ export default async function PreviewPage({ params, searchParams }: PageProps) {
   // 3. Pass it to getArchetype(industry)
   const archetype = getArchetype(normalizedIndustry);
 
-  // Check if raw mode is requested
-  const rawParam = getQueryValue(query.raw) || getQueryValue(query.mode);
-  const isRaw = rawParam === "true" || rawParam === "raw" || rawParam === "1";
-
-  // 4. Render the archetype template
-  let renderedTemplate: React.ReactNode;
+  // 4. Use a switch statement on the returned archetype to render and return the correct template
   switch (archetype) {
     case "UrgentService":
-      renderedTemplate = <UrgentService clientData={lead} />;
-      break;
+      return <UrgentService clientData={lead} />;
+
     case "ProfessionalTrust":
-      renderedTemplate = <ProfessionalTrust clientData={lead} />;
-      break;
+      return <ProfessionalTrust clientData={lead} />;
+
     case "AestheticBooking":
-      renderedTemplate = <AestheticBooking clientData={lead} />;
-      break;
+      return <AestheticBooking clientData={lead} />;
+
     case "Generic":
     default:
-      renderedTemplate = <GenericTemplate clientData={lead} />;
-      break;
+      return <GenericTemplate clientData={lead} />;
   }
-
-  if (isRaw) {
-    return renderedTemplate;
-  }
-
-  return (
-    <ScrolltidePreviewShell lead={lead} archetype={archetype} slug={slug}>
-      {renderedTemplate}
-    </ScrolltidePreviewShell>
-  );
 }
