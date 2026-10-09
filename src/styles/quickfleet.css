@@ -1029,7 +1029,7 @@ html.qf-menu-open body {
   background: #F4F2ED;
   color: var(--ink);
   display: grid;
-  grid-template-columns: minmax(340px, 0.88fr) minmax(0, 1.12fr);
+  grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
   gap: clamp(28px, 4vw, 68px);
   align-items: center;
   padding: clamp(48px, 5vw, 80px) clamp(24px, 3.5vw, 64px);
@@ -1922,3 +1922,52 @@ html.qf-menu-open body {
 .actuator-meter-bar {
   transition: width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
+/* ==========================================================================
+   MOBILE PREVIEW SIMULATION (When inspected inside preview shell on desktop)
+   ========================================================================== */
+.preview-mobile-frame .qf-pcard {
+  grid-template-columns: 1fr !important;
+  padding: 24px 12px !important;
+  gap: 20px !important;
+}
+
+.preview-mobile-frame .qf-cards-container {
+  grid-template-columns: 1fr !important;
+  gap: 16px !important;
+}
+
+.preview-mobile-frame .qf-card {
+  position: relative !important;
+  top: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: auto !important;
+  border-radius: 20px !important;
+}
+
+.preview-mobile-frame .qf-cost__in {
+  grid-template-columns: 1fr !important;
+}
+
+.preview-mobile-frame .qf-hc__row {
+  grid-template-columns: 1fr !important;
+  gap: 32px !important;
+}
+
+.preview-mobile-frame .qf-close__grid {
+  grid-template-columns: 1fr !important;
+  gap: 32px !important;
+}
+
+.preview-mobile-frame .qf-nav__center,
+.preview-mobile-frame .qf-nav__links,
+.preview-mobile-frame .qf-nav .qf-control--ghost,
+.preview-mobile-frame .qf-nav .qf-control--ink {
+  display: none !important;
+}
+
+.preview-mobile-frame .qf-nav__burger {
+  display: inline-flex !important;
+}
+

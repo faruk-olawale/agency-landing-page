@@ -31,8 +31,8 @@ export function QuickFleetLiveRecord({
   const [activeStep, setActiveStep] = useState<number>(3);
 
   return (
-    <section id="service-record" className="py-16 sm:py-24 px-4 sm:px-8 overflow-hidden">
-      <div className="qf-pcard relative overflow-hidden">
+    <section id="service-record" className="py-12 sm:py-20 lg:py-24 px-3 sm:px-6 lg:px-8 overflow-hidden">
+      <div className="qf-pcard relative overflow-hidden !grid !grid-cols-1 lg:!grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] !p-4 sm:!p-8 lg:!p-12 !gap-6 lg:!gap-12">
         {/* Concentric Orbital Drafting Rings in Background */}
         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[700px] h-[700px] pointer-events-none opacity-40 hidden xl:block">
           <svg viewBox="0 0 800 800" className="w-full h-full stroke-[#0C0730]/15 fill-none">
@@ -48,7 +48,7 @@ export function QuickFleetLiveRecord({
         </div>
 
         {/* Left Column: Editorial Headline & Value Proposition */}
-        <div className="qf-pcard__text relative z-10">
+        <div className="qf-pcard__text relative z-10 min-w-0">
           <span className="qf-eyebrow">
             <i>04</i>
             <span>The Service Record</span>
@@ -85,38 +85,38 @@ export function QuickFleetLiveRecord({
         </div>
 
         {/* Right Column: Floating Vehicle Repair Order Telemetry Card */}
-        <div className="relative z-10 flex justify-center">
-          <div className="w-full max-w-lg bg-[#0C0730] text-white rounded-3xl p-6 sm:p-7 shadow-2xl border border-white/10 font-mono">
+        <div className="relative z-10 flex justify-center w-full min-w-0">
+          <div className="w-full max-w-lg bg-[#0C0730] text-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 lg:p-7 shadow-2xl border border-white/10 font-mono min-w-0 overflow-hidden sm:overflow-visible">
             {/* RO Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-white/10 text-xs">
-              <div>
-                <span className="text-[10px] text-slate-400 block truncate max-w-[200px]">
-                  {companyName.toUpperCase()} · RO NUMBER
+            <div className="flex items-center justify-between gap-2 pb-3.5 sm:pb-4 border-b border-white/10 text-xs min-w-0">
+              <div className="min-w-0 flex-1">
+                <span className="text-[10px] text-slate-400 block truncate max-w-full uppercase tracking-wider">
+                  {companyName} · RO NUMBER
                 </span>
-                <span className="text-base font-bold text-white tracking-wide">RO-40912</span>
+                <span className="text-sm sm:text-base font-bold text-white tracking-wide">RO-40912</span>
               </div>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0A997D]/20 text-[#6FD9C1] border border-[#0A997D]/40 text-[11px] font-bold">
-                <span className="w-2 h-2 rounded-full bg-[#6FD9C1] animate-pulse" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-[#0A997D]/20 text-[#6FD9C1] border border-[#0A997D]/40 text-[10px] sm:text-[11px] font-bold shrink-0 tracking-wider">
+                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#6FD9C1] animate-pulse shrink-0" />
                 BAY 2 ACTIVE
               </span>
             </div>
 
             {/* Vehicle Identification Strip */}
-            <div className="my-4 p-3 rounded-xl bg-white/5 border border-white/10 text-xs font-sans">
-              <div className="flex items-center justify-between font-mono text-[10px] text-slate-400 mb-1">
-                <span>VEHICLE TELEMETRY</span>
-                <span>VIN: WBS33AY08P1***</span>
+            <div className="my-3.5 sm:my-4 p-3 rounded-xl bg-white/5 border border-white/10 text-xs font-sans min-w-0">
+              <div className="flex items-center justify-between gap-2 font-mono text-[10px] text-slate-400 mb-1 min-w-0">
+                <span className="shrink-0 tracking-wider">VEHICLE TELEMETRY</span>
+                <span className="truncate text-right">VIN: WBS33AY08P1***</span>
               </div>
-              <div className="font-bold text-sm text-white">
+              <div className="font-bold text-xs sm:text-sm text-white truncate">
                 2023 BMW M3 Competition (G80)
               </div>
-              <div className="text-xs text-slate-400 font-mono mt-0.5">
+              <div className="text-[11px] sm:text-xs text-slate-400 font-mono mt-0.5 truncate">
                 3.0L S58 Twin-Turbo · 8-Speed M Steptronic
               </div>
             </div>
 
             {/* 5-Step Repair Order Status Stepper */}
-            <div className="space-y-3.5 my-5 text-xs">
+            <div className="space-y-2.5 sm:space-y-3.5 my-4 sm:my-5 text-xs min-w-0">
               {[
                 {
                   step: 1,
@@ -152,14 +152,14 @@ export function QuickFleetLiveRecord({
                 <div
                   key={s.step}
                   onClick={() => setActiveStep(s.step)}
-                  className={`flex items-start gap-3 p-2.5 rounded-xl cursor-pointer transition-all border ${
+                  className={`flex items-start gap-2.5 sm:gap-3 p-2 sm:p-2.5 rounded-xl cursor-pointer transition-all border min-w-0 ${
                     activeStep === s.step
                       ? "bg-white/10 border-[#6FD9C1]/50 text-white shadow-md"
                       : "border-transparent text-slate-400 hover:bg-white/5"
                   }`}
                 >
                   <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold ${
+                    className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold ${
                       s.done
                         ? "bg-[#0A997D] text-white"
                         : s.active
@@ -170,11 +170,13 @@ export function QuickFleetLiveRecord({
                     {s.done ? "✓" : s.step}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-sans font-medium text-white truncate text-[13px]">
+                    <div className="font-sans font-medium text-white text-xs sm:text-[13px] leading-snug break-words">
                       {s.title}
                     </div>
-                    <div className="text-[10px] text-slate-400 font-mono mt-0.5">
-                      {s.time} · {s.done ? "Logged to vehicle ledger" : s.active ? "Awaiting client click" : "Queued"}
+                    <div className="text-[10px] text-slate-400 font-mono mt-0.5 leading-tight flex flex-wrap items-center gap-x-1.5">
+                      <span>{s.time}</span>
+                      <span className="text-slate-600">·</span>
+                      <span>{s.done ? "Logged to vehicle ledger" : s.active ? "Awaiting client click" : "Queued"}</span>
                     </div>
                   </div>
                 </div>
@@ -182,16 +184,16 @@ export function QuickFleetLiveRecord({
             </div>
 
             {/* Release Security Code Box (QuickFleet Door Code Parity) */}
-            <div className="mt-5 pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <span className="text-[10px] text-slate-400 block font-mono">
+            <div className="mt-4 sm:mt-5 pt-3.5 sm:pt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 min-w-0">
+              <div className="min-w-0">
+                <span className="text-[10px] text-slate-400 block font-mono tracking-wider">
                   4-DIGIT HANDOVER CODE
                 </span>
-                <div className="flex items-center gap-2 mt-1">
+                <div className="flex items-center gap-1.5 sm:gap-2 mt-1">
                   {["6", "2", "4", "9"].map((digit, i) => (
                     <span
                       key={i}
-                      className="w-7 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-sm font-bold text-[#6FD9C1]"
+                      className="w-6 h-7 sm:w-7 sm:h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-xs sm:text-sm font-bold text-[#6FD9C1]"
                     >
                       {digit}
                     </span>
@@ -199,14 +201,14 @@ export function QuickFleetLiveRecord({
                 </div>
               </div>
 
-              <div className="text-right">
-                <span className="text-[10px] text-slate-400 block font-mono">
+              <div className="text-left sm:text-right min-w-0 border-t border-white/5 sm:border-t-0 pt-2.5 sm:pt-0">
+                <span className="text-[10px] text-slate-400 block font-mono tracking-wider">
                   MASTER SPECIALIST
                 </span>
-                <div className="text-xs font-bold text-white mt-1">
+                <div className="text-xs font-bold text-white mt-0.5 truncate">
                   M. Vance (ASE L1 #4928)
                 </div>
-                <div className="text-[10px] text-[#6FD9C1]">
+                <div className="text-[10px] text-[#6FD9C1] truncate">
                   Verified Digital Signature
                 </div>
               </div>
