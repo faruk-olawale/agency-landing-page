@@ -1318,6 +1318,46 @@ html.qf-menu-open body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
+@media (max-width: 768px) {
+  .hubfig__title {
+    top: auto;
+    bottom: clamp(12px, 3vw, 18px);
+    left: clamp(12px, 3vw, 18px);
+    font-size: 12px;
+    padding: 5px 12px;
+    gap: 7px;
+    max-width: calc(100% - 24px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .hubfig__title small {
+    display: none;
+  }
+
+  .views {
+    top: clamp(12px, 3vw, 18px);
+    right: clamp(12px, 3vw, 18px);
+    padding: 3px;
+    gap: 2px;
+  }
+
+  .views button {
+    font-size: 12px;
+    padding: 5px 12px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 540px) {
+  .views {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+}
+
 /* Hotspots layer */
 .spots {
   position: absolute;
