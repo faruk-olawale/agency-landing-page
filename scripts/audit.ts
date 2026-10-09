@@ -30,30 +30,48 @@ interface AuditResult {
   cpcEstimate: number;
 }
 
-// Industry benchmarks
+// Automotive Repair & Diagnostics Benchmarks
 const NICHE_CPC_MAP: Record<string, number> = {
-  hvac: 48,
-  roofing: 65,
-  dental: 38,
-  dentist: 38,
-  legal: 85,
-  lawyer: 85,
-  attorney: 85,
-  plumbing: 42,
-  chiro: 28,
-  cosmetic: 55,
-  default: 32,
+  european: 62,
+  bmw: 62,
+  audi: 62,
+  mercedes: 62,
+  porsche: 65,
+  transmission: 58,
+  diesel: 65,
+  fleet: 65,
+  diagnostic: 54,
+  ecu: 54,
+  electrical: 52,
+  performance: 58,
+  tuning: 58,
+  brake: 46,
+  mechanic: 48,
+  "auto repair": 48,
+  default: 50,
 };
 
 function detectNiche(text: string): string {
   const lower = text.toLowerCase();
-  if (lower.includes("roof")) return "Roofing";
-  if (lower.includes("hvac") || lower.includes("air condition") || lower.includes("heating")) return "HVAC";
-  if (lower.includes("dent") || lower.includes("teeth") || lower.includes("ortho")) return "Dental";
-  if (lower.includes("law") || lower.includes("attorney") || lower.includes("injury")) return "Legal";
-  if (lower.includes("plumb")) return "Plumbing";
-  if (lower.includes("clinic") || lower.includes("medspa") || lower.includes("cosmetic")) return "Aesthetics & Medical";
-  return "Local High-Ticket Service";
+  if (lower.includes("bmw") || lower.includes("audi") || lower.includes("mercedes") || lower.includes("porsche") || lower.includes("european")) {
+    return "European Vehicle Specialist";
+  }
+  if (lower.includes("transmission") || lower.includes("drivetrain") || lower.includes("gearbox")) {
+    return "Transmission & Drivetrain";
+  }
+  if (lower.includes("diesel") || lower.includes("fleet") || lower.includes("commercial")) {
+    return "Fleet Diesel & Commercial";
+  }
+  if (lower.includes("ecu") || lower.includes("electrical") || lower.includes("diagnostic") || lower.includes("engine")) {
+    return "Engine & ECU Diagnostics";
+  }
+  if (lower.includes("performance") || lower.includes("tuning") || lower.includes("dyno")) {
+    return "Performance & Tuning";
+  }
+  if (lower.includes("brake") || lower.includes("suspension") || lower.includes("alignment")) {
+    return "Brake & Suspension Specialist";
+  }
+  return "Independent Auto Repair";
 }
 
 // Fetch webpage with timing and deep inspection

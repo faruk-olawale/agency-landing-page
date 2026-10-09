@@ -2,7 +2,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { getArchetype, getArchetypePrimaryColor } from "@/lib/archetypeMap";
+import { getArchetype, getArchetypePrimaryColor, qualifyAutomotiveLead } from "@/lib/archetypeMap";
 import type { Archetype } from "@/lib/archetypeMap";
 
 export interface AuditWebsiteParams {
@@ -326,28 +326,34 @@ export async function auditWebsiteAction(
     const phone = inputPhone || extractPhoneFromHtml(liveHtml) || "(214) 736-9201";
     const email = inputEmail || `service@${domain}`;
 
-    // Industry benchmarks
-    const lowerInd = selectedIndustry.toLowerCase();
-    const baseCpc = lowerInd.includes("plumb")
-      ? 68
-      : lowerInd.includes("roof")
-      ? 78
-      : lowerInd.includes("law")
-      ? 85
-      : lowerInd.includes("hvac")
-      ? 65
-      : lowerInd.includes("dent")
-      ? 55
-      : lowerInd.includes("medspa")
-      ? 70
-      : lowerInd.includes("cpa")
-      ? 60
-      : lowerInd.includes("electric")
-      ? 58
-      : 50;
+    // Automotive Qualification & Specialization Check
+    const qualCheck = qualifyAutomotiveLead({
+      company: inputCompany || domain,
+      niche: selectedIndustry,
+      industry: selectedIndustry,
+      website: fullUrl,
+    });
 
-    const estLostMonthlySpend = Math.round(baseCpc * 24 * (1 - mobilePageSpeed / 100));
-    const contactName = `${company} Team`;
+    const isDisqualified = qualCheck.isDisqualified;
+    const qualificationStatus: "qualified" | "unverified" | "disqualified" = isDisqualified
+      ? "disqualified"
+      : qualCheck.isQualified
+      ? "qualified"
+      : "unverified";
+
+    // Industry benchmarks for Automotive Repair & Diagnostics ($45 - $65/click)
+    const baseCpc = qualCheck.specialization === "European Vehicle Specialist"
+      ? 62
+      : qualCheck.specialization === "Transmission & Drivetrain"
+      ? 58
+      : qualCheck.specialization === "Fleet Diesel & Commercial"
+      ? 65
+      : qualCheck.specialization === "Engine & ECU Diagnostics"
+      ? 54
+      : 48;
+
+    const estLostMonthlySpend = Math.round(baseCpc * 22 * (1 - mobilePageSpeed / 100));
+    const contactName = `${company} Service Team`;
     const companySlug = company
       .toLowerCase()
       .replace(/[^a-z0-9]/g, "-")
@@ -356,71 +362,79 @@ export async function auditWebsiteAction(
 
     const previewParams = new URLSearchParams({
       name: company,
-      industry: selectedIndustry,
-      niche: selectedIndustry,
+      industry: qualCheck.specialization,
+      niche: qualCheck.specialization,
       city,
       phone,
       domain: fullUrl,
       speed: String(mobilePageSpeed),
       load: String(loadTimeSec),
-      waste: String(estLostMonthlySpend),
     });
     const previewUrl = `https://agency-landing-page-smoky-psi.vercel.app/preview/${companySlug}?${previewParams.toString()}`;
 
-    // Dynamic Email Drafting logic based strictly on hasAdTags boolean
+    // Ad Evidence Classification
+    const adEvidenceStatus: "verified_ads" | "no_detected_ads" | "inconclusive" = hasAdTags
+      ? "verified_ads"
+      : liveHtml
+      ? "no_detected_ads"
+      : "inconclusive";
+
+    // ─── AUTOMOTIVE OUTREACH STRATEGIES ───
+    // Strategy A: Verified Paid-Advertising Signals
+    // Strategy B: No Detected Ad Signals / Organic Mobile Conversion Focus
     const coldEmailSubject = hasAdTags
-      ? `Your Google Ads / ${company}`
-      : `Lost organic SEO traffic due to slow mobile speeds / ${domain}`;
+      ? `Quick question regarding ${company} mobile intake`
+      : `Mobile landing experience for ${company}`;
 
     const coldEmailBody = hasAdTags
       ? `Hey ${contactName},
 
-I noticed you're driving search traffic to ${domain}, but the mobile landing page takes about ${loadTimeSec} seconds to load.
+I was looking at ${domain} and noticed you have advertising tags configured for your search traffic, but your mobile landing experience takes about ${loadTimeSec} seconds to load.
 
-Because mobile users are impatient, you are likely losing about a third of your paid visitors before your site even loads. Wasted ad spend and leaked paid clicks mean Google is charging you for clicks that bounce before prospective clients ever see your phone number.
+When drivers search for a specialist with an urgent warning light or repair need in ${city}, every second of delay causes them to bounce back to the search results before reaching your service advisor.
 
-I run Speedcraft Studio. To show you what you're missing, I went ahead and built a custom, lightning-fast version of your landing page. It loads instantly (under half a second).
-
-Take a look on your phone to feel the speed difference:
+To show what a dedicated mobile experience looks like, I put together a lightweight, instant-loading diagnostic prototype customized for ${company}:
 Link: ${previewUrl}
 
-Zero strings attached. If you like the feel of it, would you like me to set this up on your actual domain so you stop leaking paid ad clicks?
+It gives drivers one-tap access to your service desk, an interactive diagnostic intake breakdown, and immediate reassurance of your ${qualCheck.specialization} capabilities on any smartphone.
+
+Take a look on your phone whenever you have a moment. If you'd like to put something similar in place for your incoming search traffic, I'd be glad to walk through the implementation.
 
 Best,
 Faruk — Lead Engineer, Speedcraft Studio
 Direct: farukolawale509@gmail.com`
       : `Hey ${contactName},
 
-I was looking up top ${selectedIndustry} businesses in ${city} and came across ${domain}, but noticed your mobile site takes about ${loadTimeSec} seconds to load.
+I came across ${domain} while researching reputable ${qualCheck.specialization} shops in ${city}. Your shop clearly has strong technical capabilities, but your current mobile site takes about ${loadTimeSec} seconds to load.
 
-Because Google strongly penalizes slow mobile load times in organic search rankings, you are steadily losing prospective clients and organic search traffic to faster competitors before your page even loads.
+Most vehicle owners searching for a repair shop on mobile need two things immediately: clear confirmation that you specialize in their vehicle's issue, and frictionless contact with your service advisor.
 
-I run Speedcraft Studio. To demonstrate what a modern, high-performance site feels like, I built a custom, instant-loading version of your landing page that opens in under half a second.
-
-Take a look on your phone to feel the speed difference:
+To illustrate how that can look, I built a high-performance mobile prototype tailored specifically for ${company}:
 Link: ${previewUrl}
 
-Zero strings attached. If you'd like to recapture lost organic SEO traffic and boost your mobile Google ranking, would you be open to a quick chat about deploying this to your actual domain?
+It features instant sub-second loading, clear specialist service categories, and a streamlined repair order intake flow.
+
+Take a look on your phone when convenient. If you're interested in upgrading your local search conversion experience, I'd be happy to discuss getting this live for your shop.
 
 Best,
 Faruk — Lead Engineer, Speedcraft Studio
 Direct: farukolawale509@gmail.com`;
 
     const linkedInMessage = hasAdTags
-      ? `Hey ${contactName}, saw ${domain}. Your mobile site takes ${loadTimeSec}s to load, which means you're likely losing paid leads before they can call you. I built a lightning-fast test version that loads in under half a second so customers don't bounce: ${previewUrl} — want to check it out?`
-      : `Hey ${contactName}, saw ${domain}. Your mobile site takes ${loadTimeSec}s to load, which hurts your organic search rankings and causes visitors to bounce. I built a lightning-fast test version that loads in under half a second: ${previewUrl} — want to check it out?`;
+      ? `Hey ${contactName}, saw ${domain}. Drivers searching for ${qualCheck.specialization} in ${city} need instant contact, but mobile load time is ${loadTimeSec}s. I built a sub-second diagnostic intake prototype for ${company}: ${previewUrl} — want to check it out?`
+      : `Hey ${contactName}, saw ${domain}. Built a sub-second mobile prototype tailored for ${company} with streamlined diagnostic intake and one-tap calling: ${previewUrl} — thought you might want to see how fast it feels on mobile.`;
 
     // Lead Object with industry and hasAdTags
-    const newLead = {
+    const newLead: AuditedLead = {
       company,
       website: fullUrl,
       country: locale.country,
       countryCode: locale.countryCode,
       city,
-      industry: selectedIndustry,
-      niche: selectedIndustry,
-      archetype: getArchetype(selectedIndustry),
-      primaryColor: getArchetypePrimaryColor(selectedIndustry, getArchetype(selectedIndustry)),
+      industry: qualCheck.specialization,
+      niche: qualCheck.specialization,
+      archetype: getArchetype(qualCheck.specialization),
+      primaryColor: getArchetypePrimaryColor(qualCheck.specialization, "UrgentService"),
       contactName,
       phone,
       email,
@@ -445,7 +459,7 @@ Direct: farukolawale509@gmail.com`;
       isCustomImport: true,
       adTrackingVerified: {
         activeAdPixels: hasAdTags,
-        detectedTags: hasAdTags ? ["Marketing Ad Pixel"] : [],
+        detectedTags: hasAdTags ? ["Google Ads / GTM / Meta Pixel"] : [],
         scannedAt: new Date().toISOString(),
       },
     };
@@ -464,8 +478,8 @@ Direct: farukolawale509@gmail.com`;
         fs.writeFileSync(GLOBAL_LEADS_PATH, JSON.stringify(existingLeads, null, 2), "utf-8");
       }
 
-      // Also append to qualified_targeted_leads.json if ad tags are present
-      if (hasAdTags && fs.existsSync(QUALIFIED_LEADS_PATH)) {
+      // Append to qualified_targeted_leads.json if qualified and ad tags are present
+      if (hasAdTags && qualificationStatus === "qualified" && fs.existsSync(QUALIFIED_LEADS_PATH)) {
         try {
           const qualifiedLeads: AuditedLead[] = JSON.parse(fs.readFileSync(QUALIFIED_LEADS_PATH, "utf-8"));
           const alreadyInQualified = qualifiedLeads.some(
@@ -487,8 +501,8 @@ Direct: farukolawale509@gmail.com`;
       hasAdTags,
       archetype: newLead.archetype,
       previewUrl,
-      message: `Audited ${company} (${mobilePageSpeed}/100 Speed • ${
-        hasAdTags ? "🟢 Ad Tags Found / Wasted Ad Spend Pitch" : "⚪ No Ad Tags / Organic SEO Pitch"
+      message: `Audited ${company} • ${qualCheck.specialization} (${mobilePageSpeed}/100 Speed • ${
+        hasAdTags ? "🟢 Verified Ad Signals (Strategy A)" : "⚪ No Ad Signals Detected (Strategy B)"
       })`,
     };
   } catch (err: unknown) {

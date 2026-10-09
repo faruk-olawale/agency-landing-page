@@ -31,6 +31,41 @@ const CHROME_USER_AGENT =
 const GOOGLE_ADS_REGEX = /AW-[0-9]+|googletagmanager\.com\/gtag\/js|GTM-[A-Z0-9]+/i;
 const META_PIXEL_REGEX = /fbevents\.js|connect\.facebook\.net/i;
 
+// Automotive Disqualification Keywords
+const DISQUALIFIED_KEYWORDS = [
+  "dealership",
+  "dealer",
+  "car sales",
+  "used cars",
+  "auto sales",
+  "pre-owned",
+  "financing",
+  "car rental",
+  "rental car",
+  "car hire",
+  "car wash",
+  "auto detailing",
+  "window tint",
+  "auto parts",
+  "autoparts",
+  "junkyard",
+  "salvage",
+  "scrap",
+  "wreckers",
+  "towing only",
+  "impound",
+  "plumber",
+  "plumbing",
+  "hvac",
+  "roofing",
+  "electrician",
+  "lawyer",
+  "attorney",
+  "dentist",
+  "medspa",
+  "cpa",
+];
+
 // Parse optional CLI arguments (--limit=N, --batch=N, --input=PATH)
 const args = process.argv.slice(2);
 const limitArg = args.find((a) => a.startsWith("--limit="));

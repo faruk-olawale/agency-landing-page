@@ -11,6 +11,7 @@ import { ProfessionalTrust } from "@/components/templates/ProfessionalTrust";
 import { AestheticBooking } from "@/components/templates/AestheticBooking";
 import { GenericTemplate } from "@/components/templates/GenericTemplate";
 import rawLeadsData from "../../../../leads/global_leads_audit.json";
+import rawTargetedLeads from "../../../../qualified_targeted_leads.json";
 
 interface LeadRecord {
   company: string;
@@ -35,7 +36,7 @@ interface LeadRecord {
   [key: string]: unknown;
 }
 
-const leadsData = rawLeadsData as LeadRecord[];
+const leadsData = [...(rawTargetedLeads as LeadRecord[]), ...(rawLeadsData as LeadRecord[])];
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -76,26 +77,42 @@ function extractIndustry(
 
   // Fallback keyword detection on slug
   const lowerSlug = slug.toLowerCase();
-  const targetedNiches = [
-    "plumber",
-    "hvac",
-    "roofer",
-    "electrician",
+  const automotiveKeywords = [
     "mechanic",
     "auto",
     "automotive",
     "transmission",
     "diesel",
     "diagnostic",
+    "bimmer",
+    "benz",
+    "porsche",
+    "brake",
+    "repair",
+    "motor",
+    "garage",
+    "tune",
+    "ecu",
+  ];
+  const matchedAuto = automotiveKeywords.find((n) => lowerSlug.includes(n));
+  if (matchedAuto) return matchedAuto;
+
+  // Legacy fallback support for older URLs
+  const legacyNiches = [
+    "plumber",
+    "hvac",
+    "roofer",
+    "electrician",
     "lawyer",
     "cpa",
     "dentist",
     "medspa",
   ];
-  const matched = targetedNiches.find((n) => lowerSlug.includes(n));
-  if (matched) return matched;
+  const matchedLegacy = legacyNiches.find((n) => lowerSlug.includes(n));
+  if (matchedLegacy) return matchedLegacy;
 
-  return "";
+  // System-wide default: Automotive Repair & Diagnostics
+  return "Automotive Repair & Diagnostics";
 }
 
 /**

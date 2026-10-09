@@ -30,21 +30,15 @@ import {
 import leadsData from "../../../leads/global_leads_audit.json";
 import qualifiedTargetedLeads from "../../../qualified_targeted_leads.json";
 import { auditWebsiteAction } from "@/app/actions/audit";
-import { getArchetype, getArchetypePrimaryColor } from "@/lib/archetypeMap";
-import type { Archetype } from "@/lib/archetypeMap";
+import {
+  getArchetype,
+  getArchetypePrimaryColor,
+  AUTOMOTIVE_SPECIALIZATIONS,
+  qualifyAutomotiveLead,
+} from "@/lib/archetypeMap";
+import type { Archetype, AutomotiveSpecialization } from "@/lib/archetypeMap";
 
-export const TARGET_NICHES = [
-  "Plumber",
-  "HVAC",
-  "Roofer",
-  "Electrician",
-  "Auto Mechanic",
-  "Law Firm",
-  "CPA",
-  "Dentist",
-  "MedSpa",
-  "Other",
-] as const;
+export const TARGET_NICHES = AUTOMOTIVE_SPECIALIZATIONS;
 
 export interface Lead {
   company: string;
@@ -54,6 +48,7 @@ export interface Lead {
   city: string;
   niche: string;
   industry?: string;
+  specialization?: AutomotiveSpecialization | string;
   archetype?: Archetype;
   primaryColor?: string;
   contactName: string;
@@ -78,6 +73,14 @@ export interface Lead {
   linkedInMessage: string;
   hasAdTags?: boolean;
   hasMarketingPixels?: boolean;
+  adEvidenceStatus?: "verified_ads" | "no_detected_ads" | "inconclusive";
+  qualificationStatus?: "qualified" | "unverified" | "disqualified";
+  qualificationReason?: string;
+  adTrackingVerified?: {
+    activeAdPixels: boolean;
+    detectedTags: string[];
+    scannedAt: string;
+  };
 }
 
 export interface SentRecord {
@@ -106,20 +109,20 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
   const [search, setSearch] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("all");
   const [selectedCity, setSelectedCity] = useState("all");
-  const [selectedNiche, setSelectedNiche] = useState("all");
-  const [selectedArchetype, setSelectedArchetype] = useState<string>("all");
+  const [selectedSpecialization, setSelectedSpecialization] = useState<string>("all");
+  const [selectedAdEvidence, setSelectedAdEvidence] = useState<string>("all");
+  const [selectedQualification, setSelectedQualification] = useState<string>("all");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [sendingMap, setSendingMap] = useState<Record<string, "idle" | "sending" | "sent" | "error">>({});
   const [errorMsgMap, setErrorMsgMap] = useState<Record<string, string>>({});
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Pitch Angle & Modal States (Zero-Jargon Conversion Messaging)
-  const [pitchAngle, setPitchAngle] = useState<"wasted_ads" | "direct_punchy">("wasted_ads");
+  // Pitch Assistant Modal States (Automotive Conversion Focus)
   const [activePitchLead, setActivePitchLead] = useState<Lead | null>(null);
-  const [pitchModalTab, setPitchModalTab] = useState<"email_wasted" | "email_direct" | "linkedin">("email_wasted");
+  const [pitchModalTab, setPitchModalTab] = useState<"initial" | "followup_1" | "followup_2" | "linkedin">("initial");
 
-  // Google Maps Search States
-  const [mapsQuery, setMapsQuery] = useState("Emergency Plumber");
+  // Google Maps Search States (Automotive Default)
+  const [mapsQuery, setMapsQuery] = useState("European Auto Repair");
   const [mapsLocation, setMapsLocation] = useState("Dallas, TX");
   const [isSearchingMaps, setIsSearchingMaps] = useState(false);
   const [mapsResults, setMapsResults] = useState<Lead[]>([]);
@@ -157,15 +160,29 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
     return s;
   }, [sentRecords]);
 
-  // Curated Targeted Ad Leads (69 high-value leads with verified ad spend)
+  // Curated Targeted Automotive Pool (verified automotive repair & diagnostic specialists)
   const targetedLeadsPool = useMemo(() => {
     return (qualifiedTargetedLeads as Lead[]).map((l) => {
-      const arch = l.archetype || getArchetype(l.industry || l.niche);
-      const color = l.primaryColor || getArchetypePrimaryColor(l.industry || l.niche, arch);
+      const qual = qualifyAutomotiveLead({
+        company: l.company,
+        niche: l.niche,
+        industry: l.industry,
+        website: l.website,
+      });
+      const spec = l.specialization || qual.specialization || l.niche || "Independent Auto Repair";
+      const arch = "UrgentService" as Archetype;
+      const color = l.primaryColor || getArchetypePrimaryColor(spec, arch);
+      const hasAds = l.hasAdTags !== undefined ? l.hasAdTags : (l.hasMarketingPixels ?? false);
+      const adStatus: "verified_ads" | "no_detected_ads" = hasAds ? "verified_ads" : "no_detected_ads";
+
       return {
         ...l,
+        specialization: spec,
         archetype: arch,
         primaryColor: color,
+        adEvidenceStatus: l.adEvidenceStatus || adStatus,
+        qualificationStatus: l.qualificationStatus || (qual.isQualified ? "qualified" : "unverified"),
+        qualificationReason: l.qualificationReason || qual.reason,
       };
     });
   }, []);
@@ -178,7 +195,7 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
   const [auditUrl, setAuditUrl] = useState("");
   const [auditCompany, setAuditCompany] = useState("");
   const [auditCity, setAuditCity] = useState("");
-  const [auditIndustry, setAuditIndustry] = useState<string>("Plumber");
+  const [auditIndustry, setAuditIndustry] = useState<string>("European Vehicle Specialist");
   const [isAuditing, setIsAuditing] = useState(false);
   const [bulkText, setBulkText] = useState("");
   const [isBulkImporting, setIsBulkImporting] = useState(false);
@@ -195,7 +212,7 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
   const countries = useMemo(() => {
     const counts: Record<string, number> = {};
     currentLeadsPool.forEach((l) => {
-      counts[l.country] = (counts[l.country] || 0) + 1;
+      if (l.country) counts[l.country] = (counts[l.country] || 0) + 1;
     });
     return ["all", ...Object.keys(counts).sort()];
   }, [currentLeadsPool]);
@@ -203,37 +220,63 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
   // Dynamic City list (scoped to selected country)
   const cities = useMemo(() => {
     const scoped = selectedCountry === "all" ? currentLeadsPool : currentLeadsPool.filter((l) => l.country === selectedCountry);
-    return ["all", ...new Set(scoped.map((l) => l.city))].sort();
+    return ["all", ...new Set(scoped.map((l) => l.city).filter(Boolean))].sort();
   }, [currentLeadsPool, selectedCountry]);
 
-  // Dynamic Niche list
-  const niches = useMemo(() => {
-    const scoped = selectedCountry === "all" ? currentLeadsPool : currentLeadsPool.filter((l) => l.country === selectedCountry);
-    return ["all", ...new Set(scoped.map((l) => l.niche || l.industry || ""))].filter(Boolean).sort();
-  }, [currentLeadsPool, selectedCountry]);
-
-  // Filtered Leads
+  // Filtered Leads strictly adhering to Automotive Qualification & Evidence
   const filteredAll = useMemo(() => {
     return currentLeadsPool.filter((lead) => {
+      const searchLower = search.toLowerCase();
       const matchesSearch =
-        lead.company.toLowerCase().includes(search.toLowerCase()) ||
-        (lead.website && lead.website.toLowerCase().includes(search.toLowerCase())) ||
-        (lead.email && lead.email.toLowerCase().includes(search.toLowerCase())) ||
-        (lead.city && lead.city.toLowerCase().includes(search.toLowerCase())) ||
-        (lead.country && lead.country.toLowerCase().includes(search.toLowerCase()));
+        lead.company.toLowerCase().includes(searchLower) ||
+        (lead.website && lead.website.toLowerCase().includes(searchLower)) ||
+        (lead.email && lead.email.toLowerCase().includes(searchLower)) ||
+        (lead.city && lead.city.toLowerCase().includes(searchLower)) ||
+        (lead.country && lead.country.toLowerCase().includes(searchLower)) ||
+        ((lead.niche || lead.industry || "").toLowerCase().includes(searchLower));
 
       if (sourceMode === "google_maps") return matchesSearch;
 
       const matchesCountry = selectedCountry === "all" || lead.country === selectedCountry;
       const matchesCity = selectedCity === "all" || lead.city.toLowerCase() === selectedCity.toLowerCase();
-      const rawNiche = (lead.niche || lead.industry || "").toLowerCase();
-      const matchesNiche = selectedNiche === "all" || rawNiche === selectedNiche.toLowerCase();
-      const leadArchetype = lead.archetype || getArchetype(lead.industry || lead.niche || "");
-      const matchesArchetype = selectedArchetype === "all" || leadArchetype === selectedArchetype;
 
-      return matchesSearch && matchesCountry && matchesCity && matchesNiche && matchesArchetype;
+      const leadSpec = (lead.specialization || lead.niche || lead.industry || "").toLowerCase();
+      const matchesSpec =
+        selectedSpecialization === "all" || leadSpec.includes(selectedSpecialization.toLowerCase());
+
+      const hasAds = lead.hasAdTags !== undefined ? lead.hasAdTags : (lead.hasMarketingPixels ?? false);
+      const matchesAdEvidence =
+        selectedAdEvidence === "all" ||
+        (selectedAdEvidence === "verified_ads" && hasAds) ||
+        (selectedAdEvidence === "no_detected_ads" && !hasAds);
+
+      const qual = qualifyAutomotiveLead({
+        company: lead.company,
+        niche: lead.niche,
+        industry: lead.industry,
+        website: lead.website,
+      });
+
+      const matchesQualification =
+        selectedQualification === "all" ||
+        (selectedQualification === "qualified" && qual.isQualified) ||
+        (selectedQualification === "unverified" && !qual.isQualified);
+
+      // In targeted mode, strictly exclude non-repair businesses
+      if (sourceMode === "targeted" && qual.isDisqualified) return false;
+
+      return matchesSearch && matchesCountry && matchesCity && matchesSpec && matchesAdEvidence && matchesQualification;
     });
-  }, [currentLeadsPool, search, selectedCountry, selectedCity, selectedNiche, selectedArchetype, sourceMode]);
+  }, [
+    currentLeadsPool,
+    search,
+    selectedCountry,
+    selectedCity,
+    selectedSpecialization,
+    selectedAdEvidence,
+    selectedQualification,
+    sourceMode,
+  ]);
 
   // ACTIVE UNCONTACTED QUEUE (Strictly excludes sent companies in real time)
   const activeLeads = useMemo(() => {
@@ -249,7 +292,7 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  // Google Maps Search Action
+  // Google Maps Search Action (Automotive-first)
   const handleGoogleMapsSearch = async (q?: string, loc?: string) => {
     const searchQuery = q || mapsQuery;
     const searchLocation = loc || mapsLocation;
@@ -268,7 +311,7 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
       if (data.results && Array.isArray(data.results)) {
         setMapsResults(data.results);
         setMapsMetadata({ source: data.source, hint: data.hint });
-        showToast(`Discovered ${data.uncontactedCount} uncontacted businesses on Google Maps.`);
+        showToast(`Discovered ${data.uncontactedCount} uncontacted repair facilities on Google Maps.`);
       } else {
         throw new Error(data.error || "No results found");
       }
@@ -299,8 +342,8 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
         setAuditCompany("");
         setAuditCity("");
         const adStatusText = data.hasAdTags
-          ? "🟢 Active Ad Spend Detected (Wasted Ad Spend Pitch)"
-          : "⚪ No Ad Tags Found (Lost Organic SEO Pitch)";
+          ? "🟢 Verified Ad Signals (Strategy A)"
+          : "⚪ No Detected Ad Signals (Strategy B)";
         showToast(`Audited ${data.lead.company} (${data.lead.mobilePageSpeed}/100 Speed • ${adStatusText}) — added to queue!`);
         setShowImportDrawer(false);
         setSourceMode("vault");
@@ -345,7 +388,7 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
       try {
         const data = await auditWebsiteAction({
           url,
-          industry: niche || auditIndustry || "Other",
+          industry: niche || auditIndustry,
           company: company || undefined,
           city: city || undefined,
         });
@@ -358,12 +401,12 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
 
     setIsBulkImporting(false);
     setBulkText("");
-    showToast(`Successfully audited & imported ${successCount} leads into queue!`);
+    showToast(`Successfully audited & imported ${successCount} automotive leads into queue!`);
     setShowImportDrawer(false);
     setSourceMode("vault");
   };
 
-  // Generate accurate preview URL for any lead (Targeted, Vault, or Google Maps)
+  // Generate accurate automotive prototype preview URL
   const getPreviewUrlForLead = (lead: Lead, absolute: boolean = false): string => {
     const slug = slugify(lead.company);
     const origin = typeof window !== "undefined"
@@ -374,18 +417,15 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
     const params = new URLSearchParams();
     if (lead.company) params.set("name", lead.company);
     if (lead.city) params.set("city", lead.city);
-    const ind = lead.industry || lead.niche;
-    if (ind) {
-      params.set("industry", ind);
-      params.set("niche", ind);
-    }
+    const spec = lead.specialization || lead.industry || lead.niche || "European Vehicle Specialist";
+    params.set("industry", spec);
+    params.set("niche", spec);
     if (lead.phone) params.set("phone", lead.phone);
-    const brandColor = lead.primaryColor || getArchetypePrimaryColor(ind, lead.archetype);
+    const brandColor = lead.primaryColor || getArchetypePrimaryColor(spec, "UrgentService");
     if (brandColor) params.set("primaryColor", brandColor);
     if (lead.website) params.set("domain", lead.website);
     if (lead.mobilePageSpeed) params.set("speed", String(lead.mobilePageSpeed));
     if (lead.mobileLoadTimeSec) params.set("load", String(lead.mobileLoadTimeSec));
-    if (lead.estLostMonthlySpend) params.set("waste", String(lead.estLostMonthlySpend));
 
     const queryString = params.toString();
     return queryString ? `${base}/preview/${slug}?${queryString}` : `${base}/preview/${slug}`;
@@ -404,7 +444,6 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
       previewUrl,
     };
 
-    // Update state immediately in real time
     const updated = [newRecord, ...sentRecords.filter((r) => r.company.toLowerCase() !== lead.company.toLowerCase())];
     setSentRecords(updated);
 
@@ -462,137 +501,149 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
     }
   };
 
-  const getEmailSubject = (lead: Lead, angle: "wasted_ads" | "direct_punchy" = pitchAngle): string => {
-    const domainClean = lead.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
+  // ─── AUTOMOTIVE OUTREACH MESSAGING STRATEGY ───
+  const getEmailSubject = (lead: Lead): string => {
     const hasAds = lead.hasAdTags !== undefined ? lead.hasAdTags : (lead.hasMarketingPixels ?? false);
-
-    // If hasAdTags is false: Pitch "Lost Organic SEO Traffic due to slow mobile speeds"
-    if (!hasAds) {
-      return `Lost organic SEO traffic due to slow mobile speeds / ${domainClean}`;
+    if (hasAds) {
+      return `Quick question regarding ${lead.company} mobile intake`;
     }
-
-    // If hasAdTags is true: Pitch "Wasted Ad Spend / Leaked Paid Clicks"
-    if (angle === "wasted_ads") {
-      return `Your Google Ads / ${lead.company}`;
-    }
-    return `Wasted ad spend & mobile site speed for ${domainClean}`;
+    return `Mobile landing experience for ${lead.company}`;
   };
 
-  const getEmailBody = (lead: Lead, angle: "wasted_ads" | "direct_punchy" = pitchAngle): string => {
+  const getInitialEmail = (lead: Lead): string => {
     const domainClean = lead.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
     const previewUrl = getPreviewUrlForLead(lead, true);
-    const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Team`;
+    const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Service Team`;
     const hasAds = lead.hasAdTags !== undefined ? lead.hasAdTags : (lead.hasMarketingPixels ?? false);
-    const leadIndustry = lead.industry || lead.niche || "local";
+    const spec = lead.specialization || lead.niche || "automotive repair & diagnostics";
+    const city = lead.city || "your area";
 
-    // Pitch Angle: Lost Organic SEO Traffic due to slow mobile speeds (when hasAdTags is false)
-    if (!hasAds) {
-      if (angle === "direct_punchy") {
-        return `Hey ${greeting},
-
-I noticed your mobile site at ${domainClean} takes ${lead.mobileLoadTimeSec} seconds to load.
-
-Google's search algorithm heavily penalizes slow mobile pages, meaning you are steadily dropping in organic rankings and losing search visitors to faster competitors before they even view your services.
-
-I built a sub-second, lightning-fast test version of your exact landing page:
-Link: ${previewUrl}
-
-If you want to recapture lost organic SEO traffic and boost your mobile Google ranking, would you be open to a quick chat about getting this live on your main domain?
-
-Best,
-Faruk — Lead Engineer, Speedcraft Studio
-Direct: farukolawale509@gmail.com`;
-      }
-
+    // Strategy A: Verified Paid-Advertising Evidence
+    if (hasAds) {
       return `Hey ${greeting},
 
-I was looking up top ${leadIndustry} businesses in ${lead.city || "your area"} and came across ${domainClean}, but noticed your mobile site takes about ${lead.mobileLoadTimeSec} seconds to load.
+I was looking at ${domainClean} and noticed you have advertising tags configured for your search traffic, but your mobile landing experience takes about ${lead.mobileLoadTimeSec} seconds to load.
 
-Because Google strongly penalizes slow mobile load times in organic search rankings, you are steadily losing prospective clients and organic search traffic to faster competitors before your page even loads.
+When drivers search for a specialist with an urgent warning light or repair need in ${city}, every second of delay causes them to bounce back to the search results before reaching your service advisor.
 
-I run Speedcraft Studio. To demonstrate what a modern, high-performance site feels like, I built a custom, instant-loading version of your landing page that opens in under half a second.
-
-Take a look on your phone to feel the speed difference:
+To show what a dedicated mobile experience looks like, I put together a lightweight, instant-loading diagnostic prototype customized for ${lead.company}:
 Link: ${previewUrl}
 
-Zero strings attached. If you'd like to recapture lost organic SEO traffic and boost your mobile Google ranking, would you be open to a quick chat about deploying this to your actual domain?
+It gives drivers one-tap access to your service desk, an interactive diagnostic intake breakdown, and immediate reassurance of your ${spec} capabilities on any smartphone.
+
+Take a look on your phone whenever you have a moment. If you'd like to put something similar in place for your incoming search traffic, I'd be glad to walk through the implementation.
 
 Best,
 Faruk — Lead Engineer, Speedcraft Studio
 Direct: farukolawale509@gmail.com`;
     }
 
-    // Pitch Angle: Wasted Ad Spend / Leaked Paid Clicks (when hasAdTags is true)
-    if (angle === "wasted_ads") {
-      return `Hey ${greeting},
+    // Strategy B: No Detected Advertising Signals (Organic Search & Usability Focus)
+    return `Hey ${greeting},
 
-I noticed you're driving search traffic to ${domainClean}, but the mobile landing page takes about ${lead.mobileLoadTimeSec} seconds to load.
+I came across ${domainClean} while researching reputable ${spec} shops in ${city}. Your shop clearly has strong technical capabilities, but your current mobile site takes about ${lead.mobileLoadTimeSec} seconds to load.
 
-Because mobile users are impatient, you are likely losing about a third of your paid visitors before your site even loads. Wasted ad spend and leaked paid clicks mean Google is charging you for clicks that bounce before prospective clients ever see your phone number.
+Most vehicle owners searching for a repair shop on mobile need two things immediately: clear confirmation that you specialize in their vehicle's issue, and frictionless contact with your service advisor.
 
-I run Speedcraft Studio. To show you what you're missing, I went ahead and built a custom, lightning-fast version of your landing page. It loads instantly (under half a second).
-
-Take a look on your phone to feel the speed difference:
+To illustrate how that can look, I built a high-performance mobile prototype tailored specifically for ${lead.company}:
 Link: ${previewUrl}
 
-Zero strings attached. If you like the feel of it, would you like me to set this up on your actual domain so you stop leaking paid ad clicks?
+It features instant sub-second loading, clear specialist service categories, and a streamlined repair order intake flow.
+
+Take a look on your phone when convenient. If you're interested in upgrading your local search conversion experience, I'd be happy to discuss getting this live for your shop.
 
 Best,
 Faruk — Lead Engineer, Speedcraft Studio
 Direct: farukolawale509@gmail.com`;
-    }
+  };
+
+  const getFollowUp1 = (lead: Lead): string => {
+    const previewUrl = getPreviewUrlForLead(lead, true);
+    const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Service Team`;
+    const city = lead.city || "your area";
 
     return `Hey ${greeting},
 
-I noticed you are paying for search ads, but your mobile landing page takes ${lead.mobileLoadTimeSec} seconds to load. Wasted ad spend due to slow mobile load times means you are losing a massive chunk of paid clicks before they even see your phone number.
-
-I help businesses fix this. I actually built a lightning-fast test version of your exact landing page to show you the difference.
-
-Tap this link on your phone to see how fast your site should be:
+Following up on my previous note about the mobile intake prototype I put together for ${lead.company}:
 Link: ${previewUrl}
 
-If you want to stop losing paid traffic to slow load times, would you be open to a quick chat about getting this new version running on your main domain?
+The goal was to demonstrate how much friction can be removed between an initial Google search and getting a driver on the phone with your service desk in ${city}.
+
+Did you have a chance to pull it up on your phone?
 
 Best,
-Faruk — Lead Engineer, Speedcraft Studio
-Direct: farukolawale509@gmail.com`;
+Faruk`;
+  };
+
+  const getFollowUp2 = (lead: Lead): string => {
+    const previewUrl = getPreviewUrlForLead(lead, true);
+    const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Service Team`;
+
+    return `Hey ${greeting},
+
+Quick final check to see if streamlining your mobile diagnostic booking and direct service phone calls is a priority for ${lead.company} this quarter.
+
+If not, no worries at all—I'll leave the prototype active at ${previewUrl} in case you want to revisit it later.
+
+Best,
+Faruk`;
   };
 
   const getLinkedInText = (lead: Lead): string => {
     const domainClean = lead.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
     const previewUrl = getPreviewUrlForLead(lead, true);
-    const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Team`;
-    const hasAds = lead.hasAdTags !== undefined ? lead.hasAdTags : (lead.hasMarketingPixels ?? false);
+    const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Service Team`;
+    const spec = lead.specialization || lead.niche || "auto repair";
+    const city = lead.city || "your area";
 
-    if (!hasAds) {
-      return `Hey ${greeting}, saw ${domainClean}. Your mobile site takes ${lead.mobileLoadTimeSec}s to load, which hurts your organic search rankings and causes visitors to bounce. I built a lightning-fast test version that loads in under half a second: ${previewUrl} — want to check it out?`;
+    return `Hey ${greeting}, saw ${domainClean}. Drivers searching for ${spec} in ${city} need instant contact, but mobile load time is ${lead.mobileLoadTimeSec}s. I built a sub-second diagnostic intake prototype for ${lead.company}: ${previewUrl} — thought you might want to see how fast it feels on mobile.`;
+  };
+
+  const getModalContent = (lead: Lead, tab: "initial" | "followup_1" | "followup_2" | "linkedin") => {
+    switch (tab) {
+      case "initial":
+        return {
+          subject: getEmailSubject(lead),
+          body: getInitialEmail(lead),
+        };
+      case "followup_1":
+        return {
+          subject: `Re: ${getEmailSubject(lead)}`,
+          body: getFollowUp1(lead),
+        };
+      case "followup_2":
+        return {
+          subject: `Re: ${getEmailSubject(lead)}`,
+          body: getFollowUp2(lead),
+        };
+      case "linkedin":
+        return {
+          subject: "",
+          body: getLinkedInText(lead),
+        };
     }
-
-    return `Hey ${greeting}, saw ${domainClean}. Your mobile site takes ${lead.mobileLoadTimeSec}s to load, which means you're likely losing paid leads before they can call you. I built a lightning-fast test version that loads in under half a second so customers don't bounce: ${previewUrl} — want to check it out?`;
   };
 
   const copyPitch = (lead: Lead) => {
     setActivePitchLead(lead);
-    setPitchModalTab("email_wasted");
+    setPitchModalTab("initial");
   };
 
-  const getGmailUrl = (lead: Lead, angle: "wasted_ads" | "direct_punchy" = pitchAngle) => {
-    const subject = getEmailSubject(lead, angle);
-    const body = getEmailBody(lead, angle);
-    return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(lead.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const getGmailUrl = (lead: Lead, tab: "initial" | "followup_1" | "followup_2" | "linkedin" = "initial") => {
+    const content = getModalContent(lead, tab);
+    return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(lead.email)}&su=${encodeURIComponent(content.subject)}&body=${encodeURIComponent(content.body)}`;
   };
 
-  const handleGmailClick = (lead: Lead, angle: "wasted_ads" | "direct_punchy" = pitchAngle) => {
-    const url = getGmailUrl(lead, angle);
+  const handleGmailClick = (lead: Lead, tab: "initial" | "followup_1" | "followup_2" | "linkedin" = "initial") => {
+    const url = getGmailUrl(lead, tab);
     window.open(url, "_blank", "noopener,noreferrer");
     markAsSent(lead, "gmail");
   };
 
-  const sendViaApi = async (lead: Lead, angle: "wasted_ads" | "direct_punchy" = pitchAngle) => {
+  const sendViaApi = async (lead: Lead, tab: "initial" | "followup_1" | "followup_2" | "linkedin" = "initial") => {
     setSendingMap((prev) => ({ ...prev, [lead.company]: "sending" }));
     const previewUrl = getPreviewUrlForLead(lead, true);
-    const subject = getEmailSubject(lead, angle);
-    const body = getEmailBody(lead, angle);
+    const content = getModalContent(lead, tab);
 
     try {
       const res = await fetch("/api/outreach/send", {
@@ -600,8 +651,8 @@ Direct: farukolawale509@gmail.com`;
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           to: lead.email,
-          subject,
-          body,
+          subject: content.subject,
+          body: content.body,
           company: lead.company,
           previewUrl,
         }),
@@ -631,7 +682,7 @@ Direct: farukolawale509@gmail.com`;
         </div>
       )}
 
-      {/* ─── PITCH ASSISTANT & JARGON-FREE MODAL ─── */}
+      {/* ─── PITCH ASSISTANT & AUTOMOTIVE CONVERSION MODAL ─── */}
       {activePitchLead && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150">
           <div className="bg-[#0e1017] rounded-2xl max-w-2xl w-full border border-white/[0.12] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150">
@@ -641,21 +692,27 @@ Direct: farukolawale509@gmail.com`;
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-bold text-sm tracking-tight text-white">{activePitchLead.company}</span>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30">
-                    {activePitchLead.industry || activePitchLead.niche} • {activePitchLead.city}
+                    {activePitchLead.specialization || activePitchLead.niche || "Automotive Repair"} • {activePitchLead.city}
                   </span>
-                  {(() => {
-                    const arch = activePitchLead.archetype || getArchetype(activePitchLead.industry || activePitchLead.niche || "");
-                    return (
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/10 text-zinc-300 border border-white/15">
-                        {arch} Archetype
-                      </span>
-                    );
-                  })()}
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 flex items-center gap-1">
+                    <Zap className="w-2.5 h-2.5 text-amber-400" />
+                    <span>QuickFleet UrgentService</span>
+                  </span>
+                  {(activePitchLead.hasAdTags ?? activePitchLead.hasMarketingPixels ?? false) ? (
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>Verified Ad Signals (Strategy A)</span>
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-zinc-500/10 text-zinc-400 border border-zinc-500/20 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-zinc-500" />
+                      <span>No Detected Ad Tags (Strategy B)</span>
+                    </span>
+                  )}
                 </div>
-                <p className="text-xs text-zinc-400 mt-1">
-                  {(activePitchLead.hasAdTags ?? activePitchLead.hasMarketingPixels ?? false)
-                    ? "High-converting, zero-jargon pitch focused strictly on wasted ad spend & leaked paid clicks."
-                    : "High-converting pitch focused on recovering lost organic SEO traffic due to slow mobile speeds."}
+                <p className="text-xs text-zinc-400 mt-1.5">
+                  {activePitchLead.qualificationReason ||
+                    "Verified independent automotive repair facility. Outreach strictly focused on mobile diagnostic booking & service phone access."}
                 </p>
               </div>
               <button
@@ -666,29 +723,39 @@ Direct: farukolawale509@gmail.com`;
               </button>
             </div>
 
-            {/* Angle Selection Tabs */}
-            <div className="p-3.5 bg-white/[0.02] border-b border-white/[0.08] flex flex-wrap items-center gap-2 text-xs font-medium">
+            {/* Sequence Selection Tabs */}
+            <div className="p-3 bg-white/[0.02] border-b border-white/[0.08] flex flex-wrap items-center gap-2 text-xs font-medium">
               <button
-                onClick={() => setPitchModalTab("email_wasted")}
+                onClick={() => setPitchModalTab("initial")}
                 className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                  pitchModalTab === "email_wasted"
+                  pitchModalTab === "initial"
                     ? "bg-violet-600 text-white font-semibold shadow-sm"
                     : "bg-white/[0.04] text-zinc-300 hover:bg-white/[0.08] border border-white/[0.08]"
                 }`}
               >
                 {(activePitchLead.hasAdTags ?? activePitchLead.hasMarketingPixels ?? false)
-                  ? "Angle 1: Wasted Ad Spend / Leaked Paid Clicks (Recommended)"
-                  : "Angle 1: Lost Organic SEO Traffic (Recommended)"}
+                  ? "Strategy A: Verified Ad Traffic (Initial)"
+                  : "Strategy B: Organic Search Conversion (Initial)"}
               </button>
               <button
-                onClick={() => setPitchModalTab("email_direct")}
+                onClick={() => setPitchModalTab("followup_1")}
                 className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                  pitchModalTab === "email_direct"
+                  pitchModalTab === "followup_1"
                     ? "bg-violet-600 text-white font-semibold shadow-sm"
                     : "bg-white/[0.04] text-zinc-300 hover:bg-white/[0.08] border border-white/[0.08]"
                 }`}
               >
-                Angle 2: Direct & Punchy
+                Follow-up 1 (Day 3)
+              </button>
+              <button
+                onClick={() => setPitchModalTab("followup_2")}
+                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  pitchModalTab === "followup_2"
+                    ? "bg-violet-600 text-white font-semibold shadow-sm"
+                    : "bg-white/[0.04] text-zinc-300 hover:bg-white/[0.08] border border-white/[0.08]"
+                }`}
+              >
+                Follow-up 2 (Final)
               </button>
               <button
                 onClick={() => setPitchModalTab("linkedin")}
@@ -698,7 +765,7 @@ Direct: farukolawale509@gmail.com`;
                     : "bg-white/[0.04] text-zinc-300 hover:bg-white/[0.08] border border-white/[0.08]"
                 }`}
               >
-                Angle 3: LinkedIn DM
+                LinkedIn DM
               </button>
             </div>
 
@@ -708,7 +775,7 @@ Direct: farukolawale509@gmail.com`;
                 <div>
                   <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-1.5">Subject Line</div>
                   <div className="p-2.5 bg-black/60 rounded-lg text-xs font-mono font-medium text-zinc-200 border border-white/[0.08] select-all">
-                    {getEmailSubject(activePitchLead, pitchModalTab === "email_wasted" ? "wasted_ads" : "direct_punchy")}
+                    {getModalContent(activePitchLead, pitchModalTab).subject}
                   </div>
                 </div>
               )}
@@ -718,9 +785,7 @@ Direct: farukolawale509@gmail.com`;
                   {pitchModalTab === "linkedin" ? "LinkedIn Direct Message" : "Email Body"}
                 </div>
                 <pre className="p-4 bg-black/50 border border-white/[0.08] rounded-xl text-xs font-sans text-zinc-300 whitespace-pre-wrap leading-relaxed select-all">
-                  {pitchModalTab === "linkedin"
-                    ? getLinkedInText(activePitchLead)
-                    : getEmailBody(activePitchLead, pitchModalTab === "email_wasted" ? "wasted_ads" : "direct_punchy")}
+                  {getModalContent(activePitchLead, pitchModalTab).body}
                 </pre>
               </div>
             </div>
@@ -730,16 +795,11 @@ Direct: farukolawale509@gmail.com`;
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
+                    const content = getModalContent(activePitchLead, pitchModalTab);
                     const text =
                       pitchModalTab === "linkedin"
-                        ? getLinkedInText(activePitchLead)
-                        : `Subject: ${getEmailSubject(
-                            activePitchLead,
-                            pitchModalTab === "email_wasted" ? "wasted_ads" : "direct_punchy"
-                          )}\n\n${getEmailBody(
-                            activePitchLead,
-                            pitchModalTab === "email_wasted" ? "wasted_ads" : "direct_punchy"
-                          )}`;
+                        ? content.body
+                        : `Subject: ${content.subject}\n\n${content.body}`;
                     navigator.clipboard.writeText(text);
                     setCopiedId(activePitchLead.company);
                     setTimeout(() => setCopiedId(null), 2000);
@@ -748,7 +808,7 @@ Direct: farukolawale509@gmail.com`;
                   className="px-4 py-2 bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] rounded-lg text-xs font-semibold text-zinc-200 flex items-center gap-1.5 cursor-pointer transition-all"
                 >
                   <Copy className="w-3.5 h-3.5 text-zinc-400" />
-                  <span>{copiedId === activePitchLead.company ? "Copied!" : "Copy Pitch"}</span>
+                  <span>{copiedId === activePitchLead.company ? "Copied!" : "Copy Draft"}</span>
                 </button>
 
                 <button
@@ -768,8 +828,7 @@ Direct: farukolawale509@gmail.com`;
                   <>
                     <button
                       onClick={() => {
-                        const angle = pitchModalTab === "email_wasted" ? "wasted_ads" : "direct_punchy";
-                        handleGmailClick(activePitchLead, angle);
+                        handleGmailClick(activePitchLead, pitchModalTab);
                         setActivePitchLead(null);
                       }}
                       className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-sm transition-all"
@@ -780,8 +839,7 @@ Direct: farukolawale509@gmail.com`;
 
                     <button
                       onClick={() => {
-                        const angle = pitchModalTab === "email_wasted" ? "wasted_ads" : "direct_punchy";
-                        sendViaApi(activePitchLead, angle);
+                        sendViaApi(activePitchLead, pitchModalTab);
                         setActivePitchLead(null);
                       }}
                       className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-sm transition-all"
@@ -801,36 +859,19 @@ Direct: farukolawale509@gmail.com`;
       <div className="bg-[#090A0F]/90 backdrop-blur-xl text-white border-b border-white/[0.08] px-4 py-3 sticky top-0 z-40 shadow-lg">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-md shadow-violet-500/30">
+            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center font-bold text-xs shadow-md shadow-amber-500/30">
               <Zap className="w-3.5 h-3.5 fill-white" />
             </div>
             <span className="font-extrabold text-sm tracking-tight text-white">SPEEDCRAFT</span>
             <span className="text-zinc-700 font-mono">/</span>
-            <span className="text-xs text-zinc-400 font-mono tracking-wider">LIVE DISCOVERY &amp; OUTREACH ENGINE</span>
+            <span className="text-xs text-zinc-400 font-mono tracking-wider">AUTOMOTIVE OUTREACH &amp; DIAGNOSTIC ENGINE</span>
           </div>
 
           <div className="flex items-center gap-4 text-xs font-mono">
-            <div className="hidden sm:flex items-center gap-1 bg-white/[0.04] p-0.5 rounded-lg border border-white/[0.08]">
-              <span className="text-[10px] text-zinc-400 px-1.5">Angle:</span>
-              <button
-                onClick={() => setPitchAngle("wasted_ads")}
-                className={`text-[10px] px-2 py-0.5 rounded cursor-pointer transition-all ${
-                  pitchAngle === "wasted_ads" ? "bg-violet-600 text-white font-semibold shadow-xs" : "text-zinc-400 hover:text-white"
-                }`}
-                title="Framed around wasted Google Ads budget & impatient mobile visitors"
-              >
-                Wasted Ad Spend
-              </button>
-              <button
-                onClick={() => setPitchAngle("direct_punchy")}
-                className={`text-[10px] px-2 py-0.5 rounded cursor-pointer transition-all ${
-                  pitchAngle === "direct_punchy" ? "bg-violet-600 text-white font-semibold shadow-xs" : "text-zinc-400 hover:text-white"
-                }`}
-                title="Direct, punchy message highlighting lost phone calls & leads"
-              >
-                Direct &amp; Punchy
-              </button>
-            </div>
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/25 text-[11px] font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+              <span>Niche Pivot: Automotive Only</span>
+            </span>
             <Link
               href="/qa-gallery"
               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-violet-500/10 text-violet-300 border border-violet-500/25 hover:bg-violet-500/20 hover:text-white transition-all text-xs font-semibold"
@@ -843,7 +884,7 @@ Direct: farukolawale509@gmail.com`;
             </Link>
             <span className="text-zinc-700">•</span>
             <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full text-[11px] flex items-center gap-1.5 font-mono">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               <span>Deduplication Active</span>
             </span>
           </div>
@@ -853,19 +894,19 @@ Direct: farukolawale509@gmail.com`;
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-6">
         {/* ─── HEADER COMMAND BAR ─── */}
         <div className="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 sm:p-8 backdrop-blur-md relative overflow-hidden shadow-2xl space-y-6">
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-amber-600/10 rounded-full blur-3xl pointer-events-none" />
           
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative">
             <div className="space-y-2.5 max-w-2xl">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/25 text-xs font-medium">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/25 text-xs font-medium">
                 <Compass className="w-3.5 h-3.5" />
-                <span>Real-Time Business Discovery &amp; 3 UI Archetypes</span>
+                <span>Automotive Repair &amp; Diagnostics • 9 Specialist Segments</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                Live Outreach, Google Maps &amp; Prototype Engine
+                Automotive Outreach, Diagnostic Intake &amp; Prototype Engine
               </h1>
               <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-                Seamlessly target high-intent local businesses mapped into 3 conversion archetypes: Urgent Service, Professional Trust, and Aesthetic Booking. Contacted targets vanish immediately from your dashboard to prevent duplicate outreach.
+                Target verified independent auto repair shops, European marque specialists, transmission rebuilders, and diesel fleet workshops. Every qualified prospect routes directly to the QuickFleet automotive diagnostic prototype with evidence-based conversion outreach.
               </p>
             </div>
 
@@ -879,14 +920,14 @@ Direct: farukolawale509@gmail.com`;
                 <div className="text-[11px] text-emerald-400 font-medium">Contacted / Dispatched</div>
                 <div className="text-2xl font-bold text-emerald-400 font-mono mt-0.5">{sentRecords.length}</div>
               </div>
-              <div className="bg-violet-500/10 border border-violet-500/20 hover:border-violet-500/30 rounded-xl p-3.5 min-w-[130px] flex-1 sm:flex-none transition-all">
-                <div className="text-[11px] text-violet-300 font-medium">Active Mode</div>
+              <div className="bg-amber-500/10 border border-amber-500/20 hover:border-amber-500/30 rounded-xl p-3.5 min-w-[130px] flex-1 sm:flex-none transition-all">
+                <div className="text-[11px] text-amber-300 font-medium">Active Mode</div>
                 <div className="text-xs font-bold text-zinc-200 mt-1 uppercase font-mono">
                   {sourceMode === "targeted"
-                    ? "Targeted Ad Pool"
+                    ? "Targeted Auto Pool"
                     : sourceMode === "google_maps"
                     ? "Google Maps Live"
-                    : "Audited Vault"}
+                    : "Archived Vault"}
                 </div>
               </div>
             </div>
@@ -896,8 +937,8 @@ Direct: farukolawale509@gmail.com`;
           <div className="p-4 sm:p-5 rounded-xl bg-white/[0.015] border border-white/[0.08] space-y-3 relative">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs font-semibold text-zinc-200">
-                <MapPin className="w-4 h-4 text-violet-400" />
-                <span>Fetch Directly From Google Maps:</span>
+                <MapPin className="w-4 h-4 text-amber-400" />
+                <span>Discover Auto Mechanics On Google Maps:</span>
               </div>
               <div className="text-[11px] text-zinc-500 font-mono">
                 Worldwide: US, UK, Canada, Australia, etc.
@@ -911,8 +952,8 @@ Direct: farukolawale509@gmail.com`;
                   type="text"
                   value={mapsQuery}
                   onChange={(e) => setMapsQuery(e.target.value)}
-                  placeholder="Target Niche (e.g. Emergency Plumber, Roofing)"
-                  className="w-full pl-9 pr-3 py-2 text-xs bg-black/50 border border-white/[0.1] rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/30"
+                  placeholder="Automotive Specialty (e.g. European Auto Repair, Transmission)"
+                  className="w-full pl-9 pr-3 py-2 text-xs bg-black/50 border border-white/[0.1] rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30"
                 />
               </div>
 
@@ -923,7 +964,7 @@ Direct: farukolawale509@gmail.com`;
                   value={mapsLocation}
                   onChange={(e) => setMapsLocation(e.target.value)}
                   placeholder="City, State / Country (e.g. Dallas, TX or London, UK)"
-                  className="w-full pl-9 pr-3 py-2 text-xs bg-black/50 border border-white/[0.1] rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/30"
+                  className="w-full pl-9 pr-3 py-2 text-xs bg-black/50 border border-white/[0.1] rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30"
                 />
               </div>
 
@@ -931,56 +972,76 @@ Direct: farukolawale509@gmail.com`;
                 <button
                   onClick={() => handleGoogleMapsSearch()}
                   disabled={isSearchingMaps}
-                  className="w-full py-2 px-4 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-violet-600/25 disabled:opacity-50"
+                  className="w-full py-2 px-4 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-amber-600/25 disabled:opacity-50"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${isSearchingMaps ? "animate-spin" : ""}`} />
-                  <span>{isSearchingMaps ? "Querying Maps..." : "Search Google Maps"}</span>
+                  <span>{isSearchingMaps ? "Querying Maps..." : "Search Auto Shops"}</span>
                 </button>
               </div>
             </div>
 
             {/* QUICK PRESET CHIPS */}
             <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px]">
-              <span className="text-zinc-500">Quick Searches:</span>
+              <span className="text-zinc-500">Automotive Presets:</span>
               <button
                 onClick={() => {
-                  setMapsQuery("Emergency Plumber");
+                  setMapsQuery("European Auto Repair");
                   setMapsLocation("Dallas, TX");
-                  handleGoogleMapsSearch("Emergency Plumber", "Dallas, TX");
+                  handleGoogleMapsSearch("European Auto Repair", "Dallas, TX");
                 }}
                 className="px-2.5 py-1 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.16] text-zinc-300 hover:text-white transition-all cursor-pointer"
               >
-                Dallas Plumbers
+                Dallas European Auto
               </button>
               <button
                 onClick={() => {
-                  setMapsQuery("Boiler Repair");
+                  setMapsQuery("BMW Specialist Repair");
+                  setMapsLocation("Austin, TX");
+                  handleGoogleMapsSearch("BMW Specialist Repair", "Austin, TX");
+                }}
+                className="px-2.5 py-1 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.16] text-zinc-300 hover:text-white transition-all cursor-pointer"
+              >
+                Austin BMW &amp; Audi
+              </button>
+              <button
+                onClick={() => {
+                  setMapsQuery("Transmission Repair");
+                  setMapsLocation("Houston, TX");
+                  handleGoogleMapsSearch("Transmission Repair", "Houston, TX");
+                }}
+                className="px-2.5 py-1 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.16] text-zinc-300 hover:text-white transition-all cursor-pointer"
+              >
+                Houston Transmission
+              </button>
+              <button
+                onClick={() => {
+                  setMapsQuery("ECU Automotive Diagnostics");
                   setMapsLocation("London, UK");
-                  handleGoogleMapsSearch("Boiler Repair", "London, UK");
+                  handleGoogleMapsSearch("ECU Automotive Diagnostics", "London, UK");
                 }}
                 className="px-2.5 py-1 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.16] text-zinc-300 hover:text-white transition-all cursor-pointer"
               >
-                London Boiler Repair
+                London Euro Diagnostics
               </button>
               <button
                 onClick={() => {
-                  setMapsQuery("HVAC Services");
+                  setMapsQuery("Diesel Fleet Repair");
+                  setMapsLocation("Sydney, Australia");
+                  handleGoogleMapsSearch("Diesel Fleet Repair", "Sydney, Australia");
+                }}
+                className="px-2.5 py-1 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.16] text-zinc-300 hover:text-white transition-all cursor-pointer"
+              >
+                Sydney Diesel Fleet
+              </button>
+              <button
+                onClick={() => {
+                  setMapsQuery("Engine Diagnostics & Repair");
                   setMapsLocation("Toronto, Canada");
-                  handleGoogleMapsSearch("HVAC Services", "Toronto, Canada");
+                  handleGoogleMapsSearch("Engine Diagnostics & Repair", "Toronto, Canada");
                 }}
                 className="px-2.5 py-1 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.16] text-zinc-300 hover:text-white transition-all cursor-pointer"
               >
-                Toronto HVAC
-              </button>
-              <button
-                onClick={() => {
-                  setMapsQuery("Commercial Roofing");
-                  setMapsLocation("Miami, FL");
-                  handleGoogleMapsSearch("Commercial Roofing", "Miami, FL");
-                }}
-                className="px-2.5 py-1 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.16] text-zinc-300 hover:text-white transition-all cursor-pointer"
-              >
-                Miami Roofing
+                Toronto Engine Repair
               </button>
             </div>
           </div>
@@ -1016,28 +1077,28 @@ Direct: farukolawale509@gmail.com`;
                 onClick={() => setShowImportDrawer(!showImportDrawer)}
                 className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                   showImportDrawer
-                    ? "bg-violet-600 text-white shadow-sm"
-                    : "bg-violet-500/10 text-violet-300 hover:bg-violet-500/20 border border-violet-500/25"
+                    ? "bg-amber-600 text-white shadow-sm"
+                    : "bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 border border-amber-500/25"
                 }`}
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Audit Any Website / Import</span>
+                <span>Audit Shop Website / Import</span>
               </button>
             </div>
 
-            {/* SOURCE SWITCHER: TARGETED AD LEADS vs AUDITED VAULT vs GOOGLE MAPS */}
+            {/* SOURCE SWITCHER: TARGETED AUTO LEADS vs AUDITED VAULT vs GOOGLE MAPS */}
             {activeTab === "active" && (
               <div className="flex flex-wrap items-center gap-1 bg-white/[0.03] p-1 rounded-xl border border-white/[0.08] text-xs font-medium">
                 <button
                   onClick={() => setSourceMode("targeted")}
                   className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                     sourceMode === "targeted"
-                      ? "bg-violet-600/30 text-violet-200 border border-violet-500/30 font-semibold shadow-xs"
+                      ? "bg-amber-600/30 text-amber-200 border border-amber-500/30 font-semibold shadow-xs"
                       : "text-zinc-400 hover:text-white"
                   }`}
                 >
-                  <Target className="w-3.5 h-3.5 text-violet-400" />
-                  <span>Targeted Ad Leads ({targetedLeadsPool.length})</span>
+                  <Target className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Targeted Auto Pool ({targetedLeadsPool.length})</span>
                 </button>
                 <button
                   onClick={() => setSourceMode("vault")}
@@ -1048,17 +1109,17 @@ Direct: farukolawale509@gmail.com`;
                   }`}
                 >
                   <Database className="w-3.5 h-3.5" />
-                  <span>Audited Vault ({vaultLeads.length})</span>
+                  <span>Archived Vault ({vaultLeads.length})</span>
                 </button>
                 <button
                   onClick={() => setSourceMode("google_maps")}
                   className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                     sourceMode === "google_maps"
-                      ? "bg-violet-600/30 text-violet-200 border border-violet-500/30 font-semibold shadow-xs"
+                      ? "bg-amber-600/30 text-amber-200 border border-amber-500/30 font-semibold shadow-xs"
                       : "text-zinc-400 hover:text-white"
                   }`}
                 >
-                  <Compass className="w-3.5 h-3.5 text-violet-400" />
+                  <Compass className="w-3.5 h-3.5 text-amber-400" />
                   <span>Google Maps ({mapsResults.length})</span>
                 </button>
               </div>
@@ -1067,16 +1128,16 @@ Direct: farukolawale509@gmail.com`;
 
           {/* ─── LIVE AUDITOR & LEAD IMPORTER DRAWER ─── */}
           {showImportDrawer && (
-            <div className="bg-[#0e1017] border border-violet-500/30 rounded-2xl p-5 sm:p-6 space-y-4 shadow-2xl backdrop-blur-xl relative overflow-hidden">
+            <div className="bg-[#0e1017] border border-amber-500/30 rounded-2xl p-5 sm:p-6 space-y-4 shadow-2xl backdrop-blur-xl relative overflow-hidden">
               <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-white/[0.08]">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-lg bg-violet-600 text-white flex items-center justify-center font-bold text-xs shadow-md shadow-violet-500/30">
+                  <div className="w-7 h-7 rounded-lg bg-amber-600 text-white flex items-center justify-center font-bold text-xs shadow-md shadow-amber-500/30">
                     <Sparkles className="w-3.5 h-3.5 fill-white" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm text-white">Live Website Speed Auditor &amp; Lead Importer</h3>
+                    <h3 className="font-bold text-sm text-white">Live Automotive Website Speed Auditor &amp; Lead Importer</h3>
                     <p className="text-[11px] text-zinc-400">
-                      Audit any live website on the internet: calculates real PageSpeed, detects CMS bloat, and creates an instant sub-second Next.js prototype.
+                      Audit any live automotive repair website: scans for advertising tags (Google Ads, Meta Pixel, GTM), tests real mobile page speed, and builds an instant QuickFleet automotive prototype.
                     </p>
                   </div>
                 </div>
@@ -1086,7 +1147,7 @@ Direct: farukolawale509@gmail.com`;
                     <button
                       onClick={() => setImportTab("single")}
                       className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
-                        importTab === "single" ? "bg-violet-600 text-white font-semibold shadow-xs" : "text-zinc-400 hover:text-white"
+                        importTab === "single" ? "bg-amber-600 text-white font-semibold shadow-xs" : "text-zinc-400 hover:text-white"
                       }`}
                     >
                       Single URL Audit
@@ -1094,7 +1155,7 @@ Direct: farukolawale509@gmail.com`;
                     <button
                       onClick={() => setImportTab("bulk")}
                       className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
-                        importTab === "bulk" ? "bg-violet-600 text-white font-semibold shadow-xs" : "text-zinc-400 hover:text-white"
+                        importTab === "bulk" ? "bg-amber-600 text-white font-semibold shadow-xs" : "text-zinc-400 hover:text-white"
                       }`}
                     >
                       Batch CSV / Paste
@@ -1116,7 +1177,7 @@ Direct: farukolawale509@gmail.com`;
                     {/* Business Website URL */}
                     <div>
                       <label htmlFor="audit-website-url" className="block text-[11px] font-medium text-zinc-300 mb-1">
-                        Business Website URL <span className="text-rose-400">*</span>
+                        Repair Shop Website URL <span className="text-rose-400">*</span>
                       </label>
                       <input
                         id="audit-website-url"
@@ -1124,27 +1185,27 @@ Direct: farukolawale509@gmail.com`;
                         required
                         value={auditUrl}
                         onChange={(e) => setAuditUrl(e.target.value)}
-                        placeholder="https://exampleplumber.com"
-                        className="w-full px-3 py-2 text-xs bg-black/60 border border-white/[0.1] rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/30"
+                        placeholder="https://lonestarbimmer.com"
+                        className="w-full px-3 py-2 text-xs bg-black/60 border border-white/[0.1] rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30"
                       />
                     </div>
 
-                    {/* Client Industry Dropdown */}
+                    {/* Automotive Specialization Dropdown */}
                     <div>
                       <label htmlFor="audit-client-industry" className="block text-[11px] font-medium text-zinc-300 mb-1">
-                        Client Industry <span className="text-rose-400">*</span>
+                        Automotive Specialization <span className="text-rose-400">*</span>
                       </label>
                       <select
                         id="audit-client-industry"
                         required
                         value={auditIndustry}
                         onChange={(e) => setAuditIndustry(e.target.value)}
-                        className="w-full px-3 py-2 text-xs bg-black/60 border border-white/[0.1] rounded-lg text-white font-medium focus:outline-none focus:border-violet-500"
+                        className="w-full px-3 py-2 text-xs bg-black/60 border border-white/[0.1] rounded-lg text-white font-medium focus:outline-none focus:border-amber-500"
                       >
-                        <option value="" disabled>Select client industry...</option>
-                        {TARGET_NICHES.map((niche) => (
-                          <option key={niche} value={niche} className="bg-zinc-900 text-white">
-                            {niche}
+                        <option value="" disabled>Select automotive specialization...</option>
+                        {AUTOMOTIVE_SPECIALIZATIONS.map((spec) => (
+                          <option key={spec} value={spec} className="bg-zinc-900 text-white">
+                            {spec}
                           </option>
                         ))}
                       </select>
@@ -1154,7 +1215,7 @@ Direct: farukolawale509@gmail.com`;
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <label htmlFor="audit-company-name" className="block text-[11px] font-medium text-zinc-300 mb-1">
-                          Company Name (Optional)
+                          Shop Name (Optional)
                         </label>
                         <input
                           id="audit-company-name"
@@ -1162,7 +1223,7 @@ Direct: farukolawale509@gmail.com`;
                           value={auditCompany}
                           onChange={(e) => setAuditCompany(e.target.value)}
                           placeholder="Auto-detected if blank"
-                          className="w-full px-3 py-2 text-xs bg-black/60 border border-white/[0.1] rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500"
+                          className="w-full px-3 py-2 text-xs bg-black/60 border border-white/[0.1] rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500"
                         />
                       </div>
                       <div>
@@ -1174,8 +1235,8 @@ Direct: farukolawale509@gmail.com`;
                           type="text"
                           value={auditCity}
                           onChange={(e) => setAuditCity(e.target.value)}
-                          placeholder="e.g. Austin, TX or London"
-                          className="w-full px-3 py-2 text-xs bg-black/60 border border-white/[0.1] rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500"
+                          placeholder="e.g. Dallas, TX or London"
+                          className="w-full px-3 py-2 text-xs bg-black/60 border border-white/[0.1] rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500"
                         />
                       </div>
                     </div>
@@ -1183,12 +1244,12 @@ Direct: farukolawale509@gmail.com`;
 
                   <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
                     <p className="text-[11px] text-zinc-400">
-                      Calculates live mobile load speed, detects CMS bloat (WordPress, Elementor, Divi), computes lost ad spend, and prepares cold outreach email.
+                      Calculates live mobile load speed, scans Google Ads/Meta tags, and generates an evidence-based QuickFleet prototype.
                     </p>
                     <button
                       type="submit"
                       disabled={isAuditing || !auditUrl.trim()}
-                      className="px-5 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 shrink-0 shadow-md shadow-violet-600/25"
+                      className="px-5 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 shrink-0 shadow-md shadow-amber-600/25"
                     >
                       <RefreshCw className={`w-3.5 h-3.5 ${isAuditing ? "animate-spin" : ""}`} />
                       <span>{isAuditing ? "Auditing Website..." : "Audit &amp; Add to Active Queue"}</span>
@@ -1208,18 +1269,18 @@ Direct: farukolawale509@gmail.com`;
                       rows={4}
                       value={bulkText}
                       onChange={(e) => setBulkText(e.target.value)}
-                      placeholder={`https://austinemergencyplumbing.com\nhttps://dfwmasterelectric.com\n"Summit Roofing", https://summitroofing.com, "Denver", "Roofing"`}
-                      className="w-full p-3 font-mono text-xs bg-black/60 border border-white/[0.1] rounded-lg text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-violet-500"
+                      placeholder={`Lone Star Bimmer, https://lonestarbimmer.com, Dallas, European Vehicle Specialist\nPrecision Auto Works, https://precisionautonyc.com, New York, Independent Auto Repair`}
+                      className="w-full p-3 font-mono text-xs bg-black/60 border border-white/[0.1] rounded-lg text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500"
                     />
                   </div>
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <p className="text-[11px] text-zinc-400">
-                      Accepts direct URLs or CSV rows: <code className="bg-black/60 px-1.5 py-0.5 rounded border border-white/[0.1] font-mono text-[10px] text-violet-300">Company, Website, City, Niche</code>.
+                      Accepts direct URLs or CSV rows: <code className="bg-black/60 px-1.5 py-0.5 rounded border border-white/[0.1] font-mono text-[10px] text-amber-300">Shop Name, Website, City, Specialization</code>.
                     </p>
                     <button
                       onClick={handleBulkAudit}
                       disabled={isBulkImporting || !bulkText.trim()}
-                      className="px-5 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 shrink-0 shadow-md shadow-violet-600/25"
+                      className="px-5 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 shrink-0 shadow-md shadow-amber-600/25"
                     >
                       <UploadCloud className={`w-3.5 h-3.5 ${isBulkImporting ? "animate-spin" : ""}`} />
                       <span>{isBulkImporting ? "Batch Auditing..." : "Batch Audit &amp; Add to Queue"}</span>
@@ -1233,68 +1294,70 @@ Direct: farukolawale509@gmail.com`;
           {/* ─── FILTERS (When viewing Targeted or Vault leads) ─── */}
           {activeTab === "active" && sourceMode !== "google_maps" && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-3 border-t border-white/[0.08]">
+              {/* 1. Search */}
               <div className="relative">
                 <Search className="w-4 h-4 text-zinc-500 absolute left-3 top-2.5" />
                 <input
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder={`Filter ${sourceMode === "targeted" ? "targeted leads" : "vault"}...`}
-                  className="w-full pl-9 pr-3 py-2 text-xs bg-black/50 border border-white/[0.08] hover:border-white/[0.14] rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500"
+                  placeholder={`Search automotive leads...`}
+                  className="w-full pl-9 pr-3 py-2 text-xs bg-black/50 border border-white/[0.08] hover:border-white/[0.14] rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500"
                 />
               </div>
 
+              {/* 2. Specialization filter */}
               <div>
                 <select
-                  value={selectedArchetype}
-                  onChange={(e) => setSelectedArchetype(e.target.value as "all" | Archetype)}
-                  className="w-full px-3 py-2 text-xs bg-black/50 border border-white/[0.08] hover:border-white/[0.14] rounded-lg text-violet-300 focus:outline-none focus:border-violet-500 font-semibold"
+                  value={selectedSpecialization}
+                  onChange={(e) => setSelectedSpecialization(e.target.value)}
+                  className="w-full px-3 py-2 text-xs bg-black/50 border border-white/[0.08] hover:border-white/[0.14] rounded-lg text-amber-300 focus:outline-none focus:border-amber-500 font-semibold"
                 >
-                  <option value="all" className="bg-zinc-900 text-white">All Archetypes</option>
-                  <option value="UrgentService" className="bg-zinc-900 text-white">⚡ Urgent Service (5 Niches)</option>
-                  <option value="ProfessionalTrust" className="bg-zinc-900 text-white">🛡️ Professional Trust (Law / CPA)</option>
-                  <option value="AestheticBooking" className="bg-zinc-900 text-white">✨ Aesthetic Booking (Dentist / MedSpa)</option>
-                  <option value="Generic" className="bg-zinc-900 text-white">📦 Generic</option>
+                  <option value="all" className="bg-zinc-900 text-white">All Specializations ({currentLeadsPool.length})</option>
+                  {AUTOMOTIVE_SPECIALIZATIONS.map((spec) => (
+                    <option key={spec} value={spec} className="bg-zinc-900 text-white">
+                      {spec}
+                    </option>
+                  ))}
                 </select>
               </div>
 
+              {/* 3. Advertising Evidence filter */}
+              <div>
+                <select
+                  value={selectedAdEvidence}
+                  onChange={(e) => setSelectedAdEvidence(e.target.value)}
+                  className="w-full px-3 py-2 text-xs bg-black/50 border border-white/[0.08] hover:border-white/[0.14] rounded-lg text-zinc-200 focus:outline-none focus:border-amber-500 font-medium"
+                >
+                  <option value="all" className="bg-zinc-900 text-white">All Ad Evidence Status</option>
+                  <option value="verified_ads" className="bg-zinc-900 text-emerald-400">🟢 Verified Ad Signals (Strategy A)</option>
+                  <option value="no_detected_ads" className="bg-zinc-900 text-zinc-400">⚪ No Detected Ad Tags (Strategy B)</option>
+                </select>
+              </div>
+
+              {/* 4. Qualification filter */}
+              <div>
+                <select
+                  value={selectedQualification}
+                  onChange={(e) => setSelectedQualification(e.target.value)}
+                  className="w-full px-3 py-2 text-xs bg-black/50 border border-white/[0.08] hover:border-white/[0.14] rounded-lg text-zinc-200 focus:outline-none focus:border-amber-500 font-medium"
+                >
+                  <option value="all" className="bg-zinc-900 text-white">All Qualifications</option>
+                  <option value="qualified" className="bg-zinc-900 text-white">✅ Qualified Repair Shops</option>
+                  <option value="unverified" className="bg-zinc-900 text-zinc-400">⚠️ Needs Verification</option>
+                </select>
+              </div>
+
+              {/* 5. Country filter */}
               <div>
                 <select
                   value={selectedCountry}
                   onChange={(e) => setSelectedCountry(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-black/50 border border-white/[0.08] hover:border-white/[0.14] rounded-lg text-zinc-200 focus:outline-none focus:border-violet-500 font-medium"
+                  className="w-full px-3 py-2 text-xs bg-black/50 border border-white/[0.08] hover:border-white/[0.14] rounded-lg text-zinc-200 focus:outline-none focus:border-amber-500 font-medium"
                 >
                   {countries.map((c) => (
                     <option key={c} value={c} className="bg-zinc-900 text-white">
-                      {c === "all" ? `All Countries (${currentLeadsPool.length})` : c}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <select
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-black/50 border border-white/[0.08] hover:border-white/[0.14] rounded-lg text-zinc-200 focus:outline-none focus:border-violet-500"
-                >
-                  {cities.map((city) => (
-                    <option key={city} value={city} className="bg-zinc-900 text-white">
-                      {city === "all" ? "All Cities" : city}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <select
-                  value={selectedNiche}
-                  onChange={(e) => setSelectedNiche(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-black/50 border border-white/[0.08] hover:border-white/[0.14] rounded-lg text-zinc-200 focus:outline-none focus:border-violet-500"
-                >
-                  {niches.map((niche) => (
-                    <option key={niche} value={niche} className="bg-zinc-900 text-white">
-                      {niche === "all" ? "All Niches" : niche}
+                      {c === "all" ? `All Countries` : c}
                     </option>
                   ))}
                 </select>
@@ -1350,10 +1413,11 @@ Direct: farukolawale509@gmail.com`;
                 <button
                   onClick={() => {
                     setSourceMode("targeted");
-                    setSelectedArchetype("all");
+                    setSelectedSpecialization("all");
+                    setSelectedAdEvidence("all");
+                    setSelectedQualification("all");
                     setSelectedCountry("all");
                     setSelectedCity("all");
-                    setSelectedNiche("all");
                     setSearch("");
                   }}
                   className="px-4 py-2 bg-white text-zinc-950 rounded-lg text-xs font-semibold mt-2 cursor-pointer hover:bg-zinc-200 transition-all shadow-sm"
@@ -1366,6 +1430,14 @@ Direct: farukolawale509@gmail.com`;
                 {activeLeads.map((lead) => {
                   const sendStatus = sendingMap[lead.company] || "idle";
                   const errorMsg = errorMsgMap[lead.company];
+                  const hasAds = lead.hasAdTags !== undefined ? lead.hasAdTags : (lead.hasMarketingPixels ?? false);
+                  const qual = qualifyAutomotiveLead({
+                    company: lead.company,
+                    niche: lead.niche,
+                    industry: lead.industry,
+                    website: lead.website,
+                  });
+                  const spec = lead.specialization || qual.specialization || lead.niche || "Independent Auto Repair";
 
                   return (
                     <div
@@ -1377,40 +1449,41 @@ Direct: farukolawale509@gmail.com`;
                         <div className="flex items-start justify-between gap-3">
                           <div className="space-y-1.5">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <span className="font-bold text-sm tracking-tight text-white group-hover:text-violet-200 transition-colors">
+                              <span className="font-bold text-sm tracking-tight text-white group-hover:text-amber-200 transition-colors">
                                 {lead.company}
                               </span>
                               <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.05] text-zinc-300 border border-white/[0.08]">
-                                {lead.countryCode || "AU"}
+                                {lead.countryCode || "US"}
                               </span>
                               <span className="text-[10px] font-medium bg-white/[0.03] text-zinc-400 border border-white/[0.06] px-1.5 py-0.5 rounded">
                                 {lead.city}
                               </span>
 
-                              {/* ARCHETYPE BADGE */}
-                              {(() => {
-                                const leadArchetype = lead.archetype || getArchetype(lead.industry || lead.niche || "");
-                                return (
-                                  <span
-                                    className={`text-[10px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1 border ${
-                                      leadArchetype === "UrgentService"
-                                        ? "bg-amber-500/10 text-amber-300 border-amber-500/25"
-                                        : leadArchetype === "ProfessionalTrust"
-                                        ? "bg-sky-500/10 text-sky-300 border-sky-500/25"
-                                        : leadArchetype === "AestheticBooking"
-                                        ? "bg-rose-500/10 text-rose-300 border-rose-500/25"
-                                        : "bg-zinc-500/10 text-zinc-400 border-zinc-500/25"
-                                    }`}
-                                    title={`UI Archetype: ${leadArchetype}`}
-                                  >
-                                    {leadArchetype === "UrgentService" && <Zap className="w-2.5 h-2.5 text-amber-400 fill-amber-400" />}
-                                    {leadArchetype === "ProfessionalTrust" && <Shield className="w-2.5 h-2.5 text-sky-400" />}
-                                    {leadArchetype === "AestheticBooking" && <Sparkles className="w-2.5 h-2.5 text-rose-400" />}
-                                    {leadArchetype === "Generic" && <Layers className="w-2.5 h-2.5 text-zinc-400" />}
-                                    <span>{leadArchetype}</span>
-                                  </span>
-                                );
-                              })()}
+                              {/* AUTOMOTIVE SPECIALIZATION BADGE */}
+                              <span
+                                className="text-[10px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1 border bg-amber-500/10 text-amber-300 border-amber-500/25"
+                                title={`Automotive Specialization: ${spec}`}
+                              >
+                                <Zap className="w-2.5 h-2.5 text-amber-400 fill-amber-400" />
+                                <span>{spec}</span>
+                              </span>
+
+                              {/* QUALIFICATION BADGE */}
+                              {qual.isQualified ? (
+                                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1 border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                                  <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
+                                  <span>Verified Repair Shop</span>
+                                </span>
+                              ) : qual.isDisqualified ? (
+                                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1 border bg-rose-500/10 text-rose-400 border-rose-500/20">
+                                  <X className="w-2.5 h-2.5 text-rose-400" />
+                                  <span>Disqualified</span>
+                                </span>
+                              ) : (
+                                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1 border bg-zinc-500/10 text-zinc-400 border-zinc-500/20">
+                                  <span>Needs Review</span>
+                                </span>
+                              )}
 
                               {/* BRAND COLOR SWATCH */}
                               {lead.primaryColor && (
@@ -1426,23 +1499,16 @@ Direct: farukolawale509@gmail.com`;
                                 </span>
                               )}
 
-                              {/* INDUSTRY / NICHE PILL */}
-                              {(lead.industry || lead.niche) && (
-                                <span className="text-[10px] font-medium bg-white/[0.03] text-zinc-400 border border-white/[0.06] px-1.5 py-0.5 rounded">
-                                  {lead.industry || lead.niche}
-                                </span>
-                              )}
-
                               {/* AD-STATUS PILL */}
-                              {(lead.hasAdTags !== undefined ? lead.hasAdTags : lead.hasMarketingPixels !== undefined ? lead.hasMarketingPixels : lead.coldEmailSubject?.toLowerCase().includes("ads")) ? (
+                              {hasAds ? (
                                 <span className="text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full inline-flex items-center gap-1.5">
                                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                  <span>Active Ad Spend</span>
+                                  <span>Verified Ad Signals (Strategy A)</span>
                                 </span>
                               ) : (
                                 <span className="text-[10px] font-mono bg-zinc-500/10 text-zinc-400 border border-zinc-500/20 px-2 py-0.5 rounded-full inline-flex items-center gap-1.5">
                                   <span className="w-1.5 h-1.5 rounded-full bg-zinc-500" />
-                                  <span>Organic SEO Pitch</span>
+                                  <span>No Detected Ad Tags (Strategy B)</span>
                                 </span>
                               )}
 
@@ -1483,24 +1549,28 @@ Direct: farukolawale509@gmail.com`;
                           </div>
                         </div>
 
-                        {/* EMAIL & AD/ORGANIC WASTE (RECESSED TELEMETRY STRIP) */}
+                        {/* TARGET CONTACT & POSITIONING ANGLE STRIP */}
                         <div className="bg-black/50 rounded-xl p-3 text-xs flex flex-wrap items-center justify-between gap-2 border border-white/[0.06]">
                           <div className="space-y-0.5">
                             <div className="text-[10px] text-zinc-500 font-mono uppercase tracking-wider">Target Contact:</div>
                             <div className="font-mono text-zinc-200 font-medium truncate max-w-[220px]">
-                              {lead.email || lead.phone || "Contact via Website"}
+                              {lead.email || lead.phone || "Direct Service Desk"}
                             </div>
                           </div>
                           <div className="text-right">
                             <div className="text-[10px] text-zinc-500 font-mono uppercase tracking-wider">
-                              {(lead.hasAdTags === false || (lead.hasAdTags === undefined && lead.hasMarketingPixels === false)) ? "Organic Penalty:" : "Est. Ad Waste:"}
+                              Outreach Positioning:
                             </div>
-                            <div className={`font-bold font-mono ${(lead.hasAdTags === false || (lead.hasAdTags === undefined && lead.hasMarketingPixels === false)) ? "text-amber-400" : "text-rose-400"}`}>
-                              {(lead.hasAdTags === false || (lead.hasAdTags === undefined && lead.hasMarketingPixels === false))
-                                ? `~${Math.round((1 - lead.mobilePageSpeed / 100) * 45)}% Bounce Rate`
-                                : `~${lead.currencySymbol || "$"}${lead.estLostMonthlySpend} ${lead.currency || "USD"}/mo`}
+                            <div className={`font-semibold font-mono text-xs ${hasAds ? "text-emerald-400" : "text-amber-400"}`}>
+                              {hasAds ? "Strategy A: Ad Click-to-Phone Friction" : "Strategy B: Organic Mobile Intake"}
                             </div>
                           </div>
+                        </div>
+
+                        {/* QUALIFICATION EVIDENCE / REASON LINE */}
+                        <div className="text-[11px] text-zinc-400 bg-white/[0.02] border border-white/[0.06] rounded-lg px-2.5 py-1.5 font-sans leading-relaxed">
+                          <span className="text-zinc-500 font-mono uppercase text-[9px] mr-1.5 font-bold">Evidence:</span>
+                          <span>{lead.qualificationReason || qual.reason || "Independent automotive repair shop verified for active diagnostic outreach."}</span>
                         </div>
 
                         {/* ERROR ALERT IF RESEND RESTRICTED */}
@@ -1527,14 +1597,14 @@ Direct: farukolawale509@gmail.com`;
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-all text-xs border border-white/10 shadow-sm"
                         >
                           <span>Open Prototype</span>
-                          <ExternalLink className="w-3 h-3 text-violet-300" />
+                          <ExternalLink className="w-3 h-3 text-amber-300" />
                         </Link>
 
                         {/* 1-CLICK SEND VIA GMAIL & CLEAR */}
                         {lead.email ? (
                           <button
                             onClick={() => handleGmailClick(lead)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-semibold transition-all text-xs shadow-md shadow-violet-600/20 cursor-pointer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-semibold transition-all text-xs shadow-md shadow-amber-600/20 cursor-pointer"
                             title="Opens in Gmail and removes from active queue"
                           >
                             <Mail className="w-3 h-3" />
@@ -1556,10 +1626,10 @@ Direct: farukolawale509@gmail.com`;
                         {/* PITCH ASSISTANT MODAL TRIGGER */}
                         <button
                           onClick={() => copyPitch(lead)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 border border-violet-500/25 rounded-lg font-medium transition-all text-xs cursor-pointer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/25 rounded-lg font-medium transition-all text-xs cursor-pointer"
                           title="View and customize zero-jargon pitch angles"
                         >
-                          <Sparkles className="w-3 h-3 text-violet-400" />
+                          <Sparkles className="w-3 h-3 text-amber-400" />
                           <span>Pitch Assistant</span>
                         </button>
 

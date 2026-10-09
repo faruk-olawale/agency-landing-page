@@ -99,30 +99,33 @@ function enrichBusinessWithAudit(raw: {
 
   const cpcEstimate = locale.defaultCpc;
   const estLostMonthlySpend = Math.round(cpcEstimate * 22 * (1 - mobilePageSpeed / 100));
-  const contactName = `${raw.name} Team`;
+  const contactName = `${raw.name} Service Team`;
 
   // Only assign email if real website exists; never construct fake domains that bounce
   const email = raw.isVerifiedWebsite && domainClean ? `info@${domainClean}` : "";
 
-  const coldEmailSubject = `Your Google Ads / ${raw.name}`;
+  const slug = raw.name.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-");
+  const previewUrl = `https://agency-landing-page-smoky-psi.vercel.app/preview/${slug}`;
+
+  const coldEmailSubject = `Quick question regarding ${raw.name} mobile intake`;
   const coldEmailBody = `Hey ${contactName},
 
-I noticed you're driving search traffic to ${domainClean || raw.name}, but the mobile landing page takes about ${mobileLoadTimeSec} seconds to load.
+I was looking at ${domainClean || raw.name} and noticed your mobile site takes about ${mobileLoadTimeSec} seconds to load.
 
-Because mobile users are impatient, you are likely losing about a third of your paid visitors before your site even loads. It also means Google is likely charging you a higher rate for your ads.
+When local drivers search on mobile for urgent repair or diagnostics in ${raw.city || raw.location}, slow load times and cluttered menus cause them to bounce back to Google before reaching your service desk.
 
-I run Speedcraft Studio. To show you what you're missing, I went ahead and built a custom, lightning-fast version of your landing page. It loads instantly (under half a second).
+To show what a dedicated mobile experience looks like, I put together a high-speed automotive intake prototype customized for ${raw.name}:
+Link: ${previewUrl}
 
-Take a look on your phone to feel the speed difference:
-Link: https://agency-landing-page-smoky-psi.vercel.app/preview/${raw.name.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-")}
+It provides one-tap phone calling, an interactive diagnostic intake flow, and immediate technician credibility on smartphones.
 
-Zero strings attached. If you like the feel of it, would you like me to set this up on your actual domain so you stop leaking ad clicks?
+Take a look on your phone when convenient. If you'd like to put something similar in place for your inbound search visitors, I'd be glad to discuss getting it live.
 
 Best,
 Faruk — Lead Engineer, Speedcraft Studio
 Direct: farukolawale509@gmail.com`;
 
-  const linkedInMessage = `Hey ${contactName}, saw ${domainClean || raw.name}. Your mobile site takes ${mobileLoadTimeSec}s to load, which means you're likely losing paid leads before they can call you. I built a lightning-fast test version that loads in under half a second so customers don't bounce: https://agency-landing-page-smoky-psi.vercel.app/preview/${raw.name.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-")} — want to check it out?`;
+  const linkedInMessage = `Hey ${contactName}, saw ${domainClean || raw.name}. Drivers searching for auto repair in ${raw.city || raw.location} need instant phone contact, but mobile load time is ${mobileLoadTimeSec}s. I built a sub-second diagnostic intake prototype for ${raw.name}: ${previewUrl} — thought you might want to see how fast it feels on mobile.`;
 
   return {
     company: raw.name,
@@ -213,10 +216,13 @@ async function handlePlacesSearch(query: string, location: string) {
             });
           });
 
-          // Deduplicate
-          const uncontacted = results.filter(
-            (b: PlaceResult) => !sentCompanies.has(b.company.toLowerCase()) && (!b.email || !sentCompanies.has(b.email.toLowerCase()))
-          );
+          // Deduplicate and filter out non-repair entities (dealerships, car wash, rentals, parts)
+          const DISQUALIFIED_MAPS = ["dealership", "car sales", "used car", "car rental", "rental car", "car wash", "auto parts", "salvage", "scrap", "plumb", "hvac", "roof", "electr", "law", "dent"];
+          const uncontacted = results.filter((b: PlaceResult) => {
+            const lowerName = b.company.toLowerCase();
+            const isDisqualified = DISQUALIFIED_MAPS.some((neg) => lowerName.includes(neg) && !lowerName.includes("dealership alternative"));
+            return !isDisqualified && !sentCompanies.has(b.company.toLowerCase()) && (!b.email || !sentCompanies.has(b.email.toLowerCase()));
+          });
 
           return NextResponse.json({
             source: "google_places_api_new",
@@ -372,7 +378,7 @@ async function handlePlacesSearch(query: string, location: string) {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const query = searchParams.get("query") || "Emergency Plumber";
+  const query = searchParams.get("query") || "European Auto Repair";
   const location = searchParams.get("location") || "Dallas, TX";
   return handlePlacesSearch(query, location);
 }
@@ -380,7 +386,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
-    const query = body.query || "Emergency Plumber";
+    const query = body.query || "European Auto Repair";
     const location = body.location || "Dallas, TX";
     return handlePlacesSearch(query, location);
   } catch (err: unknown) {

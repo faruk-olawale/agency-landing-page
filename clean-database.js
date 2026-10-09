@@ -29,43 +29,92 @@ const path = require("node:path");
 // CONFIGURATION & CONSTANTS
 // ============================================================================
 
-// 1. Target Niches (Allowed Keywords)
+// 1. Target Automotive Segments (Single Vertical: Automotive Repair & Diagnostics)
 const ALLOWED_KEYWORDS = [
-  "plumber",
-  "hvac",
-  "roofer",
-  "electrician",
   "mechanic",
+  "auto repair",
+  "car repair",
+  "automotive",
+  "transmission",
+  "diesel",
+  "engine",
+  "diagnostic",
+  "ecu",
+  "brake",
+  "european auto",
+  "bmw",
+  "audi",
+  "mercedes",
+  "porsche",
+  "fleet repair",
+  "tuning",
+];
+
+// Explicit negative keywords: Disqualify dealerships, car washes, car rentals, parts retailers, and non-automotive trades
+const DISQUALIFIED_KEYWORDS = [
+  "dealership",
+  "dealer",
+  "car sales",
+  "used cars",
+  "auto sales",
+  "pre-owned",
+  "financing",
+  "car rental",
+  "rental car",
+  "car hire",
+  "car wash",
+  "auto detailing",
+  "window tint",
+  "auto parts",
+  "autoparts",
+  "junkyard",
+  "salvage",
+  "scrap",
+  "wreckers",
+  "towing only",
+  "impound",
+  "plumber",
+  "plumbing",
+  "hvac",
+  "roofing",
+  "electrician",
   "lawyer",
-  "cpa",
+  "attorney",
   "dentist",
   "medspa",
+  "cpa",
 ];
 
 // Display names for clean terminal progress formatting
 const NICHE_DISPLAY_NAMES = {
-  plumber: "Plumber",
-  hvac: "HVAC",
-  roofer: "Roofer",
-  electrician: "Electrician",
-  mechanic: "Mechanic",
-  lawyer: "Lawyer",
-  cpa: "CPA",
-  dentist: "Dentist",
-  medspa: "Medspa",
+  mechanic: "Independent Auto Repair",
+  "auto repair": "Independent Auto Repair",
+  "car repair": "Independent Auto Repair",
+  automotive: "Specialist Automotive Service",
+  transmission: "Transmission & Drivetrain",
+  diesel: "Fleet Diesel & Commercial",
+  engine: "Engine & ECU Diagnostics",
+  diagnostic: "Engine & ECU Diagnostics",
+  ecu: "Engine & ECU Diagnostics",
+  brake: "Brake & Suspension Specialist",
+  "european auto": "European Vehicle Specialist",
+  bmw: "European Vehicle Specialist",
+  audi: "European Vehicle Specialist",
+  mercedes: "European Vehicle Specialist",
+  porsche: "European Vehicle Specialist",
+  "fleet repair": "Fleet Diesel & Commercial",
+  tuning: "Performance & Tuning",
 };
 
-// Semantic alias map to bridge database variations (e.g. "Plumbing" -> "plumber", "Dental" -> "dentist")
+// Semantic alias map for automotive repair specializations
 const ALIAS_MAP = {
-  plumber: ["plumbing", "plumb", "drain", "pipe"],
-  hvac: ["heating", "air conditioning", "cooling", "air condition", "air_conditioning"],
-  roofer: ["roofing", "roof"],
-  electrician: ["electrical", "sparky", "electric"],
-  mechanic: ["automotive", "auto repair", "car repair", "mechanics", "auto"],
-  lawyer: ["legal", "law", "attorney", "solicitor", "lawyers", "barrister"],
-  cpa: ["accounting", "accountant", "accountants", "bookkeeping"],
-  dentist: ["dental", "dentistry", "teeth", "orthodontist", "ortho"],
-  medspa: ["cosmetic", "aesthetics", "aesthetic", "medical spa", "med spa"],
+  "european auto": ["euro", "volkswagen", "audi", "bmw", "mercedes", "porsche", "mini", "land rover"],
+  transmission: ["gearbox", "drivetrain", "clutch"],
+  diesel: ["fleet diesel", "commercial vehicle", "truck repair"],
+  diagnostic: ["engine diagnostics", "auto electrical", "check engine", "scan tool"],
+  mechanic: ["motor mechanic", "auto service", "auto care", "car service"],
+  tuning: ["dyno", "performance tuning", "motorsport"],
+  brake: ["suspension", "wheel alignment", "brakes"],
 };
 
 // 2. Marketing Pixel Detection Regex
@@ -113,38 +162,38 @@ function resolveInputPath() {
 }
 
 /**
- * Evaluates whether a lead's industry matches our allowed keywords.
- * Checks lead's industry field (normalized to lowercase), falling back to niche.
- * Returns { keyword, displayName } if matched, or null if discarded.
+ * Checks a lead against automotive qualification criteria.
+ * Strictly disqualifies dealerships, car washes, car rentals, parts stores, and unrelated trades.
  */
 function evaluateNiche(lead) {
   if (!lead || typeof lead !== "object") return null;
 
-  // Check the lead's industry field (normalized to lowercase), falling back to niche
-  const rawIndustry =
-    lead.industry !== undefined && lead.industry !== null && String(lead.industry).trim().length > 0
-      ? String(lead.industry)
-      : String(lead.niche || "");
+  const combined = `${lead.company || ""} ${lead.industry || ""} ${lead.niche || ""} ${lead.website || ""}`.toLowerCase().trim();
+  if (!combined) return null;
 
-  const normalized = rawIndustry.toLowerCase().trim();
-  if (!normalized) return null;
+  // 1. Check for negative keywords (Disqualify non-repair businesses)
+  for (const neg of DISQUALIFIED_KEYWORDS) {
+    if (combined.includes(neg) && !combined.includes("dealership alternative")) {
+      return null; // Strictly disqualified
+    }
+  }
 
-  // 1. Direct match or substring check with allowed keywords
+  // 2. Direct match or substring check with allowed automotive keywords
   for (const keyword of ALLOWED_KEYWORDS) {
-    if (normalized === keyword || normalized.includes(keyword)) {
+    if (combined.includes(keyword)) {
       return {
         keyword,
-        displayName: NICHE_DISPLAY_NAMES[keyword] || keyword,
+        displayName: NICHE_DISPLAY_NAMES[keyword] || "Independent Auto Repair",
       };
     }
   }
 
-  // 2. Semantic alias / root stem fallback for database variations
+  // 3. Semantic alias / root stem fallback
   for (const [keyword, aliases] of Object.entries(ALIAS_MAP)) {
-    if (aliases.some((alias) => normalized === alias || normalized.includes(alias))) {
+    if (aliases.some((alias) => combined.includes(alias))) {
       return {
         keyword,
-        displayName: NICHE_DISPLAY_NAMES[keyword] || keyword,
+        displayName: NICHE_DISPLAY_NAMES[keyword] || "Independent Auto Repair",
       };
     }
   }
@@ -231,8 +280,8 @@ async function cleanDatabase() {
   const inputPath = resolveInputPath();
   const outputPath = outputArg
     ? path.resolve(process.cwd(), outputArg.split("=")[1])
-    : path.resolve(process.cwd(), "qualified_targeted_leads.json");
-  const checkpointPath = path.resolve(process.cwd(), "qualified_targeted_leads.checkpoint.json");
+    : path.resolve(process.cwd(), "cleaned_scanned_leads.json");
+  const checkpointPath = path.resolve(process.cwd(), "cleaned_scanned_leads.checkpoint.json");
 
   console.log(`📂 Ingesting database from : ${inputPath}`);
   const rawData = fs.readFileSync(inputPath, "utf-8");
