@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import { ArrowRight, Phone } from "lucide-react";
 
 interface QuickFleetLiveRecordProps {
@@ -152,14 +153,21 @@ export function QuickFleetLiveRecord({
                 <div
                   key={s.step}
                   onClick={() => setActiveStep(s.step)}
-                  className={`flex items-start gap-2.5 sm:gap-3 p-2 sm:p-2.5 rounded-xl cursor-pointer transition-all border min-w-0 ${
+                  className={`relative flex items-start gap-2.5 sm:gap-3 p-2 sm:p-2.5 rounded-xl cursor-pointer transition-colors min-w-0 ${
                     activeStep === s.step
-                      ? "bg-white/10 border-[#6FD9C1]/50 text-white shadow-md"
-                      : "border-transparent text-slate-400 hover:bg-white/5"
+                      ? "text-white shadow-md"
+                      : "text-slate-400 hover:bg-white/5"
                   }`}
                 >
+                  {activeStep === s.step && (
+                    <motion.div
+                      layoutId="activeRecordStep"
+                      className="absolute inset-0 bg-white/10 border border-[#6FD9C1]/50 rounded-xl z-0"
+                      transition={{ type: "spring", stiffness: 450, damping: 32 }}
+                    />
+                  )}
                   <div
-                    className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold ${
+                    className={`relative z-10 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold ${
                       s.done
                         ? "bg-[#0A997D] text-white"
                         : s.active
@@ -169,7 +177,7 @@ export function QuickFleetLiveRecord({
                   >
                     {s.done ? "✓" : s.step}
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div className="relative z-10 flex-1 min-w-0">
                     <div className="font-sans font-medium text-white text-xs sm:text-[13px] leading-snug break-words">
                       {s.title}
                     </div>
@@ -191,12 +199,15 @@ export function QuickFleetLiveRecord({
                 </span>
                 <div className="flex items-center gap-1.5 sm:gap-2 mt-1">
                   {["6", "2", "4", "9"].map((digit, i) => (
-                    <span
+                    <motion.span
                       key={i}
-                      className="w-6 h-7 sm:w-7 sm:h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-xs sm:text-sm font-bold text-[#6FD9C1]"
+                      whileHover={{ scale: 1.12, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                      className="w-6 h-7 sm:w-7 sm:h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-xs sm:text-sm font-bold text-[#6FD9C1] cursor-pointer select-none"
                     >
                       {digit}
-                    </span>
+                    </motion.span>
                   ))}
                 </div>
               </div>

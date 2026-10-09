@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface QuickFleetServicesInteractiveProps {
   companyName: string;
@@ -628,13 +629,20 @@ export function QuickFleetServicesInteractive({
                     key={tab.id}
                     type="button"
                     onClick={() => setSelectedCategory(tab.id)}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap shrink-0 cursor-pointer ${
+                    className={`relative px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       selectedCategory === tab.id
-                        ? "bg-[#0C0730] text-white shadow-sm font-semibold"
-                        : "text-[#0C0730]/70 hover:text-[#0C0730] hover:bg-black/5"
+                        ? "text-white font-semibold"
+                        : "text-[#0C0730]/70 hover:text-[#0C0730]"
                     }`}
                   >
-                    {tab.label}
+                    {selectedCategory === tab.id && (
+                      <motion.span
+                        layoutId="activeCategoryPill"
+                        className="absolute inset-0 bg-[#0C0730] rounded-full shadow-sm z-0"
+                        transition={{ type: "spring", stiffness: 450, damping: 32 }}
+                      />
+                    )}
+                    <span className="relative z-10">{tab.label}</span>
                   </button>
                 ))}
               </div>
@@ -642,82 +650,89 @@ export function QuickFleetServicesInteractive({
           </div>
 
           {/* Service Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredServices.map((service) => (
-              <div
-                key={service.id}
-                className="qf-service-card group bg-white rounded-2xl p-6 border border-[#0C0730]/10 hover:border-[#0A997D]/50 hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
-              >
-                <div>
-                  {/* Top Header & Category */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="px-2.5 py-1 rounded-full bg-[#0A997D]/10 text-[#0A997D] font-mono text-[11px] font-semibold tracking-wide">
-                      {service.categoryLabel}
-                    </span>
-                    <div className="w-9 h-9 rounded-xl bg-[#0C0730]/5 flex items-center justify-center text-[#0C0730] group-hover:bg-[#0A997D] group-hover:text-white transition-colors">
-                      {service.iconSvg}
+          <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <AnimatePresence mode="popLayout">
+              {filteredServices.map((service) => (
+                <motion.div
+                  layout
+                  key={service.id}
+                  initial={{ opacity: 0, scale: 0.94, y: 12 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.94, y: 12 }}
+                  transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                  className="qf-service-card group bg-white rounded-2xl p-6 border border-[#0C0730]/10 hover:border-[#0A997D]/50 hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                >
+                  <div>
+                    {/* Top Header & Category */}
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="px-2.5 py-1 rounded-full bg-[#0A997D]/10 text-[#0A997D] font-mono text-[11px] font-semibold tracking-wide">
+                        {service.categoryLabel}
+                      </span>
+                      <div className="w-9 h-9 rounded-xl bg-[#0C0730]/5 flex items-center justify-center text-[#0C0730] group-hover:bg-[#0A997D] group-hover:text-white transition-colors">
+                        {service.iconSvg}
+                      </div>
+                    </div>
+
+                    <h4 className="text-lg font-semibold text-[#0C0730] tracking-tight group-hover:text-[#0A997D] transition-colors">
+                      {service.title}
+                    </h4>
+                    <p className="text-xs font-medium text-[#0A997D] mt-1 font-mono">
+                      {service.highlight}
+                    </p>
+
+                    <p className="text-xs sm:text-sm text-[#0C0730]/75 mt-3 leading-relaxed">
+                      {service.summary}
+                    </p>
+
+                    {/* Common Symptoms / Indications */}
+                    <div className="mt-5 pt-4 border-t border-[#0C0730]/8">
+                      <div className="text-[11px] font-mono uppercase text-[#0C0730]/50 font-semibold mb-2">
+                        Symptom Triggers We Resolve:
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {service.symptoms.map((symptom, i) => (
+                          <span
+                            key={i}
+                            className="px-2 py-0.5 rounded-md bg-[#F3F1EC] text-[#0C0730]/80 text-[11px] font-medium"
+                          >
+                            {symptom}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Laboratory Tools Deployed */}
+                    <div className="mt-4 pt-3 border-t border-[#0C0730]/8">
+                      <div className="text-[11px] font-mono uppercase text-[#0C0730]/50 font-semibold mb-1">
+                        Factory Tools Deployed:
+                      </div>
+                      <div className="text-xs text-[#0C0730]/80 leading-snug">
+                        {service.equipment.join(" · ")}
+                      </div>
                     </div>
                   </div>
 
-                  <h4 className="text-lg font-semibold text-[#0C0730] tracking-tight group-hover:text-[#0A997D] transition-colors">
-                    {service.title}
-                  </h4>
-                  <p className="text-xs font-medium text-[#0A997D] mt-1 font-mono">
-                    {service.highlight}
-                  </p>
-
-                  <p className="text-xs sm:text-sm text-[#0C0730]/75 mt-3 leading-relaxed">
-                    {service.summary}
-                  </p>
-
-                  {/* Common Symptoms / Indications */}
-                  <div className="mt-5 pt-4 border-t border-[#0C0730]/8">
-                    <div className="text-[11px] font-mono uppercase text-[#0C0730]/50 font-semibold mb-2">
-                      Symptom Triggers We Resolve:
+                  {/* Card Footer: Turnaround & Action */}
+                  <div className="mt-6 pt-4 border-t border-[#0C0730]/8 flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-mono text-[#0C0730]/50">TURNAROUND</span>
+                      <span className="text-xs font-semibold text-[#0C0730]">{service.turnaround}</span>
                     </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {service.symptoms.map((symptom, i) => (
-                        <span
-                          key={i}
-                          className="px-2 py-0.5 rounded-md bg-[#F3F1EC] text-[#0C0730]/80 text-[11px] font-medium"
-                        >
-                          {symptom}
-                        </span>
-                      ))}
-                    </div>
+
+                    <a
+                      href="#book"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0C0730] text-white text-xs font-medium hover:bg-[#0A997D] transition-colors"
+                    >
+                      <span>Reserve Bay</span>
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </a>
                   </div>
-
-                  {/* Laboratory Tools Deployed */}
-                  <div className="mt-4 pt-3 border-t border-[#0C0730]/8">
-                    <div className="text-[11px] font-mono uppercase text-[#0C0730]/50 font-semibold mb-1">
-                      Factory Tools Deployed:
-                    </div>
-                    <div className="text-xs text-[#0C0730]/80 leading-snug">
-                      {service.equipment.join(" · ")}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card Footer: Turnaround & Action */}
-                <div className="mt-6 pt-4 border-t border-[#0C0730]/8 flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-mono text-[#0C0730]/50">TURNAROUND</span>
-                    <span className="text-xs font-semibold text-[#0C0730]">{service.turnaround}</span>
-                  </div>
-
-                  <a
-                    href="#book"
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0C0730] text-white text-xs font-medium hover:bg-[#0A997D] transition-colors"
-                  >
-                    <span>Reserve Bay</span>
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
 
           {/* Bottom Transparency Notice */}
           <div className="mt-10 p-5 rounded-2xl bg-white border border-[#0C0730]/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
