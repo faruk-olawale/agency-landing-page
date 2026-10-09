@@ -127,21 +127,21 @@ export function QuickFleetBookingClose({
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-2 flex flex-col sm:flex-row gap-3">
+              <div className="pt-2 flex flex-col md:flex-row gap-3 w-full">
                 <button
                   type="submit"
-                  className="qf-control qf-control--teal text-sm font-semibold justify-center flex-1"
+                  className="qf-control qf-control--teal text-sm font-semibold justify-center w-full md:w-auto md:flex-1 shrink-0"
                 >
-                  <span>Confirm Bay Reservation</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <span className="truncate">Confirm Bay Reservation</span>
+                  <ArrowRight className="w-4 h-4 shrink-0" />
                 </button>
 
                 <a
                   href={`tel:${cleanPhone}`}
-                  className="qf-control qf-control--ghost-dark text-xs sm:text-sm font-mono justify-center"
+                  className="qf-control qf-control--ghost-dark text-xs sm:text-sm font-mono justify-center w-full md:w-auto shrink-0"
                 >
-                  <Phone className="w-3.5 h-3.5 text-[#6FD9C1]" />
-                  <span>Call Bay Desk: {phone}</span>
+                  <Phone className="w-3.5 h-3.5 text-[#6FD9C1] shrink-0" />
+                  <span className="truncate">Call Bay Desk: {phone}</span>
                 </a>
               </div>
 

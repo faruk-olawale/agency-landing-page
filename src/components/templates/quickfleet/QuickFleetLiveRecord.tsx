@@ -31,8 +31,8 @@ export function QuickFleetLiveRecord({
   const [activeStep, setActiveStep] = useState<number>(3);
 
   return (
-    <section id="service-record" className="py-16 sm:py-24 px-4 sm:px-8">
-      <div className="qf-pcard relative">
+    <section id="service-record" className="py-16 sm:py-24 px-4 sm:px-8 overflow-hidden">
+      <div className="qf-pcard relative overflow-hidden">
         {/* Concentric Orbital Drafting Rings in Background */}
         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[700px] h-[700px] pointer-events-none opacity-40 hidden xl:block">
           <svg viewBox="0 0 800 800" className="w-full h-full stroke-[#0C0730]/15 fill-none">
@@ -65,10 +65,10 @@ export function QuickFleetLiveRecord({
             security code.
           </p>
 
-          <div className="flex flex-wrap items-center gap-3 mt-8">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mt-8">
             <a
               href="#book-intake"
-              className="qf-control qf-control--ink text-sm font-medium"
+              className="qf-control qf-control--ink text-sm font-medium justify-center"
             >
               <span>Book Diagnostic Intake</span>
               <ArrowRight className="w-4 h-4" />
@@ -76,10 +76,10 @@ export function QuickFleetLiveRecord({
 
             <a
               href={`tel:${cleanPhone}`}
-              className="qf-control qf-control--ghost text-sm font-mono"
+              className="qf-control qf-control--ghost text-sm font-mono justify-center"
             >
               <Phone className="w-3.5 h-3.5 text-[#0A997D]" />
-              <span>Direct Line: {phone}</span>
+              <span className="truncate">Direct Line: {phone}</span>
             </a>
           </div>
         </div>
@@ -182,7 +182,7 @@ export function QuickFleetLiveRecord({
             </div>
 
             {/* Release Security Code Box (QuickFleet Door Code Parity) */}
-            <div className="mt-5 pt-4 border-t border-white/10 flex items-center justify-between">
+            <div className="mt-5 pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <span className="text-[10px] text-slate-400 block font-mono">
                   4-DIGIT HANDOVER CODE

@@ -11,12 +11,14 @@
     --citrus-neon: #65a30d;
   }
 
-  html {
+  html, body {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: #ffffff;
     color: #09090b;
+    overflow-x: hidden;
+    max-width: 100vw;
   }
   
   ::selection {
@@ -97,19 +99,20 @@
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #090a0f;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
-  border-radius: 3px;
+  background: rgba(120, 120, 140, 0.25);
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: rgba(120, 120, 140, 0.45);
 }
 
 /* Godly / Aceternity / MagicUI Dark Infrastructure Styles */

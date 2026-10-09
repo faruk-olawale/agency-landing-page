@@ -96,7 +96,7 @@ export function QuickFleetCostBenchmark({
           </div>
 
           {/* Side-by-Side Visual Metric Bars */}
-          <div className="grid grid-cols-2 gap-4 my-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6">
             {/* Dealer Column */}
             <div className="bg-white/80 rounded-2xl p-4 sm:p-5 border border-red-500/15">
               <div className="font-mono text-[11px] text-slate-500 flex items-center justify-between">
@@ -157,14 +157,14 @@ export function QuickFleetCostBenchmark({
           </div>
 
           {/* Savings Callout */}
-          <div className="p-3 bg-white rounded-xl flex items-center justify-between border border-[rgba(10,153,125,0.2)] text-xs font-mono">
+          <div className="p-3 bg-white rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 border border-[rgba(10,153,125,0.2)] text-xs font-mono">
             <div>
               <span className="text-slate-500 block">TOTAL DIRECT SAVINGS</span>
               <span className="text-sm font-bold text-[#0A997D]">
                 ${savings.toLocaleString()} saved ({savingsPercent}%)
               </span>
             </div>
-            <div className="text-right">
+            <div className="sm:text-right">
               <span className="text-slate-500 block">TIME RETURNED</span>
               <span className="text-sm font-bold text-[#0C0730]">
                 Up to 3 weeks faster

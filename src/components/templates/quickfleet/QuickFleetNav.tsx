@@ -170,7 +170,9 @@ export function QuickFleetNav({
                 />
               </svg>
             </div>
-            <span className="qf-nav__brand-name">{companyName}</span>
+            <span className="qf-nav__brand-name" title={companyName}>
+              {companyName}
+            </span>
           </a>
 
           {/* Centered Floating Pill Navigation Links (Desktop) */}
@@ -302,7 +304,7 @@ export function QuickFleetNav({
       >
         {/* Top Header Row of the Menu */}
         <div className="qf-mnav__bar">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 min-w-0 max-w-[calc(100%-60px)]">
             <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0">
               <svg
                 className="w-8 h-8"
@@ -327,7 +329,7 @@ export function QuickFleetNav({
                 />
               </svg>
             </div>
-            <span className="text-lg font-bold tracking-tight text-white">
+            <span className="text-base sm:text-lg font-bold tracking-tight text-white truncate min-w-0">
               {companyName}
             </span>
           </div>

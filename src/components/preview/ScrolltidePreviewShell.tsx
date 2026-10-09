@@ -153,7 +153,7 @@ export function ScrolltidePreviewShell({
               </div>
 
               {/* Viewport Screen */}
-              <div className="rounded-[36px] overflow-hidden bg-[#07090e] max-h-[820px] overflow-y-auto select-none border border-zinc-800">
+              <div className="rounded-[36px] overflow-x-hidden overflow-y-auto bg-[#07090e] max-h-[820px] select-none border border-zinc-800 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {children}
               </div>
             </div>
