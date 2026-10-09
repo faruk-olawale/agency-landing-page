@@ -109,6 +109,7 @@ export function UrgentService({ clientData }: TemplateProps) {
         city={city}
         phone={phone}
         cleanPhone={cleanPhone}
+        primaryColor={primaryColor}
       />
     </div>
   );
