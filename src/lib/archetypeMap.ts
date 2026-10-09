@@ -55,7 +55,27 @@ export interface TemplateProps {
 }
 
 export const ARCHETYPE_INDUSTRIES: Record<Exclude<Archetype, "Generic">, string[]> = {
-  UrgentService: ["plumber", "hvac", "roofer", "electrician", "mechanic"],
+  UrgentService: [
+    "plumber",
+    "hvac",
+    "roofer",
+    "electrician",
+    "mechanic",
+    "auto",
+    "automotive",
+    "auto repair",
+    "car repair",
+    "transmission",
+    "diesel",
+    "bmw",
+    "audi",
+    "mercedes",
+    "porsche",
+    "european auto",
+    "diagnostic",
+    "engine",
+    "brake",
+  ],
   ProfessionalTrust: ["lawyer", "cpa"],
   AestheticBooking: ["dentist", "medspa"],
 };
@@ -99,7 +119,14 @@ export function getArchetype(industry: string = ""): Archetype {
   if (
     normalized.includes("plumb") ||
     normalized.includes("roof") ||
-    normalized.includes("electric")
+    normalized.includes("electric") ||
+    normalized.includes("mechanic") ||
+    normalized.includes("auto") ||
+    normalized.includes("transmission") ||
+    normalized.includes("diesel") ||
+    normalized.includes("engine") ||
+    normalized.includes("brake") ||
+    normalized.includes("diagnostic")
   ) {
     return "UrgentService";
   }
@@ -136,14 +163,28 @@ export function getArchetypePrimaryColor(
   if (norm.includes("hvac") || norm.includes("air") || norm.includes("heat")) return "#EA580C"; // Climate Orange
   if (norm.includes("roof")) return "#D97706"; // Architectural Terracotta Amber
   if (norm.includes("electr")) return "#EAB308"; // High-Voltage Electric Amber
-  if (norm.includes("mechanic") || norm.includes("auto")) return "#F97316"; // Performance Mechanical Orange
+  if (
+    norm.includes("mechanic") ||
+    norm.includes("auto") ||
+    norm.includes("transmission") ||
+    norm.includes("diesel") ||
+    norm.includes("engine") ||
+    norm.includes("brake") ||
+    norm.includes("diagnostic") ||
+    norm.includes("bmw") ||
+    norm.includes("audi") ||
+    norm.includes("mercedes") ||
+    norm.includes("porsche")
+  ) {
+    return "#0A997D"; // QuickFleet Precision Teal
+  }
   if (norm.includes("law") || norm.includes("legal") || norm.includes("attorney")) return "#1E3A8A"; // Executive Navy
   if (norm.includes("cpa") || norm.includes("account") || norm.includes("tax")) return "#0F766E"; // Fiduciary Teal
   if (norm.includes("dent") || norm.includes("ortho") || norm.includes("smile")) return "#0284C7"; // Clinical Porcelain Blue
   if (norm.includes("medspa") || norm.includes("spa") || norm.includes("aesthetic")) return "#BE185D"; // Luxury Rose Gold
 
   const arch = archetype || getArchetype(industry);
-  if (arch === "UrgentService") return "#0284C7";
+  if (arch === "UrgentService") return "#0A997D";
   if (arch === "ProfessionalTrust") return "#1E3A8A";
   if (arch === "AestheticBooking") return "#BE185D";
   return "#4F46E5";
@@ -161,7 +202,15 @@ export function getArchetypeSecondaryColor(
   if (norm.includes("hvac") || norm.includes("air") || norm.includes("heat")) return "#7C2D12"; // Deep Ember
   if (norm.includes("roof")) return "#78350F"; // Deep Bronze Slate
   if (norm.includes("electr")) return "#713F12"; // Deep Amber Slate
-  if (norm.includes("mechanic") || norm.includes("auto")) return "#7C2D12"; // Deep Engine Iron
+  if (
+    norm.includes("mechanic") ||
+    norm.includes("auto") ||
+    norm.includes("transmission") ||
+    norm.includes("diesel") ||
+    norm.includes("diagnostic")
+  ) {
+    return "#7C2D12"; // Deep Engine Iron
+  }
   if (norm.includes("law") || norm.includes("legal") || norm.includes("attorney")) return "#0F172A"; // Slate 900
   if (norm.includes("cpa") || norm.includes("account") || norm.includes("tax")) return "#134E4A"; // Deep Teal
   if (norm.includes("dent") || norm.includes("ortho") || norm.includes("smile")) return "#0C4A6E"; // Deep Sky

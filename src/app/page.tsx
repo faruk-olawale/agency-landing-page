@@ -34,6 +34,7 @@ import {
 export default function WhiteCreativeStudioAgency() {
   // Navigation & Scroll state
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Pricing toggle state: 'subscription' | 'lumpSum'
   const [billingPlan, setBillingPlan] = useState<"subscription" | "lumpSum">("subscription");
@@ -139,56 +140,160 @@ export default function WhiteCreativeStudioAgency() {
       <header
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
           scrolled
-            ? "bg-white/85 backdrop-blur-md border-b border-zinc-200/80 py-3.5 shadow-xs"
-            : "bg-transparent py-5"
+            ? "bg-white/90 backdrop-blur-md border-b border-[rgba(12,7,48,0.08)] py-3 shadow-[0_1px_0_rgba(12,7,48,0.06)]"
+            : "bg-transparent py-4 sm:py-5"
         }`}
+        style={{ fontFamily: 'var(--font, "Geist", sans-serif)' }}
       >
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center justify-between">
           {/* Studio Moniker */}
           <Link
             href="/"
-            className="flex items-center gap-3 text-sm font-bold text-zinc-950 tracking-tight"
+            className="flex items-center gap-3 text-sm font-bold text-[#0C0730] tracking-tight group"
           >
-            <span className="w-2.5 h-2.5 rounded-full bg-zinc-950" />
-            <span className="font-extrabold text-base tracking-tight text-zinc-950">
-              SPEEDCRAFT
+            <span className="w-2.5 h-2.5 rounded-full bg-[#0C0730]" />
+            <span className="font-extrabold text-base tracking-tight text-[#0C0730]">
+              SPEEDCRAFT<span className="text-[#0A997D]">.</span>
             </span>
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-medium text-zinc-600 border border-zinc-200 rounded-full bg-zinc-100">
-              High-Performance Web Studio
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[10.5px] font-mono font-semibold text-[#0A997D] border border-[#0A997D]/20 rounded-full bg-[rgba(10,153,125,0.08)] uppercase tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0A997D] animate-pulse" />
+              Sub-Second Studio
             </span>
           </Link>
 
-          {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center gap-8 text-xs font-semibold tracking-wide text-zinc-600">
-            <a href="#performance" className="hover:text-zinc-950 transition-colors">
+          {/* Desktop Nav Links (QuickFleet Centered Pill) */}
+          <nav className="hidden lg:flex items-center gap-1 bg-[#F3F1EC] p-1.5 rounded-full border border-[rgba(12,7,48,0.05)] text-xs font-semibold tracking-normal text-[#0C0730]">
+            <a href="#performance" className="px-4 py-1.5 rounded-full hover:bg-white hover:shadow-xs transition-all">
               Performance
             </a>
-            <a href="#work" className="hover:text-zinc-950 transition-colors">
+            <a href="#work" className="px-4 py-1.5 rounded-full hover:bg-white hover:shadow-xs transition-all">
               Featured Work
             </a>
-            <a href="#concierge" className="hover:text-zinc-950 transition-colors">
+            <a href="#concierge" className="px-4 py-1.5 rounded-full hover:bg-white hover:shadow-xs transition-all">
               Concierge Care
             </a>
-            <a href="#roi-calculator" className="hover:text-zinc-950 transition-colors">
+            <a href="#roi-calculator" className="px-4 py-1.5 rounded-full hover:bg-white hover:shadow-xs transition-all">
               ROI Calculator
             </a>
-            <a href="#pricing" className="hover:text-zinc-950 transition-colors">
+            <a href="#pricing" className="px-4 py-1.5 rounded-full hover:bg-white hover:shadow-xs transition-all">
               Pricing
             </a>
           </nav>
 
-          {/* Action CTA */}
+          {/* Action CTA & Mobile Burger Pill */}
           <div className="flex items-center gap-3">
             <a
               href="#prototype"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold tracking-wide transition-all studio-btn-primary"
+              className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold tracking-wide text-white bg-[#0C0730] hover:bg-[#22184A] active:scale-[0.98] transition-all shadow-sm"
             >
-              <span>Request Free Prototype</span>
+              <span>Request Prototype</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </a>
+
+            {/* QuickFleet Mobile Labelled Burger Pill */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden inline-flex items-center gap-2 h-10 px-3 pl-3.5 rounded-full bg-[#0C0730] text-white text-xs font-semibold cursor-pointer active:scale-95 transition-all"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileMenuOpen}
+            >
+              <span>Menu</span>
+              <span className="w-6 h-6 rounded-full bg-white/15 flex flex-col items-center justify-center gap-1">
+                <span className={`block w-3 h-[1.5px] bg-white rounded-full transition-transform ${mobileMenuOpen ? "translate-y-[2.75px] rotate-45" : ""}`} />
+                <span className={`block w-3 h-[1.5px] bg-white rounded-full transition-transform ${mobileMenuOpen ? "-translate-y-[2.75px] -rotate-45" : ""}`} />
+              </span>
+            </button>
           </div>
         </div>
       </header>
+
+      {/* QuickFleet Mobile Full-Screen Navy Menu Overlay */}
+      <div
+        className={`fixed inset-0 z-50 flex flex-col bg-[#0C0730] text-white transition-all duration-300 ${
+          mobileMenuOpen
+            ? "opacity-100 visible translate-y-0"
+            : "opacity-0 invisible -translate-y-2 pointer-events-none"
+        }`}
+        style={{ fontFamily: 'var(--font, "Geist", sans-serif)' }}
+      >
+        <div className="flex items-center justify-between h-18 px-5 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#6FD9C1]" />
+            <div>
+              <span className="text-base font-extrabold text-white tracking-tight">SPEEDCRAFT</span>
+              <span className="block text-[10px] font-mono text-[#6FD9C1] uppercase tracking-wider">
+                100/100 Core Web Vitals
+              </span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(false)}
+            className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-white/10 transition"
+            aria-label="Close menu"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <nav className="flex-1 flex flex-col justify-center px-6 py-6 space-y-3" aria-label="Mobile Navigation">
+          <a
+            href="#performance"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-between py-3 border-b border-white/10 text-2xl font-medium tracking-tight text-white hover:text-[#6FD9C1] transition-colors"
+          >
+            <span>Performance</span>
+            <ArrowRight className="w-5 h-5 text-white/40" />
+          </a>
+          <a
+            href="#work"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-between py-3 border-b border-white/10 text-2xl font-medium tracking-tight text-white hover:text-[#6FD9C1] transition-colors"
+          >
+            <span>Featured Work</span>
+            <ArrowRight className="w-5 h-5 text-white/40" />
+          </a>
+          <a
+            href="#concierge"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-between py-3 border-b border-white/10 text-2xl font-medium tracking-tight text-white hover:text-[#6FD9C1] transition-colors"
+          >
+            <span>Concierge Care</span>
+            <ArrowRight className="w-5 h-5 text-white/40" />
+          </a>
+          <a
+            href="#roi-calculator"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-between py-3 border-b border-white/10 text-2xl font-medium tracking-tight text-white hover:text-[#6FD9C1] transition-colors"
+          >
+            <span>ROI Calculator</span>
+            <ArrowRight className="w-5 h-5 text-white/40" />
+          </a>
+          <a
+            href="#pricing"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-between py-3 border-b border-white/10 text-2xl font-medium tracking-tight text-white hover:text-[#6FD9C1] transition-colors"
+          >
+            <span>Pricing</span>
+            <ArrowRight className="w-5 h-5 text-white/40" />
+          </a>
+        </nav>
+
+        <div className="p-6 pt-2 pb-8 border-t border-white/10 space-y-3">
+          <a
+            href="#prototype"
+            onClick={() => setMobileMenuOpen(false)}
+            className="w-full flex items-center justify-center gap-2 h-13 rounded-full bg-white text-[#0C0730] font-bold text-base shadow-lg transition active:scale-98"
+          >
+            <span>Request Free Prototype</span>
+            <ArrowRight className="w-4 h-4" />
+          </a>
+          <div className="text-center text-xs font-mono text-white/40 uppercase tracking-widest pt-1">
+            Sub-Second Engineering · Next.js · Zero Bloat
+          </div>
+        </div>
+      </div>
 
       {/* ──────────────────────────────────────────────────────────────────────
           1. HERO SECTION (Editorial, Authoritative, High-Trust)
