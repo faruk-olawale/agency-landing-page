@@ -2,22 +2,30 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { Phone, ArrowRight, Wrench, X } from "lucide-react";
+import type { AutomotiveTruth } from "@/lib/automotiveTruth";
 
 interface QuickFleetNavProps {
   companyName: string;
-  city: string;
-  phone: string;
-  cleanPhone: string;
+  city?: string;
+  phone?: string;
+  cleanPhone?: string;
   primaryColor?: string;
+  truth?: AutomotiveTruth;
 }
 
 export function QuickFleetNav({
-  companyName,
-  city,
-  phone,
-  cleanPhone,
+  companyName: propCompanyName,
+  city: propCity,
+  phone: propPhone,
+  cleanPhone: propCleanPhone,
   primaryColor = "#0A997D",
+  truth,
 }: QuickFleetNavProps) {
+  const companyName = truth?.companyName || propCompanyName;
+  const city = truth?.hasCity ? truth.city : propCity;
+  const phone = truth?.phone || propPhone;
+  const cleanPhone = truth?.cleanPhone || propCleanPhone;
+  const hasPhone = Boolean(phone && cleanPhone && cleanPhone.length >= 7);
   // Strictly enforce QuickFleet teal and eliminate any orange
   const safeColor =
     !primaryColor ||
@@ -246,14 +254,26 @@ export function QuickFleetNav({
 
           {/* Action Pills & Labelled Burger Button */}
           <div className="qf-nav__right">
-            <a
-              href={`tel:${cleanPhone}`}
-              id="qf-nav-contact"
-              aria-label={`Contact ${companyName}`}
-              className="qf-control qf-control--ghost"
-            >
-              Contact
-            </a>
+            {hasPhone ? (
+              <a
+                href={`tel:${cleanPhone}`}
+                id="qf-nav-contact"
+                aria-label={`Call ${companyName} at ${phone}`}
+                className="qf-control qf-control--ghost"
+              >
+                Call: {phone}
+              </a>
+            ) : (
+              <a
+                href="#book-intake"
+                id="qf-nav-contact"
+                onClick={(e) => handleLinkClick(e, "#book-intake")}
+                aria-label={`Contact ${companyName}`}
+                className="qf-control qf-control--ghost"
+              >
+                Contact
+              </a>
+            )}
 
             <a
               href="#book-intake"
@@ -499,24 +519,45 @@ export function QuickFleetNav({
           </a>
 
           <div className="qf-mnav__more">
-            <a
-              href={`tel:${cleanPhone}`}
-              onClick={() => setMenu(false)}
-            >
-              Contact
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-3.5 h-3.5"
-                aria-hidden="true"
+            {hasPhone ? (
+              <a
+                href={`tel:${cleanPhone}`}
+                onClick={() => setMenu(false)}
               >
-                <path d="M5 12h14M13 6l6 6-6 6" />
-              </svg>
-            </a>
+                Call: {phone}
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-3.5 h-3.5"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </a>
+            ) : (
+              <a
+                href="#book-intake"
+                onClick={(e) => handleLinkClick(e, "#book-intake")}
+              >
+                Intake Request
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-3.5 h-3.5"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </a>
+            )}
           </div>
         </nav>
 
@@ -542,15 +583,25 @@ export function QuickFleetNav({
             </svg>
           </a>
 
-          <a
-            className="qf-mnav__phone"
-            href={`tel:${cleanPhone}`}
-          >
-            <span>Direct Bay Hotline: {phone}</span>
-          </a>
+          {hasPhone ? (
+            <a
+              className="qf-mnav__phone"
+              href={`tel:${cleanPhone}`}
+            >
+              <span>Direct Bay Hotline: {phone}</span>
+            </a>
+          ) : (
+            <a
+              className="qf-mnav__phone"
+              href="#book-intake"
+              onClick={(e) => handleLinkClick(e, "#book-intake")}
+            >
+              <span>Schedule Diagnostic Drop-Off</span>
+            </a>
+          )}
 
           <p className="qf-mnav__meta">
-            {city.toUpperCase()} FIRST · PRECISION INTAKE 2026
+            {city ? `${city.toUpperCase()} · ` : ""}PRECISION DIAGNOSTICS 2026
           </p>
         </div>
       </div>

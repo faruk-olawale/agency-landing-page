@@ -4,21 +4,31 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Phone } from "lucide-react";
 
+import type { AutomotiveTruth } from "@/lib/automotiveTruth";
+
 interface QuickFleetLiveRecordProps {
   companyName: string;
-  city: string;
-  phone: string;
-  cleanPhone: string;
+  city?: string;
+  phone?: string;
+  cleanPhone?: string;
   primaryColor?: string;
+  truth?: AutomotiveTruth;
 }
 
 export function QuickFleetLiveRecord({
-  companyName,
-  city,
-  phone,
-  cleanPhone,
+  companyName: propCompanyName,
+  city: propCity,
+  phone: propPhone,
+  cleanPhone: propCleanPhone,
   primaryColor = "#0A997D",
+  truth,
 }: QuickFleetLiveRecordProps) {
+  const companyName = truth?.companyName || propCompanyName;
+  const hasCity = truth ? truth.hasCity : Boolean(propCity);
+  const city = truth?.city || propCity;
+  const hasPhone = truth ? truth.hasPhone : Boolean(propCleanPhone && propCleanPhone.length >= 7);
+  const phone = truth?.phone || propPhone;
+  const cleanPhone = truth?.cleanPhone || propCleanPhone;
   // Strictly enforce QuickFleet teal #0A997D and eliminate orange
   const safeColor =
     !primaryColor ||
@@ -61,7 +71,7 @@ export function QuickFleetLiveRecord({
 
           <p className="text-base sm:text-[17px] text-[#0C0730]/75 leading-relaxed mt-6 max-w-[42ch]">
             <b>From the first scan to the handover, your vehicle stays in view.</b> Track
-            diagnosis in real time at our {city} facility, watch the technician&apos;s video
+            diagnosis in real time at our {hasCity ? `${city} ` : ""}facility, watch the technician&apos;s video
             walkthrough, approve line items with a single tap, and verify completion with a 4-digit
             security code.
           </p>
@@ -75,13 +85,22 @@ export function QuickFleetLiveRecord({
               <ArrowRight className="w-4 h-4" />
             </a>
 
-            <a
-              href={`tel:${cleanPhone}`}
-              className="qf-control qf-control--ghost text-sm font-mono justify-center"
-            >
-              <Phone className="w-3.5 h-3.5 text-[#0A997D]" />
-              <span className="truncate">Direct Line: {phone}</span>
-            </a>
+            {hasPhone ? (
+              <a
+                href={`tel:${cleanPhone}`}
+                className="qf-control qf-control--ghost text-sm font-mono justify-center"
+              >
+                <Phone className="w-3.5 h-3.5 text-[#0A997D]" />
+                <span className="truncate">Direct Line: {phone}</span>
+              </a>
+            ) : (
+              <a
+                href="#facility"
+                className="qf-control qf-control--ghost text-sm font-mono justify-center"
+              >
+                <span>Explore Capabilities</span>
+              </a>
+            )}
           </div>
         </div>
 
@@ -95,10 +114,13 @@ export function QuickFleetLiveRecord({
                   {companyName} · RO NUMBER
                 </span>
                 <span className="text-sm sm:text-base font-bold text-white tracking-wide">RO-40912</span>
+                <span className="text-[9px] text-[#6FD9C1]/90 block font-mono mt-0.5">
+                  {truth?.isDemoMode ? "SAMPLE WORK ORDER · WORKFLOW DEMO" : "WORKFLOW CAPABILITY PREVIEW"}
+                </span>
               </div>
               <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-[#0A997D]/20 text-[#6FD9C1] border border-[#0A997D]/40 text-[10px] sm:text-[11px] font-bold shrink-0 tracking-wider">
                 <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#6FD9C1] animate-pulse shrink-0" />
-                BAY 2 ACTIVE
+                {truth ? truth.bays.liveBayStatus : "BAY 2 ACTIVE"}
               </span>
             </div>
 
@@ -217,10 +239,10 @@ export function QuickFleetLiveRecord({
                   MASTER SPECIALIST
                 </span>
                 <div className="text-xs font-bold text-white mt-0.5 truncate">
-                  M. Vance (ASE L1 #4928)
+                  {truth ? truth.technicians.leadTechTitle : "Assigned Master Diagnostic Specialist"}
                 </div>
                 <div className="text-[10px] text-[#6FD9C1] truncate">
-                  Verified Digital Signature
+                  {truth ? truth.technicians.signatureLabel : "Verified Digital Inspection"}
                 </div>
               </div>
             </div>

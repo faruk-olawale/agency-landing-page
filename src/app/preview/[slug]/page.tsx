@@ -159,10 +159,13 @@ function fetchLeadData(
     found?.website ||
     (slug ? `https://${slug}.com` : "https://example.com");
 
-  const city =
-    getQueryValue(query?.city) ||
-    found?.city ||
-    "Metropolitan Area";
+  const rawCity = getQueryValue(query?.city) || found?.city;
+  const isGenericCity =
+    !rawCity ||
+    rawCity.toLowerCase() === "metropolitan area" ||
+    rawCity.toLowerCase() === "local market" ||
+    rawCity.toLowerCase() === "city";
+  const city = isGenericCity ? undefined : rawCity.trim();
 
   const phone =
     getQueryValue(query?.phone) ||
@@ -173,6 +176,14 @@ function fetchLeadData(
     getQueryValue(query?.email) ||
     found?.email ||
     "";
+
+  const demoParam = getQueryValue(query?.demo) || getQueryValue(query?.mode);
+  const isDemoMode =
+    demoParam === "demo" ||
+    demoParam === "true" ||
+    slug === "demo" ||
+    slug === "sample" ||
+    Boolean(found?.isDemoMode);
 
   const primaryColor =
     getQueryValue(query?.primaryColor) ||
@@ -207,6 +218,7 @@ function fetchLeadData(
     detectedPlugins: found?.detectedPlugins,
     hasAdTags: found?.hasAdTags,
     hasMarketingPixels: found?.hasMarketingPixels,
+    isDemoMode,
   };
 }
 
@@ -256,7 +268,7 @@ export default async function PreviewPage({ params, searchParams }: PageProps) {
   let renderedTemplate: React.ReactNode;
   switch (archetype) {
     case "UrgentService":
-      renderedTemplate = <UrgentService clientData={lead} />;
+      renderedTemplate = <UrgentService clientData={lead} isDemoMode={lead.isDemoMode} />;
       break;
 
     case "ProfessionalTrust":

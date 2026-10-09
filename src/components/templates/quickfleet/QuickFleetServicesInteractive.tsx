@@ -3,11 +3,14 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+import type { AutomotiveTruth } from "@/lib/automotiveTruth";
+
 interface QuickFleetServicesInteractiveProps {
   companyName: string;
-  city: string;
-  cleanPhone: string;
+  city?: string;
+  cleanPhone?: string;
   primaryColor?: string;
+  truth?: AutomotiveTruth;
 }
 
 interface WorkflowStep {
@@ -288,11 +291,19 @@ const SERVICE_DISCIPLINES: ServiceDiscipline[] = [
 ];
 
 export function QuickFleetServicesInteractive({
-  companyName,
-  city,
-  cleanPhone,
+  companyName: propCompanyName,
+  city: propCity,
+  cleanPhone: propCleanPhone,
   primaryColor = "#0A997D",
+  truth,
 }: QuickFleetServicesInteractiveProps) {
+  const companyName = truth?.companyName || propCompanyName;
+  const hasCity = truth ? truth.hasCity : Boolean(propCity);
+  const city = truth?.city || propCity;
+  const hasPhone = truth ? truth.hasPhone : Boolean(propCleanPhone && propCleanPhone.length >= 7);
+  const cleanPhone = truth?.cleanPhone || propCleanPhone;
+  const phone = truth?.phone || propCleanPhone;
+
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const [autoRotate, setAutoRotate] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<
@@ -331,14 +342,14 @@ export function QuickFleetServicesInteractive({
               A complete diagnostic cockpit. Built to eliminate guesswork.
             </h2>
             <p className="mt-4 text-base sm:text-lg text-[#0C0730]/75 leading-relaxed">
-              Every vehicle entering our {city} facility passes through a standardized 5-phase forensic
+              Every vehicle entering our {hasCity ? `${city} ` : ""}facility passes through a standardized 5-phase forensic
               workflow. No &ldquo;parts cannon,&rdquo; no speculative labor, and no surprise charges—supported by 4K cloud video proof.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
             <a
-              href="#book"
+              href="#book-intake"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0C0730] text-white text-sm font-medium hover:bg-[#1E1648] transition-all shadow-sm"
             >
               <span>Book Diagnostic Bay</span>
@@ -545,7 +556,7 @@ export function QuickFleetServicesInteractive({
 
                   {/* Phone screen footer status */}
                   <div className="pt-2 px-1 border-t border-white/10 flex items-center justify-between text-[10px] font-mono">
-                    <span className="text-white/50">{city.toUpperCase()} BAY 02</span>
+                    <span className="text-white/50">{hasCity && city ? `${city.toUpperCase()} BAY 02` : "FACILITY BAY 02"}</span>
                     <span className="text-[#6FD9C1] font-semibold">{currentStep.hudReadout.integrity}</span>
                   </div>
                 </div>
@@ -608,7 +619,7 @@ export function QuickFleetServicesInteractive({
                 Our Primary Service Disciplines
               </h3>
               <p className="text-sm text-[#0C0730]/70 mt-1 max-w-[60ch]">
-                Every procedure is performed in our climate-controlled {city} workshop according to strict
+                Every procedure is performed in our climate-controlled {hasCity ? `${city} ` : ""}workshop according to strict
                 factory workshop manuals (TIS/ELSA/WIS).
               </p>
             </div>
@@ -742,16 +753,23 @@ export function QuickFleetServicesInteractive({
               </div>
               <p className="text-xs sm:text-sm text-[#0C0730]/80">
                 <strong className="text-[#0C0730]">Don&rsquo;t see your specific trouble code or mechanical symptom?</strong>{" "}
-                Our master technicians diagnose any European or domestic platform. Call directly at{" "}
-                <a href={`tel:${cleanPhone}`} className="text-[#0A997D] font-bold hover:underline">
-                  {cleanPhone}
-                </a>{" "}
-                for an instant technical assessment.
+                Our master technicians diagnose any European or domestic platform.{" "}
+                {hasPhone ? (
+                  <>
+                    Call directly at{" "}
+                    <a href={`tel:${cleanPhone}`} className="text-[#0A997D] font-bold hover:underline">
+                      {phone}
+                    </a>{" "}
+                    for an instant technical assessment.
+                  </>
+                ) : (
+                  <>Submit your vehicle details below for an expedited diagnostic assessment.</>
+                )}
               </p>
             </div>
 
             <a
-              href="#book"
+              href="#book-intake"
               className="inline-flex items-center justify-center whitespace-nowrap px-5 py-2.5 rounded-full bg-[#0C0730] text-white text-xs font-semibold hover:bg-[#0A997D] transition-colors"
             >
               Get Direct Fault Diagnosis

@@ -3,15 +3,21 @@
 import React, { useState, useEffect } from "react";
 import { CheckCircle2, Play, Pause, Check, ShieldAlert, Cpu, Activity, Zap, RefreshCw } from "lucide-react";
 
+import type { AutomotiveTruth } from "@/lib/automotiveTruth";
+
 interface QuickFleetStickyCardsProps {
-  city: string;
+  city?: string;
   primaryColor?: string;
+  truth?: AutomotiveTruth;
 }
 
 export function QuickFleetStickyCards({
-  city,
+  city: propCity,
   primaryColor = "#0A997D",
+  truth,
 }: QuickFleetStickyCardsProps) {
+  const hasCity = truth ? truth.hasCity : Boolean(propCity);
+  const city = truth?.city || propCity;
   // Strictly enforce QuickFleet teal #0A997D and eliminate orange
   const safeColor =
     !primaryColor ||
@@ -508,9 +514,11 @@ export function QuickFleetStickyCards({
           <div className="w-full max-w-lg bg-white rounded-2xl p-5 text-[#0C0730] shadow-lg border border-[rgba(12,7,48,0.08)]">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 font-mono text-xs">
               <span className="font-bold text-[#0C0730] uppercase tracking-wider">
-                {city} Bay Dispatch Matrix
+                {truth ? truth.bays.matrixTitle : (hasCity ? `${city} Bay Dispatch Matrix` : "Diagnostic Bay Schedule")}
               </span>
-              <span className="text-[10px] text-[#0A997D] font-bold">4 OF 4 ACTIVE</span>
+              <span className="text-[10px] text-[#0A997D] font-bold">
+                {truth ? truth.bays.statusSummary : "ACTIVE BAYS · ACCEPTING INTAKE"}
+              </span>
             </div>
 
             {/* 4 Interactive Bays Grid */}
@@ -521,7 +529,7 @@ export function QuickFleetStickyCards({
                   name: "Bay 1: Oscilloscope Triage",
                   vehicle: "2023 BMW M3 Comp",
                   status: "In Waveform Scan",
-                  tech: "M. Vance (ASE L1)",
+                  tech: truth?.isDemoMode ? "M. Vance (ASE L1) · Sample" : "Lead Scope Specialist",
                   tool: "PicoScope 4425A",
                 },
                 {
@@ -529,7 +537,7 @@ export function QuickFleetStickyCards({
                   name: "Bay 2: Drivetrain Clean Room",
                   vehicle: "2022 Porsche Macan GTS",
                   status: "Valve Body Assembly",
-                  tech: "J. Mercer (Porsche Cert)",
+                  tech: truth?.isDemoMode ? "J. Mercer (Porsche Cert) · Sample" : "Master Drivetrain Specialist",
                   tool: "Stahlwille Digital Torque",
                 },
                 {
@@ -537,15 +545,15 @@ export function QuickFleetStickyCards({
                   name: "Bay 3: ADAS & 3D Alignment",
                   vehicle: "2021 Audi RS6 Avant",
                   status: "Radar Calibration",
-                  tech: "S. Chen (ODIS Master)",
+                  tech: truth?.isDemoMode ? "S. Chen (ODIS Master) · Sample" : "ADAS Calibration Lead",
                   tool: "Hunter Hawkeye Elite",
                 },
                 {
                   id: 4,
                   name: "Bay 4: Express Handover",
                   vehicle: "2024 Mercedes C63 AMG",
-                  status: "Road Test &amp; QC Done",
-                  tech: "K. Davis (Xentry Tech)",
+                  status: "Road Test & QC Done",
+                  tech: truth?.isDemoMode ? "K. Davis (Xentry Tech) · Sample" : "Quality Inspection Lead",
                   tool: "4-Digit Handover Code",
                 },
               ].map((bay) => (

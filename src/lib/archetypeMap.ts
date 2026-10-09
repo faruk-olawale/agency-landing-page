@@ -240,11 +240,13 @@ export interface ClientData {
   adEvidenceStatus?: "verified_ads" | "no_detected_ads" | "inconclusive";
   qualificationStatus?: "qualified" | "unverified" | "disqualified";
   qualificationReason?: string;
+  isDemoMode?: boolean;
   [key: string]: unknown;
 }
 
 export interface TemplateProps {
   clientData: ClientData;
+  isDemoMode?: boolean;
 }
 
 export const ARCHETYPE_INDUSTRIES: Record<Exclude<Archetype, "Generic">, string[]> = {

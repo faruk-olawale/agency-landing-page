@@ -1,22 +1,32 @@
 "use client";
 
 import React from "react";
+import type { AutomotiveTruth } from "@/lib/automotiveTruth";
 
 interface QuickFleetFooterProps {
-  companyName: string;
-  city: string;
-  phone: string;
-  cleanPhone: string;
+  companyName?: string;
+  city?: string;
+  phone?: string;
+  cleanPhone?: string;
   primaryColor?: string;
+  truth?: AutomotiveTruth;
 }
 
 export function QuickFleetFooter({
-  companyName,
-  city,
-  phone,
-  cleanPhone,
+  companyName: propCompanyName = "Independent Diagnostic Specialist",
+  city: propCity,
+  phone: propPhone,
+  cleanPhone: propCleanPhone,
   primaryColor = "#0A997D",
+  truth,
 }: QuickFleetFooterProps) {
+  const companyName = truth?.companyName || propCompanyName;
+  const hasCity = truth ? truth.hasCity : Boolean(propCity);
+  const city = truth?.city || propCity;
+  const hasPhone = truth ? truth.hasPhone : Boolean(propCleanPhone && propCleanPhone.length >= 7);
+  const phone = truth?.phone || propPhone;
+  const cleanPhone = truth?.cleanPhone || propCleanPhone;
+
   // Strictly enforce QuickFleet teal and eliminate any orange
   const safeColor =
     !primaryColor ||
@@ -69,7 +79,7 @@ export function QuickFleetFooter({
                 {companyName}
               </div>
               <div className="text-[11px] font-mono text-slate-400">
-                Precision Automotive Diagnostics · {city}
+                Precision Automotive Diagnostics{hasCity ? ` · ${city}` : ""}
               </div>
             </div>
           </a>
@@ -87,25 +97,37 @@ export function QuickFleetFooter({
             <a href="#cost-benchmark" className="hover:text-white transition-colors">
               Cost Benchmark
             </a>
-            <a href={`tel:${cleanPhone}`} className="text-[#6FD9C1] hover:underline">
-              Bay Hotline: {phone}
-            </a>
+            {hasPhone ? (
+              <a href={`tel:${cleanPhone}`} className="text-[#6FD9C1] hover:underline">
+                Bay Hotline: {phone}
+              </a>
+            ) : (
+              <a href="#book-intake" className="text-[#6FD9C1] hover:underline">
+                Book Intake
+              </a>
+            )}
           </div>
         </div>
 
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[11px] text-slate-400">
           <div>
-            &copy; {new Date().getFullYear()} {companyName}. All rights reserved. Built with OEM factory diagnostic protocols.
+            &copy; {new Date().getFullYear()} {companyName}. All rights reserved.
           </div>
-          <div className="flex items-center gap-4">
-            <span>ASE L1 MASTER CERTIFIED</span>
+          <div className="flex flex-wrap items-center gap-4">
+            <span>
+              {truth ? truth.technicians.footerCertTag : "OEM FACTORY DIAGNOSTIC PROTOCOLS"}
+            </span>
             <span>•</span>
-            <span>BOSCH AUTHORIZED</span>
+            <span>
+              {truth ? truth.warranty.footerTag : "WRITTEN REPAIR WARRANTY"}
+            </span>
             <span>•</span>
-            <span>3-YR / 36K WARRANTY</span>
+            <span>VERIFIED DIGITAL REPAIR ORDER</span>
           </div>
         </div>
       </div>
     </footer>
   );
 }
+
+export default QuickFleetFooter;

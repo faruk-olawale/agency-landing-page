@@ -3,9 +3,12 @@
 import React, { useState } from "react";
 import { ArrowRight, Check, X, Clock } from "lucide-react";
 
+import type { AutomotiveTruth } from "@/lib/automotiveTruth";
+
 interface QuickFleetCostBenchmarkProps {
-  companyName: string;
-  city: string;
+  companyName?: string;
+  city?: string;
+  truth?: AutomotiveTruth;
 }
 
 interface RepairScenario {
@@ -58,9 +61,14 @@ const SCENARIOS: RepairScenario[] = [
 ];
 
 export function QuickFleetCostBenchmark({
-  companyName,
-  city,
+  companyName: propCompanyName = "Independent Diagnostic Specialist",
+  city: propCity,
+  truth,
 }: QuickFleetCostBenchmarkProps) {
+  const companyName = truth?.companyName || propCompanyName;
+  const hasCity = truth ? truth.hasCity : Boolean(propCity);
+  const city = truth?.city || propCity;
+
   const [selectedScenario, setSelectedScenario] = useState<RepairScenario>(SCENARIOS[0]);
 
   const savings = selectedScenario.dealerPrice - selectedScenario.specialistPrice;
@@ -73,7 +81,7 @@ export function QuickFleetCostBenchmark({
         <div className="bg-[#E9F3EF] rounded-3xl p-6 sm:p-9 border border-[rgba(10,153,125,0.18)] shadow-sm">
           <div className="flex items-center justify-between pb-4 border-b border-[rgba(10,153,125,0.18)] font-mono text-xs">
             <span className="text-[#0C0730]/60 font-semibold uppercase tracking-wider">
-              Diagnostic &amp; Repair Benchmark · {city}
+              {truth ? truth.costBenchmark.label : (hasCity ? `Diagnostic & Repair Benchmark · ${city}` : "Diagnostic & Repair Benchmark")}
             </span>
             <span className="text-[#0A997D] font-bold">50%+ AVERAGE SAVINGS</span>
           </div>
@@ -150,7 +158,7 @@ export function QuickFleetCostBenchmark({
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="text-[#6FD9C1] font-bold">✓</span>
-                  <span>3-Yr / 36,000-Mi Warranty</span>
+                  <span>{truth ? truth.warranty.term : "Written Parts & Labor Guarantee"}</span>
                 </div>
               </div>
             </div>
@@ -170,6 +178,15 @@ export function QuickFleetCostBenchmark({
                 Up to 3 weeks faster
               </span>
             </div>
+          </div>
+
+          {/* Industry Benchmark Transparency Disclaimer */}
+          <div className="mt-4 p-3.5 rounded-xl bg-white/70 border border-[rgba(10,153,125,0.2)] text-[11px] text-[#0C0730]/75 leading-relaxed font-sans">
+            <strong className="text-[#0C0730] font-semibold block mb-0.5">
+              {truth?.costBenchmark.label || "Industry Benchmark Disclaimer"}:
+            </strong>
+            {truth?.costBenchmark.disclaimer ||
+              "Benchmark metrics reflect independent industry diagnostic averages vs. typical authorized dealer list pricing. Binding upfront quotes are provided directly to the vehicle owner prior to work commencing."}
           </div>
         </div>
 

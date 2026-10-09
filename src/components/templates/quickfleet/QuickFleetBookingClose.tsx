@@ -1,23 +1,33 @@
 "use client";
 
 import React, { useState } from "react";
-import { ArrowRight, Phone, CheckCircle2, Clock, MapPin, Key } from "lucide-react";
+import { ArrowRight, Phone, CheckCircle2, Clock, MapPin, Key, Wrench } from "lucide-react";
+import type { AutomotiveTruth } from "@/lib/automotiveTruth";
 
 interface QuickFleetBookingCloseProps {
-  companyName: string;
-  city: string;
-  phone: string;
-  cleanPhone: string;
+  companyName?: string;
+  city?: string;
+  phone?: string;
+  cleanPhone?: string;
   primaryColor?: string;
+  truth?: AutomotiveTruth;
 }
 
 export function QuickFleetBookingClose({
-  companyName,
-  city,
-  phone,
-  cleanPhone,
+  companyName: propCompanyName = "Independent Diagnostic Specialist",
+  city: propCity,
+  phone: propPhone,
+  cleanPhone: propCleanPhone,
   primaryColor = "#0A997D",
+  truth,
 }: QuickFleetBookingCloseProps) {
+  const companyName = truth?.companyName || propCompanyName;
+  const hasCity = truth ? truth.hasCity : Boolean(propCity);
+  const city = truth?.city || propCity;
+  const hasPhone = truth ? truth.hasPhone : Boolean(propCleanPhone && propCleanPhone.length >= 7);
+  const phone = truth?.phone || propPhone;
+  const cleanPhone = truth?.cleanPhone || propCleanPhone;
+
   const [vehicleIssue, setVehicleIssue] = useState("Check Engine / Drivetrain Fault");
   const [clientPhone, setClientPhone] = useState("");
   const [vehicleModel, setVehicleModel] = useState("");
@@ -40,28 +50,33 @@ export function QuickFleetBookingClose({
           </span>
 
           <h2 className="text-3xl sm:text-5xl font-semibold text-white tracking-[-0.028em] mt-5 leading-tight max-w-[14ch]">
-            Reserve your bay before triage fills.
+            Request priority diagnostic intake.
           </h2>
 
           <p className="text-base text-white/75 leading-relaxed mt-5 max-w-[44ch]">
-            We accept a strictly limited number of vehicles per day to maintain zero-delay
-            diagnostic standards. Enter your details below or call our direct bay dispatch line.
+            We accept a managed volume of vehicles per day to maintain zero-delay
+            diagnostic standards. Enter your details below to request a diagnostic intake slot
+            or call our direct service desk.
           </p>
 
           {submitted ? (
-            <div className="mt-8 p-6 rounded-2xl bg-[#0A997D]/20 border border-[#0A997D]/40 text-white font-mono text-xs">
+            <div
+              id="booking-submitted-card"
+              role="alert"
+              className="mt-8 p-6 rounded-2xl bg-[#0A997D]/20 border border-[#0A997D]/40 text-white font-mono text-xs"
+            >
               <div className="flex items-center gap-2 text-[#6FD9C1] text-sm font-bold">
                 <CheckCircle2 className="w-5 h-5 text-[#6FD9C1]" />
-                <span>Bay Intake Reserved for {vehicleModel || "Your Vehicle"}</span>
+                <span>Intake Request Transmitted · Pending Scheduling Confirmation</span>
               </div>
-              <p className="mt-2 text-slate-300">
-                Service Advisor Marcus has logged your priority intake request. We will contact{" "}
-                <span className="text-white font-bold">{clientPhone}</span> within 10 minutes to
-                confirm drop-off bay assignment.
+              <p className="mt-3 text-slate-200 leading-relaxed font-sans text-xs sm:text-sm">
+                Our service team has received your priority intake request for{" "}
+                <strong className="text-white">{vehicleModel || "your vehicle"}</strong> (symptom: {vehicleIssue}).
+                A technical advisor will reach out to <strong className="text-white">{clientPhone}</strong> to confirm bay availability and schedule drop-off.
               </p>
-              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
-                <span>INTAKE SLA: &lt; 10 MINS</span>
-                <span>STATUS: QUEUED IN BAY 2</span>
+              <div className="mt-4 pt-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-slate-300">
+                <span>INTAKE SLA: SAME-DAY ADVISOR TRIAGE</span>
+                <span className="text-[#6FD9C1]">STATUS: REQUEST LOGGED (NOT CONFIRMED APPOINTMENT)</span>
               </div>
             </div>
           ) : (
@@ -73,6 +88,7 @@ export function QuickFleetBookingClose({
                     Primary Symptom
                   </label>
                   <select
+                    id="intake-issue-select"
                     value={vehicleIssue}
                     onChange={(e) => setVehicleIssue(e.target.value)}
                     className="w-full h-11 px-3 rounded-xl bg-white/10 border border-white/20 text-white text-xs font-sans focus:outline-none focus:border-[#6FD9C1] transition-colors"
@@ -101,6 +117,7 @@ export function QuickFleetBookingClose({
                     Direct Phone / Cell
                   </label>
                   <input
+                    id="intake-phone-input"
                     type="tel"
                     required
                     placeholder="(555) 000-0000"
@@ -117,6 +134,7 @@ export function QuickFleetBookingClose({
                   Vehicle Year, Make &amp; Model
                 </label>
                 <input
+                  id="intake-vehicle-input"
                   type="text"
                   required
                   placeholder="e.g. 2022 Porsche Macan or BMW M3"
@@ -130,23 +148,35 @@ export function QuickFleetBookingClose({
               <div className="pt-2 flex flex-col md:flex-row gap-3 w-full">
                 <button
                   type="submit"
+                  id="intake-submit-btn"
                   className="qf-control qf-control--teal text-sm font-semibold justify-center w-full md:w-auto md:flex-1 shrink-0"
                 >
-                  <span className="truncate">Confirm Bay Reservation</span>
+                  <span className="truncate">Submit Intake Request</span>
                   <ArrowRight className="w-4 h-4 shrink-0" />
                 </button>
 
-                <a
-                  href={`tel:${cleanPhone}`}
-                  className="qf-control qf-control--ghost-dark text-xs sm:text-sm font-mono justify-center w-full md:w-auto shrink-0"
-                >
-                  <Phone className="w-3.5 h-3.5 text-[#6FD9C1] shrink-0" />
-                  <span className="truncate">Call Bay Desk: {phone}</span>
-                </a>
+                {hasPhone ? (
+                  <a
+                    href={`tel:${cleanPhone}`}
+                    id="intake-phone-btn"
+                    className="qf-control qf-control--ghost-dark text-xs sm:text-sm font-mono justify-center w-full md:w-auto shrink-0"
+                  >
+                    <Phone className="w-3.5 h-3.5 text-[#6FD9C1] shrink-0" />
+                    <span className="truncate">Call Bay Desk: {phone}</span>
+                  </a>
+                ) : (
+                  <a
+                    href="#facility"
+                    className="qf-control qf-control--ghost-dark text-xs sm:text-sm font-mono justify-center w-full md:w-auto shrink-0"
+                  >
+                    <Wrench className="w-3.5 h-3.5 text-[#6FD9C1] shrink-0" />
+                    <span className="truncate">View Diagnostic Bays</span>
+                  </a>
+                )}
               </div>
 
               <div className="text-[11px] font-mono text-slate-400 pt-1">
-                Zero obligation · Immediate technician response within 10 minutes.
+                Zero obligation · Service advisor contacts you to confirm scheduling.
               </div>
             </form>
           )}
@@ -158,11 +188,11 @@ export function QuickFleetBookingClose({
           <div className="pb-4 border-b border-white/10">
             <div className="flex items-center justify-between">
               <span className="text-[11px] text-slate-400 uppercase tracking-wider">
-                {city} Diagnostic Hub
+                {hasCity ? `${city} Diagnostic Hub` : "Diagnostic Hub"}
               </span>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#0A997D]/20 text-[#6FD9C1] text-[10px] font-bold">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#6FD9C1] animate-pulse" />
-                2 BAYS READY TODAY
+                {truth ? truth.bays.bookingReadyBadge : "DIAGNOSTIC BAYS ACTIVE"}
               </span>
             </div>
             <div className="text-base font-bold text-white font-sans mt-2">
@@ -170,7 +200,11 @@ export function QuickFleetBookingClose({
             </div>
             <div className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5 text-[#6FD9C1]" />
-              <span>Serving {city} &amp; surrounding 35-mile metro radius</span>
+              <span>
+                {hasCity
+                  ? `Serving ${city} & surrounding metro radius`
+                  : "Serving local drivers & surrounding metro radius"}
+              </span>
             </div>
           </div>
 
@@ -198,7 +232,7 @@ export function QuickFleetBookingClose({
             <div className="text-[11px]">
               <strong className="text-white block font-sans">24/7 Secure Digital Key Locker:</strong>
               Drop off before work or overnight. Digital touch keypad sends receipt timestamp
-              straight to your SMS.
+              straight to your phone.
             </div>
           </div>
         </div>
@@ -206,3 +240,5 @@ export function QuickFleetBookingClose({
     </section>
   );
 }
+
+export default QuickFleetBookingClose;

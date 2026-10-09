@@ -3,8 +3,11 @@
 import React, { useState } from "react";
 import Image from "next/image";
 
+import type { AutomotiveTruth } from "@/lib/automotiveTruth";
+
 interface QuickFleetHotspotsProps {
-  city: string;
+  city?: string;
+  truth?: AutomotiveTruth;
 }
 
 interface Hotspot {
@@ -102,9 +105,12 @@ const POWERTRAIN_HOTSPOTS: Hotspot[] = [
   },
 ];
 
-export function QuickFleetHotspots({ city }: QuickFleetHotspotsProps) {
+export function QuickFleetHotspots({ city: propCity, truth }: QuickFleetHotspotsProps) {
   const [activeView, setActiveView] = useState<"bay" | "powertrain">("bay");
   const [selectedSpot, setSelectedSpot] = useState<string | null>(null);
+
+  const hasCity = truth ? truth.hasCity : Boolean(propCity);
+  const city = truth?.city || propCity;
 
   const hotspots = activeView === "bay" ? BAY_HOTSPOTS : POWERTRAIN_HOTSPOTS;
   const currentSpotObj = hotspots.find((h) => h.id === selectedSpot) || hotspots[0];
@@ -129,7 +135,7 @@ export function QuickFleetHotspots({ city }: QuickFleetHotspotsProps) {
 
         <p className="mt-3 text-base sm:text-[17px] text-[#0C0730]/70 leading-relaxed max-w-[64ch]">
           Dealerships often rely on the &ldquo;parts cannon&rdquo;—swapping expensive components until a
-          warning light temporarily clears. In our {city} diagnostic bays, we capture live
+          warning light temporarily clears. In our {hasCity ? `${city} ` : ""}diagnostic bays, we capture live
           sensor waveforms and module communication at the nanosecond level before touching a single bolt.
         </p>
 
@@ -141,7 +147,7 @@ export function QuickFleetHotspots({ city }: QuickFleetHotspotsProps) {
           <div className="hubfig__img">
             <Image
               src="/images/quickfleet_auto_facility.jpg"
-              alt={`Precision Automotive Diagnostic Facility in ${city}`}
+              alt={`Precision Automotive Diagnostic Facility${hasCity ? ` in ${city}` : ""}`}
               fill
               className="object-cover"
               sizes="(max-width: 1200px) 100vw, 1200px"
@@ -155,7 +161,7 @@ export function QuickFleetHotspots({ city }: QuickFleetHotspotsProps) {
           <div className="hubfig__title">
             <i aria-hidden="true" />
             <span>{activeView === "bay" ? "Bay 02 Diagnostic Station" : "Powertrain & Sensor Lab"}</span>
-            <small>Live Calibration Active · {city}</small>
+            <small>Live Calibration Active{hasCity ? ` · ${city}` : ""}</small>
           </div>
 
           {/* Top Right View Switcher Pill */}
