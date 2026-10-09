@@ -688,7 +688,7 @@ html.qf-menu-open body {
 }
 
 .qf-hero__bg img {
-  filter: brightness(0.66) contrast(1.12);
+  filter: brightness(0.92) contrast(1.06);
   transition: filter 0.3s ease;
 }
 
@@ -698,24 +698,24 @@ html.qf-menu-open body {
   z-index: 1;
   pointer-events: none;
   background:
-    /* Primary Horizontal Scrim: Dense deep navy across left and center where headline and lede sit */
+    /* QuickFleet Signature Asymmetric Scrim: Deep navy on the left behind text, fading gracefully to transparent across center and right so the facility, bays, and vehicles remain completely visible */
     linear-gradient(90deg, 
-      rgba(12, 7, 48, 0.96) 0%, 
-      rgba(12, 7, 48, 0.92) 36%, 
-      rgba(12, 7, 48, 0.82) 58%, 
-      rgba(12, 7, 48, 0.52) 80%, 
-      rgba(12, 7, 48, 0.30) 100%
+      rgba(12, 7, 48, 0.86) 0%, 
+      rgba(12, 7, 48, 0.78) 32%, 
+      rgba(12, 7, 48, 0.48) 56%, 
+      rgba(12, 7, 48, 0.15) 75%, 
+      transparent 90%
     ),
-    /* Vertical bottom vignette for buttons and metadata separation */
+    /* Soft bottom grounding vignette for buttons and footer metadata */
     linear-gradient(0deg, 
-      rgba(12, 7, 48, 0.95) 0%, 
-      rgba(12, 7, 48, 0.60) 32%, 
-      transparent 65%
-    ),
-    /* Top vignette for clean navigation and badge separation */
-    linear-gradient(180deg, 
       rgba(12, 7, 48, 0.80) 0%, 
-      transparent 35%
+      rgba(12, 7, 48, 0.30) 24%, 
+      transparent 50%
+    ),
+    /* Subtle top ceiling vignette for clean navigation separation */
+    linear-gradient(180deg, 
+      rgba(12, 7, 48, 0.55) 0%, 
+      transparent 25%
     );
 }
 
@@ -738,21 +738,21 @@ html.qf-menu-open body {
   text-wrap: balance;
   color: #FFFFFF;
   text-shadow: 
-    0 2px 4px rgba(12, 7, 48, 0.9),
-    0 6px 24px rgba(12, 7, 48, 0.95),
-    0 12px 48px rgba(12, 7, 48, 0.9);
+    0 2px 8px rgba(12, 7, 48, 0.95),
+    0 4px 20px rgba(12, 7, 48, 0.85),
+    0 8px 32px rgba(12, 7, 48, 0.70);
 }
 
 .qf-hero__lede {
   font-size: clamp(16.5px, 1.15vw, 18.5px);
   line-height: 1.62;
-  color: rgba(255, 255, 255, 0.98);
+  color: #FFFFFF;
   margin-top: 24px;
   max-width: 48ch;
-  font-weight: 400;
+  font-weight: 450;
   text-shadow: 
-    0 1px 3px rgba(12, 7, 48, 0.9),
-    0 4px 18px rgba(12, 7, 48, 0.95);
+    0 1px 4px rgba(12, 7, 48, 0.95),
+    0 3px 14px rgba(12, 7, 48, 0.85);
 }
 
 .qf-hero__cta {
@@ -1186,19 +1186,17 @@ html.qf-menu-open body {
   }
 
   .qf-hero__bg img {
-    filter: brightness(0.55) contrast(1.15);
+    filter: brightness(0.96) contrast(1.05);
   }
 
   .qf-hero__overlay {
     background:
+      /* Clean single-layer scrim: enough contrast for headline & buttons while keeping the supercar, bays, and facility vividly visible */
       linear-gradient(180deg, 
-        rgba(12, 7, 48, 0.94) 0%, 
-        rgba(12, 7, 48, 0.86) 45%, 
-        rgba(12, 7, 48, 0.96) 100%
-      ),
-      linear-gradient(90deg, 
-        rgba(12, 7, 48, 0.96) 0%, 
-        rgba(12, 7, 48, 0.85) 100%
+        rgba(12, 7, 48, 0.68) 0%, 
+        rgba(12, 7, 48, 0.48) 38%, 
+        rgba(12, 7, 48, 0.40) 65%, 
+        rgba(12, 7, 48, 0.75) 100%
       );
   }
   

@@ -27,7 +27,7 @@ export function QuickFleetHero({
           alt={`${companyName} modern daylight automotive engineering facility`}
           fill
           priority
-          className="object-cover object-center scale-[1.01]"
+          className="object-cover object-[72%_center] sm:object-center scale-[1.01]"
         />
       </div>
 
@@ -37,9 +37,9 @@ export function QuickFleetHero({
       {/* Inner Hero Typography */}
       <div className="qf-hero__inner">
         <div className="max-w-2xl relative">
-          {/* Localized deep navy aura to guarantee 100% legibility on any screen */}
+          {/* Subtle localized soft wash: protects text contrast while allowing the facility background photo to remain clearly visible */}
           <div
-            className="absolute -inset-8 sm:-inset-12 -left-6 sm:-left-12 bg-radial from-[#0C0730]/90 via-[#0C0730]/65 to-transparent blur-3xl -z-10 pointer-events-none"
+            className="absolute -inset-6 -left-6 sm:-left-10 bg-[radial-gradient(ellipse_at_25%_35%,rgba(12,7,48,0.50)_0%,rgba(12,7,48,0.20)_60%,transparent_90%)] blur-2xl -z-10 pointer-events-none"
             aria-hidden="true"
           />
 
