@@ -613,29 +613,31 @@ export function QuickFleetServicesInteractive({
             </div>
 
             {/* Discipline Filter Tabs */}
-            <div className="flex flex-wrap gap-1.5 p-1 bg-[#0C0730]/5 rounded-full border border-[#0C0730]/10">
-              {(
-                [
-                  { id: "all", label: "All Capabilities (6)" },
-                  { id: "diagnostics", label: "Diagnostics & CAN" },
-                  { id: "powertrain", label: "Engine & Trans" },
-                  { id: "chassis", label: "Brakes & ABS" },
-                  { id: "maintenance", label: "Scheduled Care" },
-                ] as const
-              ).map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setSelectedCategory(tab.id)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
-                    selectedCategory === tab.id
-                      ? "bg-[#0C0730] text-white shadow-sm"
-                      : "text-[#0C0730]/70 hover:text-[#0C0730]"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+            <div className="w-full md:w-auto overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-4 px-4 sm:mx-0 sm:px-0 py-1">
+              <div className="inline-flex items-center gap-1.5 p-1.5 bg-[#0C0730]/5 rounded-full border border-[#0C0730]/10 shrink-0">
+                {(
+                  [
+                    { id: "all", label: "All Capabilities (6)" },
+                    { id: "diagnostics", label: "Diagnostics & CAN" },
+                    { id: "powertrain", label: "Engine & Trans" },
+                    { id: "chassis", label: "Brakes & ABS" },
+                    { id: "maintenance", label: "Scheduled Care" },
+                  ] as const
+                ).map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setSelectedCategory(tab.id)}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap shrink-0 cursor-pointer ${
+                      selectedCategory === tab.id
+                        ? "bg-[#0C0730] text-white shadow-sm font-semibold"
+                        : "text-[#0C0730]/70 hover:text-[#0C0730] hover:bg-black/5"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
