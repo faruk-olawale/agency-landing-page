@@ -36,7 +36,13 @@ export function QuickFleetHero({
 
       {/* Inner Hero Typography */}
       <div className="qf-hero__inner">
-        <div className="max-w-2xl">
+        <div className="max-w-2xl relative">
+          {/* Localized deep navy aura to guarantee 100% legibility on any screen */}
+          <div
+            className="absolute -inset-8 sm:-inset-12 -left-6 sm:-left-12 bg-radial from-[#0C0730]/90 via-[#0C0730]/65 to-transparent blur-3xl -z-10 pointer-events-none"
+            aria-hidden="true"
+          />
+
           {/* Status Badge: Frosted dark pill with luminous mint pulsing radar dot */}
           <div className="inline-block">
             <span className="qf-status">

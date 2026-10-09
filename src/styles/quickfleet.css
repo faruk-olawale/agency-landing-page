@@ -97,21 +97,22 @@
   letter-spacing: 0.04em;
 }
 
-/* Pulsing Status Pill */
+/* Pulsing Status Pill - High Contrast & Crisp Legibility */
 .qf-status {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 14px;
+  padding: 7px 16px;
   border-radius: 999px;
   font-family: var(--mono);
-  font-size: 11.5px;
-  font-weight: 500;
-  background: rgba(111, 217, 193, 0.12);
-  color: var(--mint);
-  border: 1px solid rgba(111, 217, 193, 0.25);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(12, 7, 48, 0.85);
+  color: #6FD9C1;
+  border: 1px solid rgba(111, 217, 193, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 20px rgba(12, 7, 48, 0.6);
 }
 
 .qf-status i {
@@ -683,6 +684,12 @@ html.qf-menu-open body {
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  overflow: hidden;
+}
+
+.qf-hero__bg img {
+  filter: brightness(0.66) contrast(1.12);
+  transition: filter 0.3s ease;
 }
 
 .qf-hero__overlay {
@@ -691,9 +698,25 @@ html.qf-menu-open body {
   z-index: 1;
   pointer-events: none;
   background:
-    linear-gradient(90deg, rgba(12, 7, 48, 0.85) 0%, rgba(12, 7, 48, 0.68) 32%, rgba(12, 7, 48, 0.22) 58%, rgba(12, 7, 48, 0) 74%),
-    linear-gradient(0deg, rgba(12, 7, 48, 0.5) 0%, rgba(12, 7, 48, 0.12) 22%, transparent 42%),
-    linear-gradient(180deg, rgba(12, 7, 48, 0.3) 0%, transparent 28%);
+    /* Primary Horizontal Scrim: Dense deep navy across left and center where headline and lede sit */
+    linear-gradient(90deg, 
+      rgba(12, 7, 48, 0.96) 0%, 
+      rgba(12, 7, 48, 0.92) 36%, 
+      rgba(12, 7, 48, 0.82) 58%, 
+      rgba(12, 7, 48, 0.52) 80%, 
+      rgba(12, 7, 48, 0.30) 100%
+    ),
+    /* Vertical bottom vignette for buttons and metadata separation */
+    linear-gradient(0deg, 
+      rgba(12, 7, 48, 0.95) 0%, 
+      rgba(12, 7, 48, 0.60) 32%, 
+      transparent 65%
+    ),
+    /* Top vignette for clean navigation and badge separation */
+    linear-gradient(180deg, 
+      rgba(12, 7, 48, 0.80) 0%, 
+      transparent 35%
+    );
 }
 
 .qf-hero__inner {
@@ -711,19 +734,25 @@ html.qf-menu-open body {
   letter-spacing: var(--h1-ls);
   font-weight: 600;
   margin-top: 24px;
-  max-width: 15ch;
+  max-width: 16ch;
   text-wrap: balance;
   color: #FFFFFF;
-  text-shadow: 0 2px 24px rgba(12, 7, 48, 0.6);
+  text-shadow: 
+    0 2px 4px rgba(12, 7, 48, 0.9),
+    0 6px 24px rgba(12, 7, 48, 0.95),
+    0 12px 48px rgba(12, 7, 48, 0.9);
 }
 
 .qf-hero__lede {
   font-size: clamp(16.5px, 1.15vw, 18.5px);
   line-height: 1.62;
-  color: rgba(255, 255, 255, 0.96);
+  color: rgba(255, 255, 255, 0.98);
   margin-top: 24px;
   max-width: 48ch;
-  text-shadow: 0 1px 12px rgba(12, 7, 48, 0.5);
+  font-weight: 400;
+  text-shadow: 
+    0 1px 3px rgba(12, 7, 48, 0.9),
+    0 4px 18px rgba(12, 7, 48, 0.95);
 }
 
 .qf-hero__cta {
@@ -1154,6 +1183,23 @@ html.qf-menu-open body {
   .qf-hero {
     min-height: auto;
     padding-bottom: 24px;
+  }
+
+  .qf-hero__bg img {
+    filter: brightness(0.55) contrast(1.15);
+  }
+
+  .qf-hero__overlay {
+    background:
+      linear-gradient(180deg, 
+        rgba(12, 7, 48, 0.94) 0%, 
+        rgba(12, 7, 48, 0.86) 45%, 
+        rgba(12, 7, 48, 0.96) 100%
+      ),
+      linear-gradient(90deg, 
+        rgba(12, 7, 48, 0.96) 0%, 
+        rgba(12, 7, 48, 0.85) 100%
+      );
   }
   
   .qf-hero h1 {
