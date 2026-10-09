@@ -62,9 +62,12 @@ export function QuickFleetNav({
 
   // Handle scroll events for sticky nav elevation, active section, and bottom thumb CTA
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      setIsScrolled(scrollY > 20);
+    const handleScroll = (e?: Event) => {
+      let scrollY = window.scrollY;
+      if (e && e.target && (e.target as HTMLElement).scrollTop !== undefined) {
+        scrollY = (e.target as HTMLElement).scrollTop || window.scrollY;
+      }
+      setIsScrolled(scrollY > 15);
 
       // Check if user has scrolled past hero (~380px) and hasn't reached booking close section
       const bookSection = document.getElementById("book-intake");
@@ -89,9 +92,9 @@ export function QuickFleetNav({
       }
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true, capture: true });
     handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll, { capture: true });
   }, []);
 
   // Auto-close menu on escape or resize to desktop
