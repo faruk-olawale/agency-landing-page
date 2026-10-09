@@ -27,7 +27,7 @@ export default function OutreachPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#fafafa] flex items-center justify-center font-mono text-xs text-zinc-500">
+        <div className="min-h-screen bg-[#090A0F] flex items-center justify-center font-mono text-xs text-zinc-400">
           Loading Live Outreach Command Center...
         </div>
       }
