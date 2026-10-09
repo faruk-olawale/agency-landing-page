@@ -179,7 +179,7 @@ export function QuickFleetNav({
           </a>
 
           {/* Centered Floating Pill Navigation Links (Desktop) */}
-          <nav aria-label="Primary">
+          <nav aria-label="Primary" className="qf-nav__center">
             <ul className="qf-nav__links">
               <li>
                 <a
