@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Phone,
   Radio,
@@ -9,10 +9,7 @@ import {
   ShieldCheck,
   CheckCircle2,
   Clock,
-  Sparkles,
-  AlertCircle,
   Truck,
-  Send,
 } from "lucide-react";
 
 export interface LiveDispatchSimulationProps {
@@ -34,7 +31,6 @@ export function LiveDispatchSimulation({
 
   // Simulated live minute ETA timer
   const [etaMins, setEtaMins] = useState(18);
-  const [activeStep, setActiveStep] = useState(3);
 
   useEffect(() => {
     const timer = setInterval(() => {

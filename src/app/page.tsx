@@ -2,33 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
 import {
-  Zap,
-  ShieldCheck,
-  Wrench,
   ArrowRight,
-  ArrowUpRight,
   Check,
   CheckCircle2,
-  Gauge,
-  Sparkles,
-  Layers,
-  Send,
   ChevronRight,
-  Smartphone,
-  Monitor,
   X,
   TrendingUp,
-  Sliders,
-  Phone,
-  Lock,
-  Scale,
-  Award,
-  Globe,
-  Clock,
-  ExternalLink,
-  MessageSquare,
 } from "lucide-react";
 
 export default function WhiteCreativeStudioAgency() {
@@ -56,20 +36,6 @@ export default function WhiteCreativeStudioAgency() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Template demo modal state
-  const [activeModalDemo, setActiveModalDemo] = useState<null | {
-    title: string;
-    category: string;
-    fcp: string;
-    lcp: string;
-    tbt: string;
-    cls: string;
-    highlights: string[];
-    sampleName: string;
-    tagline: string;
-    slug: string;
-  }>(null);
-  const [modalDeviceView, setModalDeviceView] = useState<"desktop" | "mobile">("desktop");
 
   // Scroll listener for sticky glass header
   useEffect(() => {

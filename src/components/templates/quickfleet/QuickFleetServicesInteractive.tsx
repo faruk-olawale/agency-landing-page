@@ -294,7 +294,6 @@ export function QuickFleetServicesInteractive({
   companyName: propCompanyName,
   city: propCity,
   cleanPhone: propCleanPhone,
-  primaryColor = "#0A997D",
   truth,
 }: QuickFleetServicesInteractiveProps) {
   const companyName = truth?.companyName || propCompanyName;
@@ -616,7 +615,7 @@ export function QuickFleetServicesInteractive({
                 CATALOG OF REPAIR &amp; DIAGNOSTIC CAPABILITIES
               </span>
               <h3 className="text-2xl sm:text-3xl font-semibold text-[#0C0730] mt-1 tracking-tight">
-                Our Primary Service Disciplines
+                Primary Service Disciplines · {companyName}
               </h3>
               <p className="text-sm text-[#0C0730]/70 mt-1 max-w-[60ch]">
                 Every procedure is performed in our climate-controlled {hasCity ? `${city} ` : ""}workshop according to strict

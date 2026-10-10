@@ -1,20 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Calendar,
   Clock,
   Sparkles,
-  Heart,
-  ShieldCheck,
   Check,
   X,
-  Phone,
   ChevronRight,
   ArrowLeft,
-  User,
-  CheckCircle2,
 } from "lucide-react";
 
 interface LuxuryBookingModalProps {
@@ -35,6 +30,7 @@ export function LuxuryBookingModal({
   isMedSpa = false,
 }: LuxuryBookingModalProps) {
   const [step, setStep] = useState<number>(1);
+  const [passRef, setPassRef] = useState("VIP-4821");
   const [formData, setFormData] = useState({
     treatment: isMedSpa ? "Lip & Facial Sculpting" : "Porcelain Veneer Consultation",
     clinician: "Lead Clinical Director",
@@ -97,6 +93,7 @@ export function LuxuryBookingModal({
 
   const handleFinish = (e: React.FormEvent) => {
     e.preventDefault();
+    setPassRef(`VIP-${Math.floor(1000 + Math.random() * 9000)}`);
     setStep(3); // Confirmation step
   };
 
@@ -329,7 +326,7 @@ export function LuxuryBookingModal({
                 Your Private Suite is Held
               </h3>
               <p className="text-xs text-slate-500 mt-1">
-                Pass Reference: VIP-{(Math.random() * 10000).toFixed(0).padStart(4, "0")}
+                Pass Reference: {passRef}
               </p>
             </div>
 

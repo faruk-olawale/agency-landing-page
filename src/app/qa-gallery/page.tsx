@@ -7,7 +7,6 @@ import {
   qualifyAutomotiveLead,
   getArchetypePrimaryColor,
 } from "@/lib/archetypeMap";
-import type { AutomotiveSpecialization } from "@/lib/archetypeMap";
 import {
   AlertTriangle,
   ExternalLink,

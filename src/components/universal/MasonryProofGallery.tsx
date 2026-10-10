@@ -4,15 +4,11 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircle2,
-  ExternalLink,
   Shield,
-  Clock,
-  Sparkles,
   X,
   Maximize2,
   Camera,
   MapPin,
-  Calendar,
 } from "lucide-react";
 
 export interface ProofItem {
@@ -413,7 +409,6 @@ export function MasonryProofGallery({
   items,
   industry = "Service",
   city = "Dallas",
-  companyName = "Speedcraft Studio",
   primaryColor = "#DC2626",
   theme = "dark",
 }: MasonryProofGalleryProps) {

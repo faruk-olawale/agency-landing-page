@@ -18,7 +18,6 @@ export function QuickFleetBookingClose({
   city: propCity,
   phone: propPhone,
   cleanPhone: propCleanPhone,
-  primaryColor = "#0A997D",
   truth,
 }: QuickFleetBookingCloseProps) {
   const companyName = truth?.companyName || propCompanyName;

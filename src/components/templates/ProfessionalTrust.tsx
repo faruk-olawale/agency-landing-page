@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import type { TemplateProps } from "@/lib/archetypeMap";
 import { CaseResultsVault } from "./professional/CaseResultsVault";
 import {
@@ -15,13 +14,9 @@ import {
   CheckCircle2,
   Lock,
   Phone,
-  ArrowRight,
   Check,
-  Clock,
   ShieldAlert,
-  ChevronRight,
   FileKey,
-  BadgeCheck,
 } from "lucide-react";
 
 /**

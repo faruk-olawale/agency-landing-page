@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import type { TemplateProps } from "@/lib/archetypeMap";
 import { InfiniteReviewMarquee, MasonryProofGallery } from "@/components/universal";
 import { BeforeAfterSlider, LuxuryBookingModal, TransformationItem } from "./aesthetic";
@@ -15,10 +15,6 @@ import {
   CheckCircle2,
   Phone,
   ChevronRight,
-  ArrowRight,
-  Eye,
-  Award,
-  Crown,
 } from "lucide-react";
 
 /**

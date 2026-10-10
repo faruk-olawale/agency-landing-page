@@ -47,6 +47,9 @@ export interface AuditedLead {
   hasAdTags?: boolean;
   hasMarketingPixels?: boolean;
   isCustomImport?: boolean;
+  adEvidenceStatus?: "verified_ads" | "no_detected_ads" | "inconclusive";
+  qualificationStatus?: "qualified" | "unverified" | "disqualified";
+  qualificationReason?: string;
   adTrackingVerified?: {
     activeAdPixels: boolean;
     detectedTags: string[];
@@ -457,6 +460,9 @@ Direct: farukolawale509@gmail.com`;
       hasAdTags,
       hasMarketingPixels: hasAdTags, // Backwards compatibility
       isCustomImport: true,
+      adEvidenceStatus,
+      qualificationStatus: qualCheck.isQualified ? "qualified" : qualCheck.isDisqualified ? "disqualified" : "unverified",
+      qualificationReason: qualCheck.reason,
       adTrackingVerified: {
         activeAdPixels: hasAdTags,
         detectedTags: hasAdTags ? ["Google Ads / GTM / Meta Pixel"] : [],

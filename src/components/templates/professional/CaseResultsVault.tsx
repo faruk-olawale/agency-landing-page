@@ -3,15 +3,9 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Scale,
   ShieldCheck,
-  TrendingUp,
-  FileCheck,
-  Building2,
   Lock,
   ChevronRight,
-  ExternalLink,
-  Filter,
   CheckCircle2,
   X,
   AlertCircle,
@@ -44,9 +38,7 @@ interface CaseResultsVaultProps {
 }
 
 export function CaseResultsVault({
-  industry,
   city,
-  companyName,
   primaryColor = "#1E3A8A",
   isCpa = false,
   theme = "light",

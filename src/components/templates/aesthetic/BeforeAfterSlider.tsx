@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
-import { motion } from "framer-motion";
 import { Sparkles, ArrowLeftRight, CheckCircle2, Eye } from "lucide-react";
 
 export interface TransformationItem {

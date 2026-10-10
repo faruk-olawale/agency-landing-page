@@ -22,8 +22,6 @@ import {
   Plus,
   UploadCloud,
   X,
-  Shield,
-  Layers,
   Target,
   Database,
 } from "lucide-react";
@@ -31,7 +29,6 @@ import leadsData from "../../../leads/global_leads_audit.json";
 import qualifiedTargetedLeads from "../../../qualified_targeted_leads.json";
 import { auditWebsiteAction } from "@/app/actions/audit";
 import {
-  getArchetype,
   getArchetypePrimaryColor,
   AUTOMOTIVE_SPECIALIZATIONS,
   qualifyAutomotiveLead,
@@ -217,11 +214,6 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
     return ["all", ...Object.keys(counts).sort()];
   }, [currentLeadsPool]);
 
-  // Dynamic City list (scoped to selected country)
-  const cities = useMemo(() => {
-    const scoped = selectedCountry === "all" ? currentLeadsPool : currentLeadsPool.filter((l) => l.country === selectedCountry);
-    return ["all", ...new Set(scoped.map((l) => l.city).filter(Boolean))].sort();
-  }, [currentLeadsPool, selectedCountry]);
 
   // Filtered Leads strictly adhering to Automotive Qualification & Evidence
   const filteredAll = useMemo(() => {

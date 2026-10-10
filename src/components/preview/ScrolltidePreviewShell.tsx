@@ -13,8 +13,6 @@ interface ScrolltidePreviewShellProps {
 
 export function ScrolltidePreviewShell({
   lead,
-  archetype,
-  slug,
   children,
 }: ScrolltidePreviewShellProps) {
   const [deviceMode, setDeviceMode] = useState<"desktop" | "mobile">("desktop");

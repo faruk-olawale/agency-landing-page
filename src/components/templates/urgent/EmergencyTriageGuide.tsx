@@ -1,18 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Phone,
-  ShieldCheck,
   CheckCircle2,
   AlertTriangle,
   Flame,
   Droplets,
   Wrench,
-  ArrowRight,
   Clock,
-  HelpCircle,
 } from "lucide-react";
 
 interface EmergencyTriageGuideProps {
@@ -82,7 +78,6 @@ export function EmergencyTriageGuide({
   ];
 
   const current = emergencyScenarios[selectedEmergency];
-  const CurrentIcon = current.icon;
 
   return (
     <section

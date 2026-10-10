@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Phone, ArrowRight, Wrench, X } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import type { AutomotiveTruth } from "@/lib/automotiveTruth";
 
 interface QuickFleetNavProps {

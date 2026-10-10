@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Zap, Phone, ArrowRight, X } from "lucide-react";
+import Link from "next/link";
+import { Zap, ArrowRight, X } from "lucide-react";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -62,7 +63,7 @@ export default function Navbar() {
       >
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 h-18 sm:h-20 flex items-center justify-between gap-4">
           {/* Logo */}
-          <a
+          <Link
             href="/"
             className="flex items-center gap-3 text-decoration-none group shrink-0"
             aria-label="Speedcraft Studio"
@@ -84,7 +85,7 @@ export default function Navbar() {
                 High-Performance Web Studio
               </div>
             </div>
-          </a>
+          </Link>
 
           {/* Desktop Nav Links (QuickFleet Floating Pill) */}
           <nav className="hidden lg:flex items-center gap-1 bg-[#F3F1EC] p-1.5 rounded-full border border-[rgba(12,7,48,0.05)]">
