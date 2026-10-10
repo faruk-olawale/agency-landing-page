@@ -121,8 +121,9 @@ export function QuickFleetFooter({
             <span>
               {truth ? truth.warranty.footerTag : "WRITTEN REPAIR WARRANTY"}
             </span>
-            <span>•</span>
-            <span>VERIFIED DIGITAL REPAIR ORDER</span>
+            <span>
+              {truth?.isDemoMode ? "SAMPLE DIGITAL WORKFLOW" : "DIGITAL INSPECTION WORKFLOW"}
+            </span>
           </div>
         </div>
       </div>

@@ -24,7 +24,9 @@ export function QuickFleetReviews({ city: propCity, truth }: QuickFleetReviewsPr
               <span>Customer Verification</span>
             </span>
             <h2 className="text-2xl sm:text-4xl font-semibold text-[#0C0730] tracking-[-0.028em] mt-3">
-              Verified diagnostic case studies{hasCity ? ` in ${city}` : ""}.
+              {truth?.reviews.isIllustrative
+                ? `Representative diagnostic case scenarios${hasCity ? ` in ${city}` : ""}.`
+                : `Verified diagnostic case studies${hasCity ? ` in ${city}` : ""}.`}
             </h2>
           </div>
           <div className="flex items-center gap-2 font-mono text-xs text-[#0A997D] font-bold">

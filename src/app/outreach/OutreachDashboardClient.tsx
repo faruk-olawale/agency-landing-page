@@ -334,8 +334,8 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
         setAuditCompany("");
         setAuditCity("");
         const adStatusText = data.hasAdTags
-          ? "🟢 Verified Ad Signals (Strategy A)"
-          : "⚪ No Detected Ad Signals (Strategy B)";
+          ? "🟢 Detected Ad Tracking Tags (Strategy A)"
+          : "⚪ No Detected Ad Tags (Strategy B)";
         showToast(`Audited ${data.lead.company} (${data.lead.mobilePageSpeed}/100 Speed • ${adStatusText}) — added to queue!`);
         setShowImportDrawer(false);
         setSourceMode("vault");
@@ -677,9 +677,9 @@ Lead Engineer, Speedcraft Studio`;
                     <span>QuickFleet UrgentService</span>
                   </span>
                   {(activePitchLead.hasAdTags ?? activePitchLead.hasMarketingPixels ?? false) ? (
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1" title="Evidence of advertising tracking instrumentation (pixels/tags), not verified active ad spend">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      <span>Verified Ad Signals (Strategy A)</span>
+                      <span>Detected Ad Tracking Tags (Strategy A)</span>
                     </span>
                   ) : (
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-zinc-500/10 text-zinc-400 border border-zinc-500/20 flex items-center gap-1">
@@ -1308,7 +1308,7 @@ Lead Engineer, Speedcraft Studio`;
                   className="w-full px-3 py-2 text-xs bg-black/50 border border-white/[0.08] hover:border-white/[0.14] rounded-lg text-zinc-200 focus:outline-none focus:border-amber-500 font-medium"
                 >
                   <option value="all" className="bg-zinc-900 text-white">All Ad Evidence Status</option>
-                  <option value="verified_ads" className="bg-zinc-900 text-emerald-400">🟢 Verified Ad Signals (Strategy A)</option>
+                  <option value="verified_ads" className="bg-zinc-900 text-emerald-400">🟢 Detected Ad Tracking Tags (Strategy A)</option>
                   <option value="no_detected_ads" className="bg-zinc-900 text-zinc-400">⚪ No Detected Ad Tags (Strategy B)</option>
                 </select>
               </div>
@@ -1479,9 +1479,9 @@ Lead Engineer, Speedcraft Studio`;
 
                               {/* AD-STATUS PILL */}
                               {hasAds ? (
-                                <span className="text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full inline-flex items-center gap-1.5">
+                                <span className="text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full inline-flex items-center gap-1.5" title="Evidence of tracking tags (e.g., GTM, Google Ads, Meta Pixel), not proof of active ad spend">
                                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                  <span>Verified Ad Signals (Strategy A)</span>
+                                  <span>Detected Ad Tracking Tags (Strategy A)</span>
                                 </span>
                               ) : (
                                 <span className="text-[10px] font-mono bg-zinc-500/10 text-zinc-400 border border-zinc-500/20 px-2 py-0.5 rounded-full inline-flex items-center gap-1.5">

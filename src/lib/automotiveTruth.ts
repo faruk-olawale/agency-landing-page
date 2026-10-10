@@ -124,22 +124,38 @@ export function getAutomotiveTruth(
       };
 
   // Unified Turnaround Claims (Single Source of Truth)
-  const turnaround = {
-    headline: "Transparent estimates. Expedited diagnostic triage.",
-    badge: "Same-Day Diagnostic Scan",
-    detail:
-      "Most drivability and sensor faults are scanned and diagnosed on same-day intake, with repairs scheduled transparently according to OEM parts availability.",
-    intakeSLA: "Same-Day Diagnostic Triage",
-  };
+  const turnaround = isDemoMode
+    ? {
+        headline: "Sample intake speed. Rapid diagnostic triage.",
+        badge: "Illustrative Diagnostic Scan",
+        detail:
+          "Demonstration workflow: faults scanned on intake with itemized estimate delivered digitally.",
+        intakeSLA: "Rapid Diagnostic Triage",
+      }
+    : {
+        headline: "Transparent estimates. Streamlined diagnostic triage.",
+        badge: "Diagnostic Intake",
+        detail:
+          "Drivability and sensor faults evaluated with dedicated scan tooling, with repair estimates provided directly before work begins.",
+        intakeSLA: "Diagnostic Triage",
+      };
 
   // Unified Bay Availability (Single Source of Truth)
-  const bays = {
-    heroBadge: hasCity ? `Diagnostic Bays Active in ${city}` : "Diagnostic Bays Active",
-    matrixTitle: hasCity ? `${city} Diagnostic Bay Schedule` : "Diagnostic Bay Schedule",
-    statusSummary: "Active Diagnostic Bays · Accepting Intake",
-    bookingReadyBadge: "Diagnostic Bays Open This Week",
-    liveBayStatus: "Bay 2 Active in Triage",
-  };
+  const bays = isDemoMode
+    ? {
+        heroBadge: "PROTOTYPE DEMO · DIAGNOSTIC WORKFLOW",
+        matrixTitle: hasCity ? `${city} Diagnostic Bay Schedule (Demo)` : "Diagnostic Bay Schedule (Demo)",
+        statusSummary: "Simulated Bay Status · Diagnostic Demo",
+        bookingReadyBadge: "Prototype Intake Workflow",
+        liveBayStatus: "SIMULATED BAY 2 · DIAGNOSTIC DEMO",
+      }
+    : {
+        heroBadge: hasCity ? `Precision Diagnostics for ${city}` : "Precision Diagnostic Workflow",
+        matrixTitle: hasCity ? `${city} Diagnostic Bay Schedule` : "Diagnostic Bay Schedule",
+        statusSummary: "Diagnostic Intake & Triage Coordination",
+        bookingReadyBadge: "Diagnostic Intake Available",
+        liveBayStatus: "PROTOTYPE WORKFLOW INTERFACE",
+      };
 
   // Unified Technician Identities (Never invent fake employee personas for real prospects)
   const technicians = isDemoMode
@@ -151,7 +167,7 @@ export function getAutomotiveTruth(
       }
     : {
         leadTechTitle: "Assigned Master Diagnostic Specialist",
-        signatureLabel: "Verified Digital Inspection",
+        signatureLabel: "Digital Inspection Workflow",
         footerCertTag: "OEM FACTORY DIAGNOSTIC PROTOCOLS",
         advisorName: "Our technical service team",
       };
@@ -164,41 +180,42 @@ export function getAutomotiveTruth(
       "Benchmark metrics reflect independent industry diagnostic averages vs. typical authorized dealer list pricing. Binding upfront quotes are provided directly to the vehicle owner prior to work commencing.",
   };
 
-  // Reviews & Case Studies: Never hardcode a specific business name like 'apex'
+  // Reviews & Case Studies: Never present unverified reviews as verified historical facts
   const reviews = {
     isIllustrative: isDemoMode || !clientData.reviewsCount,
-    headerBadge:
-      isDemoMode || !clientData.reviewsCount
-        ? "REPRESENTATIVE DIAGNOSTIC CASE STUDIES"
-        : `${clientData.rating || "5.0"} / 5.0 · VERIFIED CLIENT REVIEWS`,
+    headerBadge: isDemoMode
+      ? "SAMPLE DIAGNOSTIC CASE STUDIES"
+      : !clientData.reviewsCount
+      ? "REPRESENTATIVE DIAGNOSTIC SCENARIOS"
+      : `${clientData.rating || "5.0"} / 5.0 · VERIFIED CLIENT REVIEWS`,
     caseStudies: [
       {
-        author: isDemoMode ? "Marcus V." : "BMW M3 Competition Owner",
-        vehicle: "Verified Drivability Case Study",
+        author: isDemoMode ? "Marcus V." : "Representative Client Scenario",
+        vehicle: isDemoMode ? "Sample Case Study" : "Drivability & Sensor Scenario",
         repair: "ECU Sensor Telemetry & Wiring",
         quote:
-          "Dealership quoted weeks of wait time and an expensive control module replacement. The technical team connected their lab scope, isolated a dropped ground circuit within 45 minutes, and solved the fault cleanly.",
+          "Dealership quoted weeks of wait time and an expensive control module replacement. A precision diagnostic team connected their lab scope, isolated a dropped ground circuit within 45 minutes, and solved the fault cleanly.",
       },
       {
-        author: isDemoMode ? "Elena R." : "Porsche Macan GTS Owner",
-        vehicle: "Verified Drivetrain Case Study",
+        author: isDemoMode ? "Elena R." : "Representative Client Scenario",
+        vehicle: isDemoMode ? "Sample Case Study" : "Drivetrain & Hydraulic Scenario",
         repair: "PDK Transmission Hydraulic Telemetry",
         quote:
-          "Transmission was throwing intermittent slip codes. Rather than demanding a full gearbox replacement, they performed hydraulic line pressure tests, addressed the valve body solenoid, and saved thousands in unnecessary work.",
+          "Transmission was throwing intermittent slip codes. Rather than demanding a full gearbox replacement, hydraulic line pressure tests addressed the valve body solenoid directly, avoiding thousands in unnecessary replacements.",
       },
       {
-        author: isDemoMode ? "David S." : "Audi RS6 Avant Owner",
-        vehicle: "Verified Diagnostic Case Study",
+        author: isDemoMode ? "David S." : "Representative Client Scenario",
+        vehicle: isDemoMode ? "Sample Case Study" : "Camshaft & Timing Scenario",
         repair: "Digital Bore Scope & Cam Correlation",
         quote:
-          `Cam timing deviation fault. They provided high-definition bore scope imagery and live waveform measurements before turning a wrench. The team at ${companyName} had it diagnosed and resolved with complete transparency.`,
+          "Cam timing deviation fault. High-definition bore scope imagery and live waveform measurements were verified before turning a wrench, resolving the issue with complete itemized transparency.",
       },
       {
-        author: isDemoMode ? "Julian K." : "Mercedes-AMG C63 Owner",
-        vehicle: "Verified Fuel System Case Study",
+        author: isDemoMode ? "Julian K." : "Representative Client Scenario",
+        vehicle: isDemoMode ? "Sample Case Study" : "Direct Fuel Injection Scenario",
         repair: "High-Pressure Direct Injection",
         quote:
-          "Digital inspection walkthrough delivered straight to my phone. Approved the fuel rail sensor replacement with a single tap. Zero guesswork, transparent itemized estimate, and backed by a written repair warranty.",
+          "Digital inspection walkthrough delivered straight to smartphone. Approved the fuel rail sensor replacement with a single tap. Zero guesswork, transparent itemized estimate, and backed by a written repair warranty.",
       },
     ],
   };

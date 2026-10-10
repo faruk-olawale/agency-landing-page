@@ -150,7 +150,7 @@ export function QuickFleetCostBenchmark({
               <div className="mt-4 pt-3 border-t border-white/10 text-xs text-slate-300 space-y-1.5">
                 <div className="flex items-center gap-1.5">
                   <span className="text-[#6FD9C1] font-bold">✓</span>
-                  <span>$165 / hr flat rate</span>
+                  <span>{truth?.isDemoMode ? "$165 / hr benchmark labor model" : "Transparent independent labor rate"}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="text-[#6FD9C1] font-bold">✓</span>

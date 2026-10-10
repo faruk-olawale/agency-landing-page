@@ -94,7 +94,7 @@ const WORKFLOW_STEPS: WorkflowStep[] = [
     id: "repair",
     stepNumber: "04",
     title: "OEM Spec Precision Repair",
-    subtitle: "ASE Master L1 Certified execution",
+    subtitle: "Manufacturer specification execution",
     description:
       "Installed exclusively with Genuine OEM or Tier-1 manufacturer components. Digital torque-angle tightening, hydraulic vacuum coolant evacuation, and manufacturer module adaptation ensure zero rework.",
     telemetryMetric: "TORQUE ACCURACY",
@@ -111,18 +111,18 @@ const WORKFLOW_STEPS: WorkflowStep[] = [
   {
     id: "warranty",
     stepNumber: "05",
-    title: "Dynamic Dyno Test & Warranty",
+    title: "Dynamic Road Test & Warranty Handover",
     subtitle: "OBD-II readiness monitors verified",
     description:
-      "Dynamic road-load testing confirms all EPA emissions readiness flags are set to ready. Completed work is sealed with our 24-Month / 24,000-Mile nationwide warranty and digital maintenance log update.",
+      "Dynamic road-load testing confirms all EPA emissions readiness flags are set to ready. Completed work is backed by our written limited repair warranty and digital maintenance log update.",
     telemetryMetric: "READINESS PASS",
     telemetryVal: "8 OF 8 MONITORS",
-    statusBadge: "WARRANTY SEALED",
+    statusBadge: "WRITTEN WARRANTY",
     hudReadout: {
       system: "DYNAMIC ROAD TELEMETRY",
       diagnosticCode: "ALL MONITORS READY",
       signalValue: "0 CODES / 0 MISFIRES",
-      integrity: "24-MO WARRANTY ACTIVE",
+      integrity: "WRITTEN WARRANTY ACTIVE",
     },
     pos: { top: "86%", left: "22%" },
   },
@@ -245,9 +245,9 @@ const SERVICE_DISCIPLINES: ServiceDiscipline[] = [
     category: "diagnostics",
     categoryLabel: "Electrical & EV/Hybrid",
     title: "Automotive Electrical & High-Voltage EV/Hybrid Care",
-    highlight: "Certified high-voltage isolation & battery balancing",
+    highlight: "High-voltage isolation & battery balancing",
     summary:
-      "NFPA 70E certified high-voltage isolation procedures, 400V/800V DC-DC converter diagnostics, hybrid battery cell pack voltage deviation audits, inverter coolant circuit flushes, and smart alternator current sensor calibration.",
+      "Standard high-voltage isolation safety procedures, 400V/800V DC-DC converter diagnostics, hybrid battery cell pack voltage deviation audits, inverter coolant circuit flushes, and smart alternator current sensor calibration.",
     symptoms: [
       "Hybrid System Warning Message",
       "Reduced Electric EV Range",
@@ -725,15 +725,15 @@ export function QuickFleetServicesInteractive({
                   {/* Card Footer: Turnaround & Action */}
                   <div className="mt-6 pt-4 border-t border-[#0C0730]/8 flex items-center justify-between">
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-mono text-[#0C0730]/50">TURNAROUND</span>
+                      <span className="text-[10px] font-mono text-[#0C0730]/50">ESTIMATED TIMELINE</span>
                       <span className="text-xs font-semibold text-[#0C0730]">{service.turnaround}</span>
                     </div>
 
                     <a
-                      href="#book"
+                      href="#book-intake"
                       className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0C0730] text-white text-xs font-medium hover:bg-[#0A997D] transition-colors"
                     >
-                      <span>Reserve Bay</span>
+                      <span>Request Intake</span>
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>

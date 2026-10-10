@@ -127,7 +127,9 @@ export function QuickFleetLiveRecord({
             {/* Vehicle Identification Strip */}
             <div className="my-3.5 sm:my-4 p-3 rounded-xl bg-white/5 border border-white/10 text-xs font-sans min-w-0">
               <div className="flex items-center justify-between gap-2 font-mono text-[10px] text-slate-400 mb-1 min-w-0">
-                <span className="shrink-0 tracking-wider">VEHICLE TELEMETRY</span>
+                <span className="shrink-0 tracking-wider">
+                  {truth?.isDemoMode ? "SAMPLE VEHICLE TELEMETRY" : "PROTOTYPE TELEMETRY SAMPLE"}
+                </span>
                 <span className="truncate text-right">VIN: WBS33AY08P1***</span>
               </div>
               <div className="font-bold text-xs sm:text-sm text-white truncate">
@@ -217,7 +219,7 @@ export function QuickFleetLiveRecord({
             <div className="mt-4 sm:mt-5 pt-3.5 sm:pt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 min-w-0">
               <div className="min-w-0">
                 <span className="text-[10px] text-slate-400 block font-mono tracking-wider">
-                  4-DIGIT HANDOVER CODE
+                  {truth?.isDemoMode ? "SAMPLE 4-DIGIT CODE" : "PROTOTYPE 4-DIGIT CODE"}
                 </span>
                 <div className="flex items-center gap-1.5 sm:gap-2 mt-1">
                   {["6", "2", "4", "9"].map((digit, i) => (

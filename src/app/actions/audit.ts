@@ -326,8 +326,8 @@ export async function auditWebsiteAction(
 
     const company = inputCompany || extractCleanCompanyName(domain, extractedTitle, extractedOgSiteName);
     const city = inputCity || detectCityFromContent(combinedContent, locale.countryCode);
-    const phone = inputPhone || extractPhoneFromHtml(liveHtml) || "(214) 736-9201";
-    const email = inputEmail || `service@${domain}`;
+    const phone = inputPhone || extractPhoneFromHtml(liveHtml) || "";
+    const email = inputEmail || (domain ? `service@${domain}` : "");
 
     // Automotive Qualification & Specialization Check
     const qualCheck = qualifyAutomotiveLead({
@@ -492,7 +492,7 @@ Lead Engineer, Speedcraft Studio`;
       archetype: newLead.archetype,
       previewUrl,
       message: `Audited ${company} • ${qualCheck.specialization} (${mobilePageSpeed}/100 Speed • ${
-        hasAdTags ? "🟢 Verified Ad Signals (Strategy A)" : "⚪ No Ad Signals Detected (Strategy B)"
+        hasAdTags ? "🟢 Detected Ad Tracking Tags (Strategy A)" : "⚪ No Ad Tags Detected (Strategy B)"
       })`,
     };
   } catch (err: unknown) {

@@ -496,16 +496,16 @@ export function QuickFleetStickyCards({
             <i>02</i>
             <span>Diagnostic Bays</span>
           </span>
-          <h3>Four Dedicated Triage &amp; Calibration Bays</h3>
+          <h3>{truth?.isDemoMode ? "Four Dedicated Triage & Calibration Bays (Demo Model)" : "Dedicated Triage & Calibration Bays"}</h3>
           <p>
-            Dedicated engineering bays equipped with Hunter Hawkeye Elite laser alignment, ultrasonic
+            Dedicated engineering bays equipped with laser alignment, ultrasonic
             parts cleaning, and calibrated digital torque tools. Each bay is assigned to one
             vehicle at a time with strict intake SLAs.
           </p>
           <ul className="qf-card__facts">
             <li>Zero bay double-booking or staged delays</li>
-            <li>Hunter 3D laser alignment &amp; ADAS radar calibration</li>
-            <li>Assigned ASE L1 Master Diagnostic Specialist</li>
+            <li>3D laser alignment &amp; ADAS radar calibration capability</li>
+            <li>Assigned Master Diagnostic Specialist on duty</li>
           </ul>
         </div>
 
@@ -595,10 +595,10 @@ export function QuickFleetStickyCards({
                 <span className="text-[#0A997D] font-bold">100% SPEC VERIFIED</span>
               </div>
               <div className="text-sm font-bold text-[#0C0730] mt-1">
-                {selectedBay === 1 && "Bay 1: Oscilloscope Triage — M. Vance (ASE L1 #4928)"}
-                {selectedBay === 2 && "Bay 2: Drivetrain Clean Room — J. Mercer (Factory Cert)"}
-                {selectedBay === 3 && "Bay 3: ADAS & 3D Alignment — S. Chen (Hunter Master)"}
-                {selectedBay === 4 && "Bay 4: Express Handover — K. Davis (Lead Inspector)"}
+                {selectedBay === 1 && (truth?.isDemoMode ? "Bay 1: Oscilloscope Triage — M. Vance (ASE L1 #4928) · Sample" : "Bay 1: Oscilloscope Triage — Lead Scope Specialist")}
+                {selectedBay === 2 && (truth?.isDemoMode ? "Bay 2: Drivetrain Clean Room — J. Mercer (Factory Cert) · Sample" : "Bay 2: Drivetrain Clean Room — Master Drivetrain Specialist")}
+                {selectedBay === 3 && (truth?.isDemoMode ? "Bay 3: ADAS & 3D Alignment — S. Chen (Hunter Master) · Sample" : "Bay 3: ADAS & 3D Alignment — ADAS Calibration Lead")}
+                {selectedBay === 4 && (truth?.isDemoMode ? "Bay 4: Express Handover — K. Davis (Lead QA) · Sample" : "Bay 4: Express Handover — Quality Inspection Lead")}
               </div>
               <div className="text-[11px] text-slate-600 mt-1">
                 Air quality index: &lt; 15 ppm · Torqued to ±0.5 Nm precision · Zero debris protocol.

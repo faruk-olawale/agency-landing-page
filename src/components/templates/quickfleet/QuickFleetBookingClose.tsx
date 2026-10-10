@@ -66,16 +66,15 @@ export function QuickFleetBookingClose({
             >
               <div className="flex items-center gap-2 text-[#6FD9C1] text-sm font-bold">
                 <CheckCircle2 className="w-5 h-5 text-[#6FD9C1]" />
-                <span>Intake Request Transmitted · Pending Scheduling Confirmation</span>
+                <span>Prototype Demonstration Form Submitted</span>
               </div>
               <p className="mt-3 text-slate-200 leading-relaxed font-sans text-xs sm:text-sm">
-                Our service team has received your priority intake request for{" "}
-                <strong className="text-white">{vehicleModel || "your vehicle"}</strong> (symptom: {vehicleIssue}).
-                A technical advisor will reach out to <strong className="text-white">{clientPhone}</strong> to confirm bay availability and schedule drop-off.
+                This is an interactive concept demonstration created by Speedcraft Studio. In an active production deployment, intake requests for{" "}
+                <strong className="text-white">{vehicleModel || "your vehicle"}</strong> (symptom: {vehicleIssue}) route directly to {companyName}&apos;s service desk or shop management system.
               </p>
               <div className="mt-4 pt-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-slate-300">
-                <span>INTAKE SLA: SAME-DAY ADVISOR TRIAGE</span>
-                <span className="text-[#6FD9C1]">STATUS: REQUEST LOGGED (NOT CONFIRMED APPOINTMENT)</span>
+                <span>WORKFLOW: INTERACTIVE PROTOTYPE DEMONSTRATION</span>
+                <span className="text-[#6FD9C1]">NOTICE: NO APPOINTMENT REQUEST HAS BEEN TRANSMITTED TO {companyName.toUpperCase()}</span>
               </div>
             </div>
           ) : (
@@ -216,22 +215,29 @@ export function QuickFleetBookingClose({
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="p-2.5 rounded-xl bg-white/5">
                 <span className="text-slate-400 block text-[10px]">MON – FRI</span>
-                <span className="text-white font-bold">7:00 AM – 6:30 PM</span>
+                <span className="text-white font-bold">
+                  {truth?.isDemoMode ? "7:00 AM – 6:30 PM (Sample)" : "Standard Service Hours"}
+                </span>
               </div>
               <div className="p-2.5 rounded-xl bg-white/5">
-                <span className="text-slate-400 block text-[10px]">SATURDAY</span>
-                <span className="text-white font-bold">8:00 AM – 3:00 PM</span>
+                <span className="text-slate-400 block text-[10px]">{truth?.isDemoMode ? "SATURDAY" : "WEEKENDS"}</span>
+                <span className="text-white font-bold">
+                  {truth?.isDemoMode ? "8:00 AM – 3:00 PM (Sample)" : "By Appointment / Inquire"}
+                </span>
               </div>
             </div>
           </div>
 
-          {/* 24/7 Key Drop Locker */}
+          {/* Key Drop & Vehicle Handover */}
           <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-start gap-3">
             <Key className="w-4 h-4 text-[#6FD9C1] shrink-0 mt-0.5" />
             <div className="text-[11px]">
-              <strong className="text-white block font-sans">24/7 Secure Digital Key Locker:</strong>
-              Drop off before work or overnight. Digital touch keypad sends receipt timestamp
-              straight to your phone.
+              <strong className="text-white block font-sans">
+                {truth?.isDemoMode ? "24/7 Secure Digital Key Locker (Sample Feature):" : "Early Drop-Off & Key Box Coordination:"}
+              </strong>
+              {truth?.isDemoMode
+                ? "Drop off before work or overnight. Digital touch keypad sends receipt timestamp straight to your phone."
+                : "Coordinate early morning or after-hours vehicle drop-off directly with the service desk upon submitting an intake request."}
             </div>
           </div>
         </div>

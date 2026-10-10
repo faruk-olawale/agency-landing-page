@@ -117,7 +117,7 @@ export function QuickFleetHero({
       <div className="qf-hero__meta">
         <div className="flex items-center gap-2">
           <span>
-            {hasCity ? `${city} central bays first. ` : ""}Certified OEM diagnostic tooling on standby.
+            {hasCity ? `Serving drivers across ${city}. ` : ""}Diagnostic triage workflow ready for review.
           </span>
         </div>
         <a
