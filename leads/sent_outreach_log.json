@@ -1,5 +1,21 @@
 [
   {
+    "company": "Circle City Automatic Transmissions",
+    "email": "desk@circlecitytransmissions.com",
+    "sentAt": "2026-10-10T07:59:39.233Z",
+    "method": "gmail",
+    "status": "sent",
+    "previewUrl": "http://localhost:3001/preview/circle-city-automatic-transmissions?name=Circle+City+Automatic+Transmissions&industry=Transmission+%26+Drivetrain&city=Los+Angeles&phone=%28310%29+838-2200&primaryColor=%230284C7"
+  },
+  {
+    "company": "Bimmers Performance & Repair",
+    "email": "service@bimmersperformance.com",
+    "sentAt": "2026-10-10T07:58:15.219Z",
+    "method": "gmail",
+    "status": "sent",
+    "previewUrl": "http://localhost:3001/preview/bimmers-performance-repair?name=Bimmers+Performance+%26+Repair&industry=European+Vehicle+Specialist&city=Dallas&phone=%28214%29+341-2828&primaryColor=%232563EB"
+  },
+  {
     "company": "Airfrost HVAC",
     "email": "bob@airfrost.com.au",
     "sentAt": "2026-10-07T16:28:32.300Z",

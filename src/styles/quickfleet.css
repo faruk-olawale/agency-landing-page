@@ -180,10 +180,10 @@ html.qf-menu-open body {
   height: 100%;
   max-width: calc(var(--wrap) - 2 * var(--inner-gutter));
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  display: flex;
   align-items: center;
-  gap: clamp(12px, 1.5vw, 24px);
+  justify-content: space-between;
+  gap: clamp(10px, 1.5vw, 24px);
 }
 
 /* Logo - QuickFleet parity: Clean circular mark + Bold company title */
@@ -222,12 +222,12 @@ html.qf-menu-open body {
   min-width: 0;
 }
 
-/* Centered Navigation Pill Container (Column 2 of Grid) */
+/* Centered Navigation Pill Container (Flex Center) */
 .qf-nav__center {
   display: flex;
   justify-content: center;
   align-items: center;
-  justify-self: center;
+  flex: 1 1 auto;
   min-width: 0;
 }
 
@@ -271,13 +271,14 @@ html.qf-menu-open body {
   box-shadow: 0 1px 2px rgba(12, 7, 48, 0.06);
 }
 
-/* Right Controls (Column 3 of Grid) */
+/* Right Controls (Action Cluster) */
 .qf-nav__right {
   display: flex;
   align-items: center;
   justify-self: end;
   gap: 10px;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 /* Labelled Mobile Burger Pill */
@@ -631,16 +632,18 @@ html.qf-menu-open body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 44px;
-  padding: 0 20px;
+  height: 42px;
+  padding: 0 16px;
   border-radius: var(--r-control);
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 500;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   text-decoration: none;
   cursor: pointer;
   box-sizing: border-box;
   max-width: 100%;
+  white-space: nowrap !important;
+  flex-shrink: 0;
 }
 
 .qf-control--ghost {
@@ -1131,7 +1134,7 @@ html.qf-menu-open body {
 }
 
 /* Responsive Media Queries */
-@media (max-width: 1320px) {
+@media (max-width: 1360px) {
   .qf-nav__row {
     display: flex;
     justify-content: space-between;

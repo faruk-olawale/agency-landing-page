@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Phone } from "lucide-react";
 import type { AutomotiveTruth } from "@/lib/automotiveTruth";
 
 interface QuickFleetNavProps {
@@ -253,15 +253,16 @@ export function QuickFleetNav({
           </nav>
 
           {/* Action Pills & Labelled Burger Button */}
-          <div className="qf-nav__right">
+          <div className="qf-nav__right shrink-0">
             {hasPhone ? (
               <a
                 href={`tel:${cleanPhone}`}
                 id="qf-nav-contact"
                 aria-label={`Call ${companyName} at ${phone}`}
-                className="qf-control qf-control--ghost"
+                className="qf-control qf-control--ghost shrink-0 whitespace-nowrap text-xs sm:text-[13px] font-medium"
               >
-                Call: {phone}
+                <Phone className="w-3.5 h-3.5 text-[#0A997D] shrink-0" />
+                <span className="whitespace-nowrap">{phone}</span>
               </a>
             ) : (
               <a
@@ -269,9 +270,9 @@ export function QuickFleetNav({
                 id="qf-nav-contact"
                 onClick={(e) => handleLinkClick(e, "#book-intake")}
                 aria-label={`Contact ${companyName}`}
-                className="qf-control qf-control--ghost"
+                className="qf-control qf-control--ghost shrink-0 whitespace-nowrap text-xs sm:text-[13px] font-medium"
               >
-                Contact
+                <span className="whitespace-nowrap">Contact</span>
               </a>
             )}
 
@@ -279,9 +280,9 @@ export function QuickFleetNav({
               href="#book-intake"
               id="qf-nav-cta"
               onClick={(e) => handleLinkClick(e, "#book-intake")}
-              className="qf-control qf-control--ink group"
+              className="qf-control qf-control--ink group shrink-0 whitespace-nowrap text-xs sm:text-[13px] font-semibold"
             >
-              <span>Book Intake</span>
+              <span className="whitespace-nowrap">Book Intake</span>
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -289,7 +290,7 @@ export function QuickFleetNav({
                 strokeWidth="2.2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1"
+                className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1 shrink-0"
                 aria-hidden="true"
               >
                 <path d="M5 12h14M13 6l6 6-6 6" />
