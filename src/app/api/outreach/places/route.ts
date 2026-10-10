@@ -104,28 +104,45 @@ function enrichBusinessWithAudit(raw: {
   // Only assign email if real website exists; never construct fake domains that bounce
   const email = raw.isVerifiedWebsite && domainClean ? `info@${domainClean}` : "";
 
-  const slug = raw.name.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-");
-  const previewUrl = `https://agency-landing-page-smoky-psi.vercel.app/preview/${slug}`;
+  const previewParams = new URLSearchParams();
+  if (raw.name) previewParams.set("name", raw.name);
+  if (raw.niche) previewParams.set("industry", raw.niche);
+  if (raw.city || raw.location) previewParams.set("city", raw.city || raw.location);
+  if (raw.phone) previewParams.set("phone", raw.phone);
+  const slug = raw.name.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+  const previewUrl = `https://agency-landing-page-smoky-psi.vercel.app/preview/${slug}?${previewParams.toString()}`;
 
-  const coldEmailSubject = `Quick question regarding ${raw.name} mobile intake`;
-  const coldEmailBody = `Hey ${contactName},
+  const coldEmailSubject = `Idea for ${raw.name}`;
 
-I was looking at ${domainClean || raw.name} and noticed your mobile site takes about ${mobileLoadTimeSec} seconds to load.
+  const specRaw = (raw.niche || "auto repair").toLowerCase();
+  const industryPhrase = specRaw.includes("european")
+    ? "European auto repair shops"
+    : specRaw.includes("transmission")
+    ? "transmission and drivetrain repair shops"
+    : specRaw.includes("ecu") || specRaw.includes("diagnostic")
+    ? "engine diagnostic and repair shops"
+    : specRaw.includes("diesel") || specRaw.includes("fleet")
+    ? "commercial fleet and diesel repair shops"
+    : "auto repair shops";
 
-When local drivers search on mobile for urgent repair or diagnostics in ${raw.city || raw.location}, slow load times and cluttered menus cause them to bounce back to Google before reaching your service desk.
+  const cityText = raw.city || raw.location || "your area";
 
-To show what a dedicated mobile experience looks like, I put together a high-speed automotive intake prototype customized for ${raw.name}:
-Link: ${previewUrl}
+  const coldEmailBody = `Hi ${contactName},
 
-It provides one-tap phone calling, an interactive diagnostic intake flow, and immediate technician credibility on smartphones.
+I came across your website while looking at ${industryPhrase} in ${cityText} and wanted to share an idea.
 
-Take a look on your phone when convenient. If you'd like to put something similar in place for your inbound search visitors, I'd be glad to discuss getting it live.
+For drivers dealing with a warning light or an unexpected repair, finding the right service and contacting the shop quickly matters. I put together a mobile-focused prototype for ${raw.name} to demonstrate how the experience could be streamlined, with clearer service information, a more direct path to your service desk, and a guided diagnostic intake.
+
+Here’s the prototype:
+${previewUrl}
+
+It’s a concept, not a replacement for your existing website. I’d be happy to walk you through the idea and discuss whether it could be useful for your business.
 
 Best,
-Faruk — Lead Engineer, Speedcraft Studio
-Direct: farukolawale509@gmail.com`;
+Faruk
+Lead Engineer, Speedcraft Studio`;
 
-  const linkedInMessage = `Hey ${contactName}, saw ${domainClean || raw.name}. Drivers searching for auto repair in ${raw.city || raw.location} need instant phone contact, but mobile load time is ${mobileLoadTimeSec}s. I built a sub-second diagnostic intake prototype for ${raw.name}: ${previewUrl} — thought you might want to see how fast it feels on mobile.`;
+  const linkedInMessage = `Hi ${contactName}, came across ${raw.name} while looking at ${industryPhrase} in ${cityText}. Put together a mobile prototype to show how service information and diagnostic intake could be streamlined for drivers on their phones: ${previewUrl} — thought you might find the concept interesting!`;
 
   return {
     company: raw.name,

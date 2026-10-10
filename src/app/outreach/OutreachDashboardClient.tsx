@@ -408,16 +408,12 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
 
     const params = new URLSearchParams();
     if (lead.company) params.set("name", lead.company);
-    if (lead.city) params.set("city", lead.city);
     const spec = lead.specialization || lead.industry || lead.niche || "European Vehicle Specialist";
     params.set("industry", spec);
-    params.set("niche", spec);
+    if (lead.city) params.set("city", lead.city);
     if (lead.phone) params.set("phone", lead.phone);
     const brandColor = lead.primaryColor || getArchetypePrimaryColor(spec, "UrgentService");
     if (brandColor) params.set("primaryColor", brandColor);
-    if (lead.website) params.set("domain", lead.website);
-    if (lead.mobilePageSpeed) params.set("speed", String(lead.mobilePageSpeed));
-    if (lead.mobileLoadTimeSec) params.set("load", String(lead.mobileLoadTimeSec));
 
     const queryString = params.toString();
     return queryString ? `${base}/preview/${slug}?${queryString}` : `${base}/preview/${slug}`;
@@ -493,102 +489,92 @@ export function OutreachDashboardClient({ initialSentRecords = [] }: OutreachCli
     }
   };
 
-  // ─── AUTOMOTIVE OUTREACH MESSAGING STRATEGY ───
+  // Helper to format natural industry phrasing for email copy
+  const getIndustrySearchPhrase = (niche?: string): string => {
+    const lower = (niche || "").toLowerCase();
+    if (lower.includes("european")) return "European auto repair shops";
+    if (lower.includes("transmission")) return "transmission and drivetrain repair shops";
+    if (lower.includes("ecu") || lower.includes("diagnostic")) return "engine diagnostic and repair shops";
+    if (lower.includes("diesel") || lower.includes("fleet")) return "commercial fleet and diesel repair shops";
+    return "auto repair shops";
+  };
+
+  // ─── CREDIBLE AUTOMOTIVE OUTREACH MESSAGING STRATEGY ───
   const getEmailSubject = (lead: Lead): string => {
-    const hasAds = lead.hasAdTags !== undefined ? lead.hasAdTags : (lead.hasMarketingPixels ?? false);
-    if (hasAds) {
-      return `Quick question regarding ${lead.company} mobile intake`;
-    }
-    return `Mobile landing experience for ${lead.company}`;
+    return `Idea for ${lead.company}`;
   };
 
   const getInitialEmail = (lead: Lead): string => {
-    const domainClean = lead.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
     const previewUrl = getPreviewUrlForLead(lead, true);
-    const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Service Team`;
-    const hasAds = lead.hasAdTags !== undefined ? lead.hasAdTags : (lead.hasMarketingPixels ?? false);
-    const spec = lead.specialization || lead.niche || "automotive repair & diagnostics";
+    const greeting = lead.contactName && lead.contactName !== "there" && !lead.contactName.includes("Team")
+      ? lead.contactName
+      : `${lead.company} Team`;
+    const spec = lead.specialization || lead.niche || "auto repair";
+    const industryPhrase = getIndustrySearchPhrase(spec);
     const city = lead.city || "your area";
 
-    // Strategy A: Verified Paid-Advertising Evidence
-    if (hasAds) {
-      return `Hey ${greeting},
+    return `Hi ${greeting},
 
-I was looking at ${domainClean} and noticed you have advertising tags configured for your search traffic, but your mobile landing experience takes about ${lead.mobileLoadTimeSec} seconds to load.
+I came across your website while looking at ${industryPhrase} in ${city} and wanted to share an idea.
 
-When drivers search for a specialist with an urgent warning light or repair need in ${city}, every second of delay causes them to bounce back to the search results before reaching your service advisor.
+For drivers dealing with a warning light or an unexpected repair, finding the right service and contacting the shop quickly matters. I put together a mobile-focused prototype for ${lead.company} to demonstrate how the experience could be streamlined, with clearer service information, a more direct path to your service desk, and a guided diagnostic intake.
 
-To show what a dedicated mobile experience looks like, I put together a lightweight, instant-loading diagnostic prototype customized for ${lead.company}:
-Link: ${previewUrl}
+Here’s the prototype:
+${previewUrl}
 
-It gives drivers one-tap access to your service desk, an interactive diagnostic intake breakdown, and immediate reassurance of your ${spec} capabilities on any smartphone.
-
-Take a look on your phone whenever you have a moment. If you'd like to put something similar in place for your incoming search traffic, I'd be glad to walk through the implementation.
+It’s a concept, not a replacement for your existing website. I’d be happy to walk you through the idea and discuss whether it could be useful for your business.
 
 Best,
-Faruk — Lead Engineer, Speedcraft Studio
-Direct: farukolawale509@gmail.com`;
-    }
-
-    // Strategy B: No Detected Advertising Signals (Organic Search & Usability Focus)
-    return `Hey ${greeting},
-
-I came across ${domainClean} while researching reputable ${spec} shops in ${city}. Your shop clearly has strong technical capabilities, but your current mobile site takes about ${lead.mobileLoadTimeSec} seconds to load.
-
-Most vehicle owners searching for a repair shop on mobile need two things immediately: clear confirmation that you specialize in their vehicle's issue, and frictionless contact with your service advisor.
-
-To illustrate how that can look, I built a high-performance mobile prototype tailored specifically for ${lead.company}:
-Link: ${previewUrl}
-
-It features instant sub-second loading, clear specialist service categories, and a streamlined repair order intake flow.
-
-Take a look on your phone when convenient. If you're interested in upgrading your local search conversion experience, I'd be happy to discuss getting this live for your shop.
-
-Best,
-Faruk — Lead Engineer, Speedcraft Studio
-Direct: farukolawale509@gmail.com`;
+Faruk
+Lead Engineer, Speedcraft Studio`;
   };
 
   const getFollowUp1 = (lead: Lead): string => {
     const previewUrl = getPreviewUrlForLead(lead, true);
-    const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Service Team`;
-    const city = lead.city || "your area";
+    const greeting = lead.contactName && lead.contactName !== "there" && !lead.contactName.includes("Team")
+      ? lead.contactName
+      : `${lead.company} Team`;
 
-    return `Hey ${greeting},
+    return `Hi ${greeting},
 
-Following up on my previous note about the mobile intake prototype I put together for ${lead.company}:
-Link: ${previewUrl}
+Following up on my note with the mobile concept I put together for ${lead.company}:
+${previewUrl}
 
-The goal was to demonstrate how much friction can be removed between an initial Google search and getting a driver on the phone with your service desk in ${city}.
+The goal was to demonstrate a clearer path for drivers looking for service or diagnostic help on their phones.
 
-Did you have a chance to pull it up on your phone?
+Did you have a chance to take a look?
 
 Best,
-Faruk`;
+Faruk
+Lead Engineer, Speedcraft Studio`;
   };
 
   const getFollowUp2 = (lead: Lead): string => {
     const previewUrl = getPreviewUrlForLead(lead, true);
-    const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Service Team`;
+    const greeting = lead.contactName && lead.contactName !== "there" && !lead.contactName.includes("Team")
+      ? lead.contactName
+      : `${lead.company} Team`;
 
-    return `Hey ${greeting},
+    return `Hi ${greeting},
 
-Quick final check to see if streamlining your mobile diagnostic booking and direct service phone calls is a priority for ${lead.company} this quarter.
+Quick final check to see if reviewing the mobile prototype was of interest for ${lead.company}.
 
-If not, no worries at all—I'll leave the prototype active at ${previewUrl} in case you want to revisit it later.
+If the timing isn’t right, no worries at all—I'll leave the prototype active at ${previewUrl} in case it’s helpful down the road.
 
 Best,
-Faruk`;
+Faruk
+Lead Engineer, Speedcraft Studio`;
   };
 
   const getLinkedInText = (lead: Lead): string => {
-    const domainClean = lead.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "");
     const previewUrl = getPreviewUrlForLead(lead, true);
-    const greeting = lead.contactName && lead.contactName !== "there" ? lead.contactName : `${lead.company} Service Team`;
+    const greeting = lead.contactName && lead.contactName !== "there" && !lead.contactName.includes("Team")
+      ? lead.contactName
+      : `${lead.company} Team`;
     const spec = lead.specialization || lead.niche || "auto repair";
     const city = lead.city || "your area";
 
-    return `Hey ${greeting}, saw ${domainClean}. Drivers searching for ${spec} in ${city} need instant contact, but mobile load time is ${lead.mobileLoadTimeSec}s. I built a sub-second diagnostic intake prototype for ${lead.company}: ${previewUrl} — thought you might want to see how fast it feels on mobile.`;
+    return `Hi ${greeting}, came across ${lead.company} while looking at ${getIndustrySearchPhrase(spec)} in ${city}. Put together a mobile prototype to show how service information and diagnostic intake could be streamlined for drivers on their phones: ${previewUrl} — thought you might find the concept interesting!`;
   };
 
   const getModalContent = (lead: Lead, tab: "initial" | "followup_1" | "followup_2" | "linkedin") => {

@@ -363,16 +363,14 @@ export async function auditWebsiteAction(
       .replace(/-+/g, "-")
       .replace(/^-|-$/g, "");
 
-    const previewParams = new URLSearchParams({
-      name: company,
-      industry: qualCheck.specialization,
-      niche: qualCheck.specialization,
-      city,
-      phone,
-      domain: fullUrl,
-      speed: String(mobilePageSpeed),
-      load: String(loadTimeSec),
-    });
+    const previewParams = new URLSearchParams();
+    if (company) previewParams.set("name", company);
+    if (qualCheck.specialization) previewParams.set("industry", qualCheck.specialization);
+    if (city) previewParams.set("city", city);
+    if (phone) previewParams.set("phone", phone);
+    const brandColor = getArchetypePrimaryColor(qualCheck.specialization, "UrgentService");
+    if (brandColor) previewParams.set("primaryColor", brandColor);
+
     const previewUrl = `https://agency-landing-page-smoky-psi.vercel.app/preview/${companySlug}?${previewParams.toString()}`;
 
     // Ad Evidence Classification
@@ -382,50 +380,36 @@ export async function auditWebsiteAction(
       ? "no_detected_ads"
       : "inconclusive";
 
-    // ─── AUTOMOTIVE OUTREACH STRATEGIES ───
-    // Strategy A: Verified Paid-Advertising Signals
-    // Strategy B: No Detected Ad Signals / Organic Mobile Conversion Focus
-    const coldEmailSubject = hasAdTags
-      ? `Quick question regarding ${company} mobile intake`
-      : `Mobile landing experience for ${company}`;
+    // ─── CREDIBLE AUTOMOTIVE OUTREACH STRATEGY ───
+    const coldEmailSubject = `Idea for ${company}`;
 
-    const coldEmailBody = hasAdTags
-      ? `Hey ${contactName},
+    const specRaw = (qualCheck.specialization || "auto repair").toLowerCase();
+    const industryPhrase = specRaw.includes("european")
+      ? "European auto repair shops"
+      : specRaw.includes("transmission")
+      ? "transmission and drivetrain repair shops"
+      : specRaw.includes("ecu") || specRaw.includes("diagnostic")
+      ? "engine diagnostic and repair shops"
+      : specRaw.includes("diesel") || specRaw.includes("fleet")
+      ? "commercial fleet and diesel repair shops"
+      : "auto repair shops";
 
-I was looking at ${domain} and noticed you have advertising tags configured for your search traffic, but your mobile landing experience takes about ${loadTimeSec} seconds to load.
+    const coldEmailBody = `Hi ${contactName},
 
-When drivers search for a specialist with an urgent warning light or repair need in ${city}, every second of delay causes them to bounce back to the search results before reaching your service advisor.
+I came across your website while looking at ${industryPhrase} in ${city} and wanted to share an idea.
 
-To show what a dedicated mobile experience looks like, I put together a lightweight, instant-loading diagnostic prototype customized for ${company}:
-Link: ${previewUrl}
+For drivers dealing with a warning light or an unexpected repair, finding the right service and contacting the shop quickly matters. I put together a mobile-focused prototype for ${company} to demonstrate how the experience could be streamlined, with clearer service information, a more direct path to your service desk, and a guided diagnostic intake.
 
-It gives drivers one-tap access to your service desk, an interactive diagnostic intake breakdown, and immediate reassurance of your ${qualCheck.specialization} capabilities on any smartphone.
+Here’s the prototype:
+${previewUrl}
 
-Take a look on your phone whenever you have a moment. If you'd like to put something similar in place for your incoming search traffic, I'd be glad to walk through the implementation.
-
-Best,
-Faruk — Lead Engineer, Speedcraft Studio
-Direct: farukolawale509@gmail.com`
-      : `Hey ${contactName},
-
-I came across ${domain} while researching reputable ${qualCheck.specialization} shops in ${city}. Your shop clearly has strong technical capabilities, but your current mobile site takes about ${loadTimeSec} seconds to load.
-
-Most vehicle owners searching for a repair shop on mobile need two things immediately: clear confirmation that you specialize in their vehicle's issue, and frictionless contact with your service advisor.
-
-To illustrate how that can look, I built a high-performance mobile prototype tailored specifically for ${company}:
-Link: ${previewUrl}
-
-It features instant sub-second loading, clear specialist service categories, and a streamlined repair order intake flow.
-
-Take a look on your phone when convenient. If you're interested in upgrading your local search conversion experience, I'd be happy to discuss getting this live for your shop.
+It’s a concept, not a replacement for your existing website. I’d be happy to walk you through the idea and discuss whether it could be useful for your business.
 
 Best,
-Faruk — Lead Engineer, Speedcraft Studio
-Direct: farukolawale509@gmail.com`;
+Faruk
+Lead Engineer, Speedcraft Studio`;
 
-    const linkedInMessage = hasAdTags
-      ? `Hey ${contactName}, saw ${domain}. Drivers searching for ${qualCheck.specialization} in ${city} need instant contact, but mobile load time is ${loadTimeSec}s. I built a sub-second diagnostic intake prototype for ${company}: ${previewUrl} — want to check it out?`
-      : `Hey ${contactName}, saw ${domain}. Built a sub-second mobile prototype tailored for ${company} with streamlined diagnostic intake and one-tap calling: ${previewUrl} — thought you might want to see how fast it feels on mobile.`;
+    const linkedInMessage = `Hi ${contactName}, came across ${company} while looking at ${industryPhrase} in ${city}. Put together a mobile prototype to show how service information and diagnostic intake could be streamlined for drivers on their phones: ${previewUrl} — thought you might find the concept interesting!`;
 
     // Lead Object with industry and hasAdTags
     const newLead: AuditedLead = {
